@@ -1,0 +1,50 @@
+{
+  "name": "basteyy/webstatt",
+  "description": "Webstatt is a free Content Management System written in PHP ",
+  "license": [
+    "Creative Commons Attribution Non Commercial Share Alike 4.0 International",
+    false,
+    false
+  ],
+  "authors": [
+    {
+      "name": "Sebastian Eiweleit",
+      "homepage": "https://eiweleit.de",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "basteyy\\Webstatt\\": "src/"
+    }
+  },
+  "repositories": [
+    {
+      "url": "https://github.com/basteyy/slim-session.git",
+      "type": "vcs"
+    }
+  ],
+  "require": {
+    "slim/slim": "4.*",
+    "league/plates": "^3.4",
+    "slim/psr7": "^1.5",
+    "php-di/slim-bridge": "^3.2",
+    "filp/whoops": "^2.14",
+    "basteyy/plates-url-toolset": "dev-master",
+    "basteyy/plates-local-assets-copy": "dev-master",
+    "tmarois/filebase": "^v1.0.24",
+    "basteyy/scss-php-builder": "dev-master",
+    "basteyy/various-php-snippets": "dev-master",
+    "rakibtg/sleekdb": "^2.13",
+    "basteyy/minimal-hash-wrapper": "^1.0",
+    "bryanjhv/slim-session": "dev-master"
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "scripts": {
+    "post-update-cmd": "basteyy\\Webstatt\\bin\\Setup::run",
+    "i18n-webstatt-de": " php vendor/basteyy/various-php-snippets/bin/i18n.php basteyy/webstatt/src/ basteyy/webstatt/src/Resources/Languages/de_DE.ini",
+    "i18n-webstatt-en": " php vendor/basteyy/various-php-snippets/bin/i18n.php basteyy/webstatt/src/ basteyy/webstatt/src/Resources/Languages/en_US.ini"
+  }
+}
