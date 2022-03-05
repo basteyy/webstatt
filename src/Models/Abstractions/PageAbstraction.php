@@ -7,8 +7,6 @@ namespace basteyy\Webstatt\Models\Abstractions;
 use basteyy\Webstatt\Enums\ContentType;
 use basteyy\Webstatt\Services\ConfigService;
 use Exception;
-use Filebase\Config;
-use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 use function basteyy\VariousPhpSnippets\__;
 use function basteyy\VariousPhpSnippets\getRandomString;
@@ -136,8 +134,12 @@ final class PageAbstraction
         return $this->keywords;
     }
 
-    public function getLayout() : string|null {
+    public function getLayout() : string {
         return $this->layout;
+    }
+
+    public function hasLayout() : bool {
+        return strlen($this->layout) > 0 && 'NONE' !== $this->layout;
     }
 
     public function getBody(): string
@@ -171,7 +173,7 @@ final class PageAbstraction
      * Return the absolute filepath for the file
      * @return string
      */
-    #[Pure] private function getAbsoluteFilePath() : string {
+    #[Pure] public function getAbsoluteFilePath() : string {
         return $this->getPath() . DIRECTORY_SEPARATOR . $this->file_name . $this->getFileExtension();
     }
 
@@ -194,6 +196,10 @@ final class PageAbstraction
         if ($this->isDifferentBody($body)) {
             $this->makeBackup();
         }
+
+        if(!is_dir($this->path . DIRECTORY_SEPARATOR . $this->backup_folder_name)) {
+            mkdir($folder = $this->path . DIRECTORY_SEPARATOR . $this->backup_folder_name, 0755, true);
+    }
 
         file_put_contents($this->getAbsoluteFilePath(), $body);
     }
@@ -271,7 +277,7 @@ final class PageAbstraction
      * Build the array for storing it
      * @return array
      */
-    #[ArrayShape(['title' => "mixed|string", 'name' => "mixed", 'url' => "string", 'description' => "mixed|string", 'keywords' => "mixed|string", 'path' => "mixed|string", 'online' => "bool|mixed", 'secret' => "mixed|string", 'layout' => "mixed|string"])] public function toArray(): array
+    public function toArray(): array
     {
         return [
             'title'       => $this->title,
@@ -283,6 +289,7 @@ final class PageAbstraction
             'online'      => $this->online,
             'secret'      => $this->secret,
             'layout'      => $this->layout,
+            'contentType' => $this->contentType
         ];
     }
 

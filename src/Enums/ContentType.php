@@ -5,6 +5,6 @@ namespace basteyy\Webstatt\Enums;
 
 enum ContentType: string
 {
-    case MARKDOWN = 'markdown';
-    case HTML_PHP = 'html';
+    case MARKDOWN = 'MARKDOWN';
+    case HTML_PHP = 'HTML_PHP';
 }

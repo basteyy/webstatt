@@ -1,7 +1,6 @@
 
-<textarea id="_body" name="body" class="form-text">
 
-</textarea>
+<textarea id="_body" name="body" class="form-text"><?= $page->getBody() ?></textarea>
 
 
 <link rel="stylesheet" href="<?= $this->cacheLocal('https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css') ?>"

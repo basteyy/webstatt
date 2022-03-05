@@ -5,20 +5,17 @@ declare(strict_types=1);
 namespace basteyy\Webstatt\Controller\Content;
 
 use basteyy\Webstatt\Controller\Controller;
-use basteyy\Webstatt\Enums\ContentType;
 use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Models\Abstractions\PageAbstraction;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use SleekDB\Exceptions\IdNotAllowedException;
 use SleekDB\Exceptions\InvalidArgumentException;
 use SleekDB\Exceptions\InvalidConfigurationException;
 use SleekDB\Exceptions\IOException;
-use SleekDB\Exceptions\JsonException;
+use SplFileInfo;
 use function basteyy\VariousPhpSnippets\__;
-use function basteyy\VariousPhpSnippets\varDebug;
 
 class ViewContentVersionController extends Controller
 {
@@ -41,20 +38,22 @@ class ViewContentVersionController extends Controller
 
         $page = new PageAbstraction($page, $this->getConfigService());
 
-        foreach($page->getAllVersions() as $timestamp => $path) {
-            if(basename($path) === $version_file_name) {
+        foreach ($page->getAllVersions() as $timestamp => $path) {
+
+            $file = new SplFileInfo($path);
+
+            if ($file->getBasename('.' . $file->getExtension()) === $version_file_name) {
                 $version_content = file_get_contents($path);
             }
         }
 
-        if(!isset($version_content)) {
+        if (!isset($version_content)) {
             FlashMessages::addErrorMessage(__('Version %s of the page not found.', $version_file_name));
             return $this->redirect('/admin/content/edit/' . $content_page_secret);
         }
 
-
         return $this->render('content/version', [
-            'page' => $page,
+            'page'         => $page,
             'version_body' => $version_content
         ]);
     }

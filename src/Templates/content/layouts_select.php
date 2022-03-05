@@ -2,6 +2,7 @@
 
 use function basteyy\VariousPhpSnippets\__;
 
+/** @var \basteyy\Webstatt\Models\Abstractions\PageAbstraction $page */
 ?>
 <div class="col-12">
     <label class="form-label" for="_layout">
@@ -11,7 +12,7 @@ use function basteyy\VariousPhpSnippets\__;
         <option value="NONE"><?= __('No layout') ?></option>
         <?php
         foreach ($this->getLayouts() as $layout) {
-            printf('<option value="%1$s">%1$s</option>', $layout);
+            printf('<option value="%1$s"%2$s>%1$s</option>', $layout, isset($page) && $layout === $page->getLayout() ? ' selected' : '');
         } ?>
     </select>
     <p class="text-xs mt-2 alert alert-info">

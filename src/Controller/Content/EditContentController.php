@@ -47,6 +47,7 @@ class EditContentController extends Controller
 
             $patched_page->updateBody($request->getParsedBody()['body']);
 
+
             $this->getContentPagesDatabase()->updateById($patched_page->getId(), $patched_page->toArray());
 
             FlashMessages::addSuccessMessage(__('Changes are saved'));

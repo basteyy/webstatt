@@ -18,7 +18,10 @@ use function basteyy\VariousPhpSnippets\__;
         <optgroup label="<?= __('Please select') ?>">
             <?php
             foreach ($page->getAllVersions() as $version) {
-                printf('<option value="%1$s">%2$s</option>', basename($version), __('Version from %s', date('d M Y H:i:s', filemtime($version))));
+
+                $file = new SplFileInfo($version);
+
+                printf('<option value="%1$s">%2$s</option>', basename($file->getBasename(), '.' . $file->getExtension()), __('Version from %s', date('d M Y H:i:s', filemtime($version))));
             }
             ?>
         </optgroup>

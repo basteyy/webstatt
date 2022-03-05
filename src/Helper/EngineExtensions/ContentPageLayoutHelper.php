@@ -10,7 +10,6 @@
 
 declare(strict_types=1);
 
-
 namespace basteyy\Webstatt\Helper\EngineExtensions;
 
 use League\Plates\Engine;
@@ -22,7 +21,7 @@ final class ContentPageLayoutHelper implements ExtensionInterface
 
     public function __construct(array $layouts)
     {
-        $this->layouts = $layouts;
+        $this->layouts = $layouts ?? [];
     }
 
     public function register(Engine $engine)

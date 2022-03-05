@@ -260,11 +260,9 @@ class Webstatt
             }
 
             /** Content Pages Layout */
-            if($this->template_layouts) {
                 $this->getApp()->getContainer()->get(Engine::class)->loadExtension(
                     new ContentPageLayoutHelper($this->template_layouts)
                 );
-            }
 
 
             $this->getApp()->run($this->request);
