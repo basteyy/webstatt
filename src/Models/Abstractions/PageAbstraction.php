@@ -8,6 +8,7 @@ use basteyy\Webstatt\Enums\ContentType;
 use basteyy\Webstatt\Services\ConfigService;
 use Exception;
 use Filebase\Config;
+use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 use function basteyy\VariousPhpSnippets\__;
 use function basteyy\VariousPhpSnippets\getRandomString;
@@ -23,6 +24,7 @@ final class PageAbstraction
     private string $keywords;
     private string $body;
     private string $secret;
+    private string $layout;
     private ContentType $contentType;
     private bool $online;
     private ConfigService $configService;
@@ -72,6 +74,7 @@ final class PageAbstraction
         }
 
         $this->path = $data['path'];
+        $this->layout = $data['layout'] ?? '';
         $this->name = $data['name'] ?? $data['title'];
         $this->title = $data['title'];
         $this->url = isset($data['url']) ? slugify($data['url']) : '';
@@ -131,6 +134,10 @@ final class PageAbstraction
     public function getKeywords(): string
     {
         return $this->keywords;
+    }
+
+    public function getLayout() : string|null {
+        return $this->layout;
     }
 
     public function getBody(): string
@@ -198,7 +205,7 @@ final class PageAbstraction
      */
     private function isDifferentBody(string $new_body)
     {
-        return hash('xxh3', $new_body) !== hash('xxh3', $this->loadBody());
+        return strlen($this->loadBody()) > 0 && hash('xxh3', $new_body) !== hash('xxh3', $this->loadBody());
     }
 
     /**
@@ -236,6 +243,10 @@ final class PageAbstraction
     public function getAllVersions() : array {
         $folder = $this->path . DIRECTORY_SEPARATOR . $this->backup_folder_name;
 
+        if(!is_dir($folder)) {
+            return [];
+        }
+
         $dir = new \DirectoryIterator($folder);
 
         foreach($dir as $file) {
@@ -244,6 +255,10 @@ final class PageAbstraction
                 // Valid look file .. :-)
                 $versions[$file->getMTime()] = $file->getRealPath();
             }
+        }
+
+        if(!isset($versions)) {
+            return [];
         }
 
         ksort($versions);
@@ -256,7 +271,7 @@ final class PageAbstraction
      * Build the array for storing it
      * @return array
      */
-    public function toArray()
+    #[ArrayShape(['title' => "mixed|string", 'name' => "mixed", 'url' => "string", 'description' => "mixed|string", 'keywords' => "mixed|string", 'path' => "mixed|string", 'online' => "bool|mixed", 'secret' => "mixed|string", 'layout' => "mixed|string"])] public function toArray(): array
     {
         return [
             'title'       => $this->title,
@@ -267,6 +282,7 @@ final class PageAbstraction
             'path'        => $this->path,
             'online'      => $this->online,
             'secret'      => $this->secret,
+            'layout'      => $this->layout,
         ];
     }
 

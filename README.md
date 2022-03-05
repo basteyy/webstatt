@@ -188,4 +188,4 @@ $website->addWebsiteTemplateLayouts([
 ```
 
 While creating and editing your content pages, you can select one of the layouts. On that way, the content page content will be dispatched into the layout. Be aware, that you 
-have access inside the layout to the content page variables by using `$page`. `$page` is a instance of the PageAbstraction. 
+have access inside the layout to the content page variables by using `$page`. `$page` is a instance of the [PageAbstraction](https://github.com/basteyy/webstatt/blob/master/src/Models/Abstractions/PageAbstraction.php). 

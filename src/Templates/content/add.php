@@ -15,7 +15,7 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Add new content')]);
 
 
 <form class="row g-5" method="post" action="<?= $this->getCurrentUrl() ?>">
-    <div class="col-md-6">
+    <div class="col-md-4">
         <h2><?= __('Basic data') ?></h2>
 
         <div class="row g-3">
@@ -27,29 +27,11 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Add new content')]);
                 <label for="_name" class="form-label"><?= __('Intern name of the page') ?></label>
                 <input type="text" class="form-control" id="_name" name="name" placeholder="<?= __('Intern name of the page') ?>" required>
             </div>
-            <div class="col-12">
-                <label for="_type" class="form-label"><?= __('Type') ?></label>
-                <select class="form-select" id="_type" name="contentType">
-                    <optgroup label="<?= __('Please select') ?>">
-                        <?php
-                        foreach (ContentType::cases() as $case) {
-                            printf('<option value="%s">%s</option>', $case->name, $case->value);
-                        }
-                        ?>
-                    </optgroup>
-                </select>
 
-                <p class="text-xs mt-2 alert alert-info">
-                    <strong>Inhaltstypen</strong> legt fest, wei der Inhalte vom System verarbeitet wird. <code><?=
-                        ContentType::MARKDOWN->value ?></code> bedeutet, dass der Inhalt danach als <a href="https://www.markdownguide.org"
-                                                                                                       target="_blank">Markdown</a> verarbeitet wird.
-                    Die zweite Variante ist aktuell <code><?= ContentType::HTML_PHP->value ?></code>, bei welchen eine umfängliche Bearbeitung möglich ist.
-                </p>
-            </div>
         </div>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-4">
         <h2><?= __('SEO data') ?></h2>
 
         <div class="row g-3">
@@ -70,6 +52,34 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Add new content')]);
             </div>
         </div>
     </div>
+
+
+    <div class="col-md-4">
+        <h2><?= __('Settings') ?></h2>
+        <div class="row g-3">
+        <div class="col-12">
+            <label for="_type" class="form-label"><?= __('Type') ?></label>
+            <select class="form-select" id="_type" name="contentType">
+                <optgroup label="<?= __('Please select') ?>">
+                    <?php
+                    foreach (ContentType::cases() as $case) {
+                        printf('<option value="%s">%s</option>', $case->name, $case->value);
+                    }
+                    ?>
+                </optgroup>
+            </select>
+
+            <p class="text-xs mt-2 alert alert-info">
+                <?= __('<strong>Content types</strong> define the processing of the content page.') ?>
+            </p>
+        </div>
+        <?php
+        if($this->getLayouts() !== null && count($this->getLayouts()) > 0 ) {
+            echo $this->fetch('Webstatt::content/layouts_select');
+        }
+        ?></div>
+    </div>
+
 
 
     <div class="col-12">

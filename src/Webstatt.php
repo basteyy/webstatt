@@ -17,6 +17,7 @@ use basteyy\PlatesUrlToolset\PlatesUrlToolset;
 use basteyy\VariousPhpSnippets\i18n;
 use basteyy\Webstatt\Controller\Content\DispatchContentController;
 use basteyy\Webstatt\Helper\AdminNavbarItem;
+use basteyy\Webstatt\Helper\EngineExtensions\ContentPageLayoutHelper;
 use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Helper\UserSession;
 use basteyy\Webstatt\Services\ConfigService;
@@ -54,8 +55,9 @@ class Webstatt
     /** @var array */
     private array $config;
     private array $template_navbar_items = [];
+    private array $template_layouts = [];
 
-    public function __construct(array $options)
+    public function __construct(array $options = [])
     {
         if(isset($options['debug']) && is_bool($options['debug'])) {
             $this->config['debug'] = $options['debug'];
@@ -255,6 +257,13 @@ class Webstatt
             /** Push more admin navbar items to the template */
             if ($this->template_navbar_items && count($this->template_navbar_items) > 0) {
                 $this->getApp()->getContainer()->get(Engine::class)->addData(['additional_admin_nav_items' => $this->template_navbar_items], 'Webstatt::layouts/acp');
+            }
+
+            /** Content Pages Layout */
+            if($this->template_layouts) {
+                $this->getApp()->getContainer()->get(Engine::class)->loadExtension(
+                    new ContentPageLayoutHelper($this->template_layouts)
+                );
             }
 
 
