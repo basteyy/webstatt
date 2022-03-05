@@ -1,10 +1,13 @@
-# Welcome to website - a website
+# Welcome to Webstatt - perhaps your next Content Management System
 
-Webstatt is written in PHP and a flat-file content management system for (hopefully) rapid website development. 
+Webstatt is written in PHP and made use of a flat-file database system. 
+Perhaps you're asking yourself, what it is, what webstat makes special. Actually more or less it's a typical CMS. But perhaps the approach is lightly different. Instead of 
+define your website, webstatt allows you to 
+create the website by using the admin control panel and a few methods. Wann start? See the setup section. 
 
 ## Features
 
-In the following I try to explain the features website comes with. 
+In the following I try to explain the features webstatt comes with. 
 
 The features at the glance:
 
