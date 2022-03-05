@@ -34,6 +34,6 @@ class DashboardController extends Controller
         /** @var $response Response */
 
 
-        return $this->render('dashboard');
+        return $this->render('Webstatt::dashboard');
     }
 }
