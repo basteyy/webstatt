@@ -1,11 +1,7 @@
 {
   "name": "basteyy/webstatt",
   "description": "Webstatt is a free Content Management System written in PHP ",
-  "license": [
-    "Creative Commons Attribution Non Commercial Share Alike 4.0 International",
-    false,
-    false
-  ],
+  "license": "CC-BY-SA-4.0",
   "authors": [
     {
       "name": "Sebastian Eiweleit",
