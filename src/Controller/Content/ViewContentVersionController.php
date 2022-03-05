@@ -52,7 +52,7 @@ class ViewContentVersionController extends Controller
             return $this->redirect('/admin/content/edit/' . $content_page_secret);
         }
 
-        return $this->render('content/version', [
+        return $this->render('Webstatt::content/version', [
             'page'         => $page,
             'version_body' => $version_content
         ]);

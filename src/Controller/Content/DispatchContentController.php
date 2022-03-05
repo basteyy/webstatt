@@ -38,7 +38,7 @@ class DispatchContentController extends Controller
             return $this->render_404();
         }
 
-        return $this->render('content/dispatch', [
+        return $this->render('Webstatt::content/dispatch', [
             'page' => new PageAbstraction($page)
         ]);
     }

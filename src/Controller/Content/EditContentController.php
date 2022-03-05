@@ -56,7 +56,7 @@ class EditContentController extends Controller
 
         }
 
-        return $this->render('content/edit', [
+        return $this->render('Webstatt::content/edit', [
             'page' => new PageAbstraction($page, $this->getConfigService())
         ]);
     }

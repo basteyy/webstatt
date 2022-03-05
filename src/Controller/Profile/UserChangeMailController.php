@@ -60,7 +60,7 @@ class UserChangeMailController extends Controller
             return $this->redirect('/admin/me/email');
         }
 
-        return $this->render('profile/change_mail', [
+        return $this->render('Webstatt::profile/change_mail', [
             'user' => $user
         ]);
     }

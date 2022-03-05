@@ -29,7 +29,7 @@ class ContentOverview extends Controller
     {
 
 
-        return $this->render('content/overview', [
+        return $this->render('Webstatt::content/overview', [
             'pages' => $this->getContentPagesDatabase()->findAll()
         ]);
     }

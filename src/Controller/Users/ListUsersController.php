@@ -29,7 +29,7 @@ class ListUsersController extends Controller
 
         }
 
-        return $this->render('users/overview', [
+        return $this->render('Webstatt::users/overview', [
             'users' => ($this->getUserDatabase())->findAll(),
             'primary_id' => ($this->getUserDatabase())->getPrimaryKey()
         ]);

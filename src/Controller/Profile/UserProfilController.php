@@ -44,7 +44,7 @@ class UserProfilController extends Controller
             return $this->redirect('/admin/me');
         }
 
-        return $this->render('profile/manage', [
+        return $this->render('Webstatt::profile/manage', [
             'user' => $user
         ]);
     }

@@ -27,7 +27,9 @@ use Exception;
 use Invoker\Exception\NotCallableException;
 use League\Plates\Engine;
 use League\Plates\Extension\URI;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use SleekDB\Store;
 use Slim\App;
@@ -38,7 +40,6 @@ use SlimSession\Helper;
 use Throwable;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
-use function basteyy\VariousPhpSnippets\varDebug;
 use function DI\create;
 
 class Webstatt
@@ -54,15 +55,15 @@ class Webstatt
 
     /** @var array */
     private array $config;
+
+    /** @var array Array for Navbar Items */
     private array $template_navbar_items = [];
+
+    /** @var array Array for the supported layouts */
     private array $template_layouts = [];
 
     public function __construct(array $options = [])
     {
-        if(isset($options['debug']) && is_bool($options['debug'])) {
-            $this->config['debug'] = $options['debug'];
-        }
-
         /** Yes, i'am lazy */
         define('DS', DIRECTORY_SEPARATOR);
 
@@ -88,11 +89,17 @@ class Webstatt
                 throw new Exception(sprintf('No default-config file found at "%s"', PACKAGE_ROOT . DS . 'config.ini'));
             }
 
+            /** Load the default config */
             $this->config = parse_ini_file(PACKAGE_ROOT . DS . 'config.ini', false);
 
             /** Try to load the config from the config.ini in root folder */
             if (file_exists(ROOT . DS . 'config.ini')) {
                 $this->config = array_merge($this->config, parse_ini_file(ROOT . DS . 'config.ini', false));
+            }
+
+            /** Is Debug-Mode forced? */
+            if (isset($options['debug']) && is_bool($options['debug'])) {
+                $this->config['debug'] = $options['debug'];
             }
 
             /** Make the temp folder */
@@ -129,6 +136,7 @@ class Webstatt
             $builder = new ContainerBuilder();
             $builder->useAnnotations(false);
 
+            /** We need the request object later a few times inside the DI definitions */
             $request = $this->request;
 
             $builder->addDefinitions([
@@ -159,6 +167,7 @@ class Webstatt
                 }
             ]);
 
+            /** Build the app from DI Builder */
             $this->app = Bridge::create($builder->build());
 
 
@@ -171,7 +180,10 @@ class Webstatt
                 ])
             );
 
+            /** Register the FlashMessages Middleware */
             $this->app->add(FlashMessages::class);
+
+            /** Register the User Session Middleware */
             $this->app->add(UserSession::class);
 
             if (file_exists(SRC . 'routes' . DS . 'WebsiteRoutes.php')) {
@@ -194,6 +206,7 @@ class Webstatt
                 i18n::addTranslationFolder(SRC . 'Resources' . DS . 'Languages');
                 i18n::setTranslationLanguage('de_DE');
 
+                /** Include the Admin Routes */
                 include SRC . 'Routes' . DS . 'AdminRoutes.php';
             }
 
@@ -207,15 +220,25 @@ class Webstatt
 
     }
 
+    /**
+     * Run Exception Handler in Debuge State
+     * @param Throwable $exception
+     * @return void
+     */
     private function displayDebugPage(Throwable $exception)
     {
         (new Run())->pushHandler(new PrettyPageHandler())->handleException($exception);
     }
 
-    private function displayErrorPage()
+    /**
+     * Output a error page
+     * @param int $status_code
+     * @return void
+     */
+    private function displayErrorPage(int $status_code = 501)
     {
         ob_clean();
-        http_response_code(501);
+        http_response_code($status_code);
         echo file_get_contents(SRC . 'Templates' . DS . 'layouts' . DS . 'offline.php');
         die();
     }
@@ -230,10 +253,18 @@ class Webstatt
      * @param array $layouts
      * @return void
      */
-    public function addWebsiteTemplateLayouts(array $layouts) : void {
+    public function addWebsiteTemplateLayouts(array $layouts): void
+    {
         $this->template_layouts = $layouts;
     }
 
+    /**
+     * Add your website template folder to the scope
+     * @param string $template_folder
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function addWebsiteTemplateFolder(string $template_folder): void
     {
         /** @var Engine $engine */
@@ -242,11 +273,19 @@ class Webstatt
         $engine->setDirectory($template_folder);
     }
 
+    /**
+     * Get the Slim App
+     * @return App
+     */
     public function getApp(): App
     {
         return $this->app;
     }
 
+    /**
+     * Run Webstatt
+     * @return void
+     */
     public function run()
     {
         try {
@@ -257,12 +296,13 @@ class Webstatt
             }
 
             /** Content Pages Layout */
-                $this->getApp()->getContainer()->get(Engine::class)->loadExtension(
-                    new ContentPageLayoutHelper($this->template_layouts)
-                );
+            $this->getApp()->getContainer()->get(Engine::class)->loadExtension(
+                new ContentPageLayoutHelper($this->template_layouts)
+            );
 
-
+            /** Run Slim 4 */
             $this->getApp()->run($this->request);
+
         } catch (Exception|NotCallableException|Throwable $exception) {
             if (isset($this->config) && ($this->config['debug'] || $this->config['website'] === 'development')) {
                 $this->displayDebugPage($exception);

@@ -48,6 +48,6 @@ class AddContentController extends Controller
 
         }
 
-        return $this->render('content/add');
+        return $this->render('Webstatt::content/add');
     }
 }

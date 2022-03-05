@@ -66,6 +66,6 @@ class AddUserController extends Controller
             return $this->redirect('/admin/users/add');
         }
 
-        return $this->render('users/add');
+        return $this->render('Webstatt::users/add');
     }
 }
