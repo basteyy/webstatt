@@ -28,7 +28,6 @@
     "filp/whoops": "^2.14",
     "basteyy/plates-url-toolset": "dev-master",
     "basteyy/plates-local-assets-copy": "dev-master",
-    "tmarois/filebase": "^v1.0.24",
     "basteyy/scss-php-builder": "dev-master",
     "basteyy/various-php-snippets": "dev-master",
     "rakibtg/sleekdb": "^2.13",
