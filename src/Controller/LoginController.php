@@ -87,6 +87,6 @@ class LoginController extends Controller
 
         }
 
-        return $this->render('login');
+        return $this->render('Webstatt::login');
     }
 }
