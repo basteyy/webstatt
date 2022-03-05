@@ -100,9 +100,6 @@ class Webstatt
                 mkdir(TEMP, 0755, true);
             }
 
-            /** Make the composer magic happen */
-            require ROOT . DS . 'vendor' . DS . 'autoload.php';
-
             /** Yes, I create  the request here manually. See below for the why */
             /** @var Request $request */
             $this->request = (ServerRequestCreatorFactory::create())->createServerRequestFromGlobals();
