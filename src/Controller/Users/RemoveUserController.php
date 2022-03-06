@@ -1,4 +1,12 @@
 <?php
+/**
+ * Webstatt
+ *
+ * @author Sebastian Eiweleit <sebastian@eiweleit.de>
+ * @website https://webstatt.org
+ * @website https://github.com/basteyy/webstatt
+ * @license CC BY-SA 4.0
+ */
 
 declare(strict_types=1);
 
@@ -9,12 +17,12 @@ use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Helper\FlashMessages;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use SleekDB\Exceptions\IdNotAllowedException;
 use SleekDB\Exceptions\InvalidArgumentException;
+use SleekDB\Exceptions\InvalidConfigurationException;
 use SleekDB\Exceptions\IOException;
-use SleekDB\Exceptions\JsonException;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
+use function basteyy\VariousPhpSnippets\__;
 
 class RemoveUserController extends Controller
 {
@@ -22,9 +30,8 @@ class RemoveUserController extends Controller
 
     /**
      * @throws IOException
-     * @throws JsonException
      * @throws InvalidArgumentException
-     * @throws IdNotAllowedException
+     * @throws InvalidConfigurationException
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, string $user_secret): ResponseInterface
     {
@@ -33,13 +40,13 @@ class RemoveUserController extends Controller
 
         $user = ($this->getUserDatabase())->findOneBy(['secret', '=', $user_secret]);
 
-        if($user[$this->getConfigService()->database_primary_key] === $this->_current_user_data[$this->getConfigService()->database_primary_key]) {
-            FlashMessages::addErrorMessage('You  cannot delete your own account');
+        if ($user[$this->getConfigService()->database_primary_key] === $this->_current_user_data->getId()) {
+            FlashMessages::addErrorMessage(__('You  cannot delete your own account'));
             return $this->redirect('/admin/users');
         }
 
         $this->getUserDatabase()->deleteById($user[$this->getConfigService()->database_primary_key]);
-        FlashMessages::addSuccessMessage(sprintf('User %s was delted succesfully', $user['email']));
+        FlashMessages::addSuccessMessage(__('User %s was deleted successfully', $user['email']));
         return $this->redirect('/admin/users');
 
     }

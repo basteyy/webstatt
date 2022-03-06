@@ -1,4 +1,12 @@
 <?php
+/**
+ * Webstatt
+ *
+ * @author Sebastian Eiweleit <sebastian@eiweleit.de>
+ * @website https://webstatt.org
+ * @website https://github.com/basteyy/webstatt
+ * @license CC BY-SA 4.0
+ */
 
 declare(strict_types=1);
 
@@ -12,10 +20,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SleekDB\Exceptions\IdNotAllowedException;
 use SleekDB\Exceptions\InvalidArgumentException;
+use SleekDB\Exceptions\InvalidConfigurationException;
 use SleekDB\Exceptions\IOException;
 use SleekDB\Exceptions\JsonException;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
+use function basteyy\VariousPhpSnippets\__;
 use function basteyy\VariousPhpSnippets\getRandomString;
 
 class LoginController extends Controller
@@ -26,7 +36,7 @@ class LoginController extends Controller
      * @throws IOException
      * @throws JsonException
      * @throws InvalidArgumentException
-     * @throws IdNotAllowedException
+     * @throws IdNotAllowedException|InvalidConfigurationException
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
@@ -46,7 +56,7 @@ class LoginController extends Controller
 
                 $salt = getRandomString(32);
 
-                FlashMessages::addSuccessMessage('Account hinzugefügt.');
+                FlashMessages::addSuccessMessage(__('Your account was created. You are a super admin.'));
 
                 $db->insert([
                     'email'    => $email,
@@ -55,7 +65,7 @@ class LoginController extends Controller
                     'role'     => UserRole::SUPER_ADMIN,
                     'secret' => getRandomString(12),
                     'name' => '',
-                    'alias' => '',
+                    'alias' => ''
                 ]);
 
                 $user_id = $db->getLastInsertedId();
@@ -69,17 +79,17 @@ class LoginController extends Controller
                         $user_id = $user[$db->getPrimaryKey()];
                         $login = true;
                     } else {
-                        FlashMessages::addErrorMessage('Passwort falsch');
+                        FlashMessages::addErrorMessage(__('Password was incorrect'));
                     }
                 } else {
-                    FlashMessages::addErrorMessage('Ich erkenne dich nicht.');
+                    FlashMessages::addErrorMessage(__('Unknown/wrong user'));
                 }
 
             }
 
             if ($login && isset($user_id)) {
                 UserSession::startUserSession((int)$user_id);
-                FlashMessages::addSuccessMessage('Du hast dich erfolgreich einloggen können.');
+                FlashMessages::addSuccessMessage(__('Welcome back, you logged in successfully'));
                 return $this->redirect('/admin/dashboard');
             } else {
                 return $this->redirect('/admin');

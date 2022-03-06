@@ -16,7 +16,7 @@ if(\basteyy\Webstatt\Enums\ContentType::HTML_PHP === $page->getContentType() ) {
     include $page->getAbsoluteFilePath();
 
 } elseif ( \basteyy\Webstatt\Enums\ContentType::MARKDOWN === $page->getContentType() ) {
-    echo $page->getBody();
+    echo $page->getParsedBody();
 } else {
     echo $page->getBody();
 }

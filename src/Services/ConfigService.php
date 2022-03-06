@@ -1,4 +1,12 @@
 <?php
+/**
+ * Webstatt
+ *
+ * @author Sebastian Eiweleit <sebastian@eiweleit.de>
+ * @website https://webstatt.org
+ * @website https://github.com/basteyy/webstatt
+ * @license CC BY-SA 4.0
+ */
 
 declare(strict_types=1);
 
@@ -7,18 +15,21 @@ namespace basteyy\Webstatt\Services;
 use ReflectionClass;
 use ReflectionException;
 
+/**
+ * Abstraction of the config.ini as a service
+ */
 final class ConfigService
 {
-    /**
-     * @var string $database_primary_key
-     * @see config.ini
-     */
+    /** @var string $database_primary_key */
     readonly string $database_primary_key;
 
+    /** @var string  */
     readonly string $database_pages_name;
 
+    /** @var string  */
     readonly string $database_users_name;
 
+    /** @var string  */
     readonly string $database_folder;
 
     /** @var string $website Define the state of your website (production or development) */
@@ -51,7 +62,11 @@ final class ConfigService
     /** @var int $pages_max_versions Number of supported versions of every content page */
     readonly int $pages_max_versions;
 
+    /** @var bool $caching_apcu_disabled Disable/Enable APCu Caching */
+    readonly bool $caching_apcu_disabled;
 
+    /** @var int $caching_apcu_ttl The TTL of APCu-Cache */
+    readonly int $caching_apcu_ttl;
 
     /**
      * @throws ReflectionException

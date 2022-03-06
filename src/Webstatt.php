@@ -25,6 +25,7 @@ use DI\Bridge\Slim\Bridge;
 use DI\ContainerBuilder;
 use Exception;
 use Invoker\Exception\NotCallableException;
+use JetBrains\PhpStorm\NoReturn;
 use League\Plates\Engine;
 use League\Plates\Extension\URI;
 use Psr\Container\ContainerExceptionInterface;
@@ -40,6 +41,7 @@ use SlimSession\Helper;
 use Throwable;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
+use function basteyy\VariousPhpSnippets\varDebug;
 use function DI\create;
 
 class Webstatt
@@ -68,7 +70,7 @@ class Webstatt
         define('DS', DIRECTORY_SEPARATOR);
 
         /** Root of the website (not root of webstatt) */
-        if(!defined('ROOT')) {
+        if (!defined('ROOT')) {
             define('ROOT', dirname(__DIR__, 3));
         }
 
@@ -92,16 +94,29 @@ class Webstatt
             }
 
             /** Load the default config */
-            $this->config = parse_ini_file(PACKAGE_ROOT . DS . 'config.ini', false);
+            $config = parse_ini_file(PACKAGE_ROOT . DS . 'config.ini', false);
 
             /** Try to load the config from the config.ini in root folder */
             if (file_exists(ROOT . DS . 'config.ini')) {
-                $this->config = array_merge($this->config, parse_ini_file(ROOT . DS . 'config.ini', false));
+                $config = array_merge($config, parse_ini_file(ROOT . DS . 'config.ini', false));
             }
 
             /** Is Debug-Mode forced? */
             if (isset($options['debug']) && is_bool($options['debug'])) {
-                $this->config['debug'] = $options['debug'];
+                $config['debug'] = $options['debug'];
+            }
+
+            /** Construct the CongiS ervcie */
+            $configService = new ConfigService($config);
+
+            /** APCu installed and enabled to use it */
+            if (!defined('APCU_SUPPORT')) {
+                define('APCU_SUPPORT', !$configService->caching_apcu_disabled && function_exists('apcu_enabled') && apcu_enabled());
+            }
+
+            /** APCu TTL */
+            if (APCU_SUPPORT) {
+                define('APCU_TTL', $configService->caching_apcu_ttl ?? 360);
             }
 
             /** Make the temp folder */
@@ -142,9 +157,7 @@ class Webstatt
             $request = $this->request;
 
             $builder->addDefinitions([
-                'config' => $this->config,
-
-                ConfigService::class => create()->constructor($this->config),
+                ConfigService::class => $configService,
 
                 /** Session */
                 'session'            => function () {
@@ -176,9 +189,9 @@ class Webstatt
             /** Session @see https://github.com/bryanjhv/slim-session */
             $this->app->add(
                 new Session([
-                    'name'        => $this->config['session_name'],
-                    'autorefresh' => $this->config['session_auto_refresh'],
-                    'lifetime'    => $this->config['session_timeout'],
+                    'name'        => $configService->session_name,
+                    'autorefresh' => $configService->session_auto_refresh,
+                    'lifetime'    => $configService->session_timeout,
                 ])
             );
 
@@ -192,9 +205,9 @@ class Webstatt
                 include SRC . 'Routes' . DS . 'WebsiteRoutes.php';
 
                 /** Dispatch the content page routes */
-                $pages = new Store($this->config['database_pages_name'], ROOT . DS . $this->config['database_folder'], [
+                $pages = new Store($configService->database_pages_name, ROOT . DS . $configService->database_folder, [
                     'timeout'     => false,
-                    'primary_key' => $this->config['database_primary_key']
+                    'primary_key' => $configService->database_primary_key
                 ]);
 
                 foreach ($pages->findAll() as $page) {
@@ -213,23 +226,27 @@ class Webstatt
             }
 
         } catch (Exception|NotCallableException|Throwable $exception) {
-            if (isset($this->config) && ($this->config['debug'] || $this->config['website'] === 'development')) {
-                $this->displayDebugPage($exception);
-            } else {
-                $this->displayErrorPage();
-            }
+            $this->handleException($exception);
         }
 
     }
 
     /**
-     * Run Exception Handler in Debuge State
+     * Run Exception Handler in Debug State
      * @param Throwable $exception
      * @return void
      */
-    private function displayDebugPage(Throwable $exception)
+    private function handleException(Throwable $exception)
     {
+
         (new Run())->pushHandler(new PrettyPageHandler())->handleException($exception);
+
+
+        #if (isset($configService) && ($configService->debug || $configService->website === 'development')) {
+        #    (new Run())->pushHandler(new PrettyPageHandler())->handleException($exception);
+        #} else {
+        #    $this->displayErrorPage();
+        #}
     }
 
     /**
@@ -237,7 +254,7 @@ class Webstatt
      * @param int $status_code
      * @return void
      */
-    private function displayErrorPage(int $status_code = 501)
+    #[NoReturn] private function displayErrorPage(int $status_code = 501)
     {
         ob_clean();
         http_response_code($status_code);
@@ -306,11 +323,7 @@ class Webstatt
             $this->getApp()->run($this->request);
 
         } catch (Exception|NotCallableException|Throwable $exception) {
-            if (isset($this->config) && ($this->config['debug'] || $this->config['website'] === 'development')) {
-                $this->displayDebugPage($exception);
-            } else {
-                $this->displayErrorPage();
-            }
+            $this->handleException($exception);
         }
     }
 }

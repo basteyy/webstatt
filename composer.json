@@ -32,7 +32,9 @@
     "basteyy/various-php-snippets": "dev-master",
     "rakibtg/sleekdb": "^2.13",
     "basteyy/minimal-hash-wrapper": "^1.0",
-    "bryanjhv/slim-session": "dev-master"
+    "bryanjhv/slim-session": "dev-master",
+    "erusev/parsedown": "^1.7.4",
+    "ext-apcu": "*"
   },
   "config": {
     "sort-packages": true

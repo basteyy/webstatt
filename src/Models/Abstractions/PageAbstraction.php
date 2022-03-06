@@ -1,4 +1,12 @@
 <?php
+/**
+ * Webstatt
+ *
+ * @author Sebastian Eiweleit <sebastian@eiweleit.de>
+ * @website https://webstatt.org
+ * @website https://github.com/basteyy/webstatt
+ * @license CC BY-SA 4.0
+ */
 
 declare(strict_types=1);
 
@@ -39,6 +47,8 @@ final class PageAbstraction
     private string $file_markdown_extension = 'md';
     private string $file_html_php_extension = 'php';
 
+    /** @var string $hash Hash used as key in APCu */
+    private string $hash;
 
     /**
      * @param array $data
@@ -83,6 +93,9 @@ final class PageAbstraction
         $this->contentType = !isset($data['contentType']) ? ContentType::MARKDOWN : ContentType::tryFrom($data['contentType']) ?? ContentType::MARKDOWN;
         $this->online = $data['online'] ?? false;
         $this->id = $data['_id'] ?? -1;
+
+
+        $this->hash = hash('xxh3', $this->getUrl());
     }
 
     public function __set(string $name, $value): void
@@ -147,6 +160,20 @@ final class PageAbstraction
         return $this->loadBody();
     }
 
+    public function getParsedBody(): string
+    {
+        if(APCU_SUPPORT) {
+
+            if(!apcu_exists($this->hash)) {
+                apcu_add($this->hash, (new \Parsedown())->parse($this->loadBody()), APCU_TTL);
+            }
+
+            return apcu_fetch($this->hash) . PHP_EOL . '<!-- Cached Version from ' . date('d.m.Y H:i:s', apcu_key_info($this->hash)['creation_time']) . ' -->';
+        }
+
+        return (new \Parsedown())->parse($this->loadBody());
+    }
+
     public function getOnline(): bool
     {
         return $this->online;
@@ -199,7 +226,12 @@ final class PageAbstraction
 
         if(!is_dir($this->path . DIRECTORY_SEPARATOR . $this->backup_folder_name)) {
             mkdir($folder = $this->path . DIRECTORY_SEPARATOR . $this->backup_folder_name, 0755, true);
-    }
+        }
+
+        if(APCU_SUPPORT && $this->getContentType() === ContentType::MARKDOWN) {
+            apcu_delete($this->hash);
+            apcu_add($this->hash, (new \Parsedown())->parse($body), APCU_TTL);
+        }
 
         file_put_contents($this->getAbsoluteFilePath(), $body);
     }

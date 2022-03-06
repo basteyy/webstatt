@@ -1,6 +1,7 @@
 <?php
 
 use basteyy\Webstatt\Helper\FlashMessages;
+use function basteyy\VariousPhpSnippets\__;
 
 ?>
 <!DOCTYPE html>
@@ -44,7 +45,6 @@ use basteyy\Webstatt\Helper\FlashMessages;
 <body>
 
 
-
 <div class="external text-center">
     <?php
     $__all_messages = FlashMessages::getAllMessages();
@@ -66,8 +66,8 @@ use basteyy\Webstatt\Helper\FlashMessages;
     <?= $this->section('content') ?>
 
 
-    <p  class="mt-4 text-secondary">
-        &copy; <a href="https://github.com/basteyy/webstatt" class="text-secondary">Webstatt</a>
+    <p class="mt-4 text-secondary">
+        &copy; <a href="https://github.com/basteyy/webstatt" class="text-secondary" title="<?= __('Checkout Webstatt - a open-source Content Management System') ?>">Webstatt</a>
     </p>
 </div>
 

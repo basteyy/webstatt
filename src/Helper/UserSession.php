@@ -1,17 +1,22 @@
 <?php
+/**
+ * Webstatt
+ *
+ * @author Sebastian Eiweleit <sebastian@eiweleit.de>
+ * @website https://webstatt.org
+ * @website https://github.com/basteyy/webstatt
+ * @license CC BY-SA 4.0
+ */
 
 declare(strict_types=1);
 
 namespace basteyy\Webstatt\Helper;
 
-use basteyy\Webstatt\Enums\UserRole;
 use JetBrains\PhpStorm\Pure;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use SlimSession\Helper;
-use function basteyy\VariousPhpSnippets\varDebug;
 
 class UserSession
 {
