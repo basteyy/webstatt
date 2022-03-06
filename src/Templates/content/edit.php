@@ -74,12 +74,8 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
 
         <div class="col-12">
 
-            <p class="text-xs mt-2 alert alert-danger">
-                <?= __('You cannot change the content type of the document. <a href="#" data-bs-toggle="modal" data-bs-target="#data_type_change_limitations">Read here</a> why.') ?>
-            </p>
-
             <label for="_type" class="form-label"><?= __('Type') ?></label>
-            <select class="form-select" id="_type" name="contentType" disabled>
+            <select class="form-select" id="_type" name="contentType" <?= $this->getUser()->getRole() !== \basteyy\Webstatt\Enums\UserRole::SUPER_ADMIN ? 'disabled':'' ?>>
                 <optgroup label="<?= __('Please select') ?>">
                     <?php
                     foreach (ContentType::cases() as $case) {
@@ -88,12 +84,17 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
                     ?>
                 </optgroup>
             </select>
-            <p class="text-xs mt-2 alert alert-info">
-                <strong>Inhaltstypen</strong> legt fest, wei der Inhalte vom System verarbeitet wird. <code><?=
-                    ContentType::MARKDOWN->value ?></code> bedeutet, dass der Inhalt danach als <a href="https://www.markdownguide.org"
-                                                                                                   target="_blank">Markdown</a> verarbeitet wird.
-                Die zweite Variante ist aktuell <code><?= ContentType::HTML_PHP->value ?></code>, bei welchen eine umfängliche Bearbeitung möglich ist.
-            </p>
+
+            <?php if($this->getUser()->getRole() === \basteyy\Webstatt\Enums\UserRole::SUPER_ADMIN ) { ?>
+                <p class="text-xs mt-2 alert alert-info">
+                    <?= __('Content types specifies how the content is processed by the system. <a title="Learn more about markdown" href="https://www.markdownguide.org" target="_blank">MARKDOWN</a> means that the content will be processed as Markdown afterwards. The second variant is currently HTML_PHP, where extensive processing is possible.') ?>
+                </p>
+            <?php } else { ?>
+
+                <p class="text-xs mt-2 alert alert-danger">
+                    <?= __('You cannot change the content type of the document. <a href="#" data-bs-toggle="modal" data-bs-target="#data_type_change_limitations">Read here</a> why.') ?>
+                </p>
+            <?php } ?>
         </div>
         <?php
         if($this->getLayouts() !== null && count($this->getLayouts()) > 0 ) {

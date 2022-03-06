@@ -51,10 +51,20 @@ class EditContentController extends Controller
         if ($this->isPost()) {
 
 
+            // Change Content Type?
+            if(ContentType::tryFrom($request->getParsedBody()['contentType']) !== ContentType::tryFrom($page['contentType'])) {
+                if($this->getCurrentUserData()->getRole() !== UserRole::SUPER_ADMIN) {
+                    FlashMessages::addErrorMessage(__('You are not allowed to change the content type of a document.'));
+                    return $this->redirect('/admin/content/edit/' . $content_page_secret);
+                }
+
+                $patched_page = new PageAbstraction($page, $this->getConfigService());
+                $patched_page->changeContentTypeTo(ContentType::tryFrom($request->getParsedBody()['contentType']) === ContentType::MARKDOWN ? ContentType::HTML_PHP : ContentType::MARKDOWN);
+            }
+
             $patched_page = new PageAbstraction(array_merge($page, $request->getParsedBody()), $this->getConfigService());
 
             $patched_page->updateBody($request->getParsedBody()['body']);
-
 
             $this->getContentPagesDatabase()->updateById($patched_page->getId(), $patched_page->toArray());
 

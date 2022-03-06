@@ -14,8 +14,11 @@ namespace basteyy\Webstatt\Models\Abstractions;
 
 use basteyy\Webstatt\Enums\ContentType;
 use basteyy\Webstatt\Services\ConfigService;
+use DirectoryIterator;
 use Exception;
 use JetBrains\PhpStorm\Pure;
+use Parsedown;
+use SplFileInfo;
 use function basteyy\VariousPhpSnippets\__;
 use function basteyy\VariousPhpSnippets\getRandomString;
 use function basteyy\VariousPhpSnippets\slugify;
@@ -41,6 +44,7 @@ final class PageAbstraction
 
     private mixed $name;
 
+    private bool $_new;
 
     private string $backup_folder_name = '.versions' . DIRECTORY_SEPARATOR;
     private string $file_name = 'content';
@@ -57,7 +61,7 @@ final class PageAbstraction
      */
     public function __construct(array $data, ConfigService $configService = null)
     {
-        if(isset($configService)) {
+        if (isset($configService)) {
             $this->configService = $configService;
         }
 
@@ -81,6 +85,8 @@ final class PageAbstraction
 
         }
 
+        $this->_new = file_exists($data['path']);
+
         $this->path = $data['path'];
         $this->layout = $data['layout'] ?? '';
         $this->name = $data['name'] ?? $data['title'];
@@ -98,6 +104,11 @@ final class PageAbstraction
         $this->hash = hash('xxh3', $this->getUrl());
     }
 
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
     public function __set(string $name, $value): void
     {
         if (!isset($this->{$name})) {
@@ -105,16 +116,6 @@ final class PageAbstraction
         }
 
         $this->{$name} = $value;
-    }
-
-    public function getContentType(): ContentType
-    {
-        return $this->contentType;
-    }
-
-    public function getPath(): string
-    {
-        return $this->path;
     }
 
     public function getSecret(): string
@@ -132,11 +133,6 @@ final class PageAbstraction
         return $this->name;
     }
 
-    public function getUrl(): string
-    {
-        return $this->url;
-    }
-
     public function getDescription(): string
     {
         return $this->description;
@@ -147,11 +143,13 @@ final class PageAbstraction
         return $this->keywords;
     }
 
-    public function getLayout() : string {
+    public function getLayout(): string
+    {
         return $this->layout;
     }
 
-    public function hasLayout() : bool {
+    public function hasLayout(): bool
+    {
         return strlen($this->layout) > 0 && 'NONE' !== $this->layout;
     }
 
@@ -160,18 +158,59 @@ final class PageAbstraction
         return $this->loadBody();
     }
 
+    /**
+     * Loads the body form file
+     * @return string
+     */
+    private function loadBody(): string
+    {
+        return file_exists($this->getAbsoluteFilePath()) ? file_get_contents($this->getAbsoluteFilePath()) : '';
+    }
+
+    /**
+     * Return the absolute filepath for the file
+     * @return string
+     */
+    #[Pure] public function getAbsoluteFilePath(): string
+    {
+        return $this->getPath() . DIRECTORY_SEPARATOR . $this->file_name . $this->getFileExtension();
+    }
+
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    /**
+     * Return the current file extension based on the content type
+     * @param bool $leading_dot
+     * @return string
+     */
+    #[Pure] private function getFileExtension(bool $leading_dot = true): string
+    {
+        return ($leading_dot ? '.' : '') . match ($this->getContentType()) {
+                ContentType::HTML_PHP => $this->file_html_php_extension,
+                ContentType::MARKDOWN => $this->file_markdown_extension
+            };
+    }
+
+    public function getContentType(): ContentType
+    {
+        return $this->contentType;
+    }
+
     public function getParsedBody(): string
     {
-        if(APCU_SUPPORT) {
+        if (APCU_SUPPORT) {
 
-            if(!apcu_exists($this->hash)) {
-                apcu_add($this->hash, (new \Parsedown())->parse($this->loadBody()), APCU_TTL);
+            if (!apcu_exists($this->hash)) {
+                apcu_add($this->hash, (new Parsedown())->parse($this->loadBody()), APCU_TTL);
             }
 
             return apcu_fetch($this->hash) . PHP_EOL . '<!-- Cached Version from ' . date('d.m.Y H:i:s', apcu_key_info($this->hash)['creation_time']) . ' -->';
         }
 
-        return (new \Parsedown())->parse($this->loadBody());
+        return (new Parsedown())->parse($this->loadBody());
     }
 
     public function getOnline(): bool
@@ -185,35 +224,6 @@ final class PageAbstraction
     }
 
     /**
-     * Return the current file extension based on the content type
-     * @param bool $leading_dot
-     * @return string
-     */
-    #[Pure] private function getFileExtension(bool $leading_dot = true) : string {
-        return ($leading_dot ? '.' : '') . match ($this->getContentType()) {
-            ContentType::HTML_PHP => $this->file_html_php_extension,
-            ContentType::MARKDOWN => $this->file_markdown_extension
-        };
-    }
-
-    /**
-     * Return the absolute filepath for the file
-     * @return string
-     */
-    #[Pure] public function getAbsoluteFilePath() : string {
-        return $this->getPath() . DIRECTORY_SEPARATOR . $this->file_name . $this->getFileExtension();
-    }
-
-    /**
-     * Loads the body form file
-     * @return string
-     */
-    private function loadBody(): string
-    {
-        return file_exists($this->getAbsoluteFilePath()) ? file_get_contents($this->getAbsoluteFilePath()) : '';
-    }
-
-    /**
      * Updates the body
      * @param string $body
      * @return void
@@ -224,13 +234,13 @@ final class PageAbstraction
             $this->makeBackup();
         }
 
-        if(!is_dir($this->path . DIRECTORY_SEPARATOR . $this->backup_folder_name)) {
+        if (!is_dir($this->path . DIRECTORY_SEPARATOR . $this->backup_folder_name)) {
             mkdir($folder = $this->path . DIRECTORY_SEPARATOR . $this->backup_folder_name, 0755, true);
         }
 
-        if(APCU_SUPPORT && $this->getContentType() === ContentType::MARKDOWN) {
+        if (APCU_SUPPORT && $this->getContentType() === ContentType::MARKDOWN) {
             apcu_delete($this->hash);
-            apcu_add($this->hash, (new \Parsedown())->parse($body), APCU_TTL);
+            apcu_add($this->hash, (new Parsedown())->parse($body), APCU_TTL);
         }
 
         file_put_contents($this->getAbsoluteFilePath(), $body);
@@ -251,23 +261,23 @@ final class PageAbstraction
      */
     private function makeBackup(): void
     {
-        if(!isset($this->configService)) {
-            throw new \Exception(__('To use the Versioning, you need to provide the configService to the %s', __CLASS__));
+        if (!isset($this->configService)) {
+            throw new Exception(__('To use the Versioning, you need to provide the configService to the %s', __CLASS__));
         }
 
         $folder = $this->path . DIRECTORY_SEPARATOR . $this->backup_folder_name;
         $version_name = 'v_' . date('d_m_H_i_s') . $this->getFileExtension();
 
-        if($this->configService->pages_max_versions !== 0 ) {
+        if ($this->configService->pages_max_versions !== 0) {
 
             $versions = $this->getAllVersions();
 
-            if($this->configService->pages_max_versions !== -1 && count($versions) >= $this->configService->pages_max_versions) {
+            if ($this->configService->pages_max_versions !== -1 && count($versions) >= $this->configService->pages_max_versions) {
                 // Delete the oldest version
                 unlink($versions[key($versions)]);
             }
 
-            if(!is_dir($folder)) {
+            if (!is_dir($folder)) {
                 mkdir($folder, 0755, true);
             }
 
@@ -275,27 +285,27 @@ final class PageAbstraction
         }
 
 
-
     }
 
-    public function getAllVersions() : array {
+    public function getAllVersions(): array
+    {
         $folder = $this->path . DIRECTORY_SEPARATOR . $this->backup_folder_name;
 
-        if(!is_dir($folder)) {
+        if (!is_dir($folder)) {
             return [];
         }
 
-        $dir = new \DirectoryIterator($folder);
+        $dir = new DirectoryIterator($folder);
 
-        foreach($dir as $file) {
-            /** @var \SplFileInfo $file */
-            if($file->isFile() && $file->getExtension() === $this->getFileExtension(false) ) {
+        foreach ($dir as $file) {
+            /** @var SplFileInfo $file */
+            if ($file->isFile() && $file->getExtension() === $this->getFileExtension(false)) {
                 // Valid look file .. :-)
                 $versions[$file->getMTime()] = $file->getRealPath();
             }
         }
 
-        if(!isset($versions)) {
+        if (!isset($versions)) {
             return [];
         }
 
@@ -306,6 +316,43 @@ final class PageAbstraction
     }
 
     /**
+     * Change the current page content context to $changeContentType
+     * @param ContentType $changeToContentType
+     * @return void
+     */
+    public function changeContentTypeTo(ContentType $changeToContentType): void
+    {
+        $versions = $this->getAllVersions();
+
+        $new_extension = '.' . ($changeToContentType === ContentType::MARKDOWN ? $this->file_html_php_extension : $this->file_markdown_extension);
+
+        foreach ($versions as $timestamp => $path) {
+            copy($path, str_replace($this->getFileExtension(true), $new_extension, $path));
+            unlink($path);
+        }
+
+        // Change current main version
+        $old = $this->getAbsoluteFilePath();
+        copy($this->getAbsoluteFilePath(), str_replace($this->getFileExtension(true), $new_extension, $this->getAbsoluteFilePath()));
+        unlink($old);
+
+        // Flush the Cache
+        $this->flushCache();
+
+    }
+
+    /**
+     * Delete current cache von apcu
+     * @return void
+     */
+    public function flushCache()
+    {
+        if (APCU_SUPPORT && apcu_exists($this->hash)) {
+            apcu_delete($this->hash);
+        }
+    }
+
+    /**
      * Build the array for storing it
      * @return array
      */
@@ -313,7 +360,7 @@ final class PageAbstraction
     {
         return [
             'title'       => $this->title,
-            'name'       => $this->name,
+            'name'        => $this->name,
             'url'         => $this->url,
             'description' => $this->description,
             'keywords'    => $this->keywords,
