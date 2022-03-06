@@ -67,8 +67,10 @@ class Webstatt
         /** Yes, i'am lazy */
         define('DS', DIRECTORY_SEPARATOR);
 
-        /** Every good page needs a root. That's mine root */
-        define('ROOT', dirname(__DIR__, 3));
+        /** Root of the website (not root of webstatt) */
+        if(!defined('ROOT')) {
+            define('ROOT', dirname(__DIR__, 3));
+        }
 
         /** Direct path to the ROOT Folder of the Webstatt-Package folder */
         define('PACKAGE_ROOT', dirname(__DIR__) . DS);
