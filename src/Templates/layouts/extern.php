@@ -67,7 +67,7 @@ use basteyy\Webstatt\Helper\FlashMessages;
 
 
     <p  class="mt-4 text-secondary">
-        &copy; <a href="https://eiweleit.de" class="text-secondary">EDV- und Onlineservice Eiweleit</a>
+        &copy; <a href="https://github.com/basteyy/webstatt" class="text-secondary">Webstatt</a>
     </p>
 </div>
 
