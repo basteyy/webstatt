@@ -1,0 +1,37 @@
+<?php
+
+use function basteyy\VariousPhpSnippets\__;
+
+?>
+<li class="nav-item dropdown mx-lg-3">
+    <a class="nav-link dropdown-toggle" href="#" id="adminSettingsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="mx-md-2 bi bi-gear mx-md-2"></i> <?= __('Settings') ?>
+    </a>
+    <ul class="dropdown-menu p-md-4" aria-labelledby="adminSettingsDropdown">
+
+        <li>
+            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/me') ?>" title="<?= __('Manage who\'s is allowed to access what admin-module') ?>">
+                <i class="mx-md-2 bi bi-stoplights mx-md-2"></i> <?= __('Access Settings') ?>
+            </a>
+        </li>
+
+        <li>
+            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/me') ?>" title="<?= __('Manage who\'s is allowed to access what admin-module') ?>">
+                <i class="mx-md-2 bi bi-bricks mx-md-2"></i> <?= __('Global Configuration') ?>
+            </a>
+        </li>
+
+
+
+        <li>
+            <hr class="dropdown-divider">
+        </li>
+
+        <li>
+            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/users') ?>">
+                <i class="mx-md-2 bi bi-people"></i> <?= __('User-management') ?>
+            </a>
+        </li>
+
+    </ul>
+</li>

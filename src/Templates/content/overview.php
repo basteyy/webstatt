@@ -35,7 +35,7 @@ $this->layout('Webstatt::layouts/acp', ['title' => 'Inhalte']);
                 </td>
                 <td>
                     <a class="btn btn-primary btn-sm" href="<?= $this->getAbsoluteUrl('/admin/content/edit/%s', $page->getSecret()) ?>"><?= __('Edit') ?></a>
-                    <a target="_blank" class="btn btn-secondary btn-sm" href="<?= $this->getAbsoluteUrl($page->getUrl()) ?>"><i class="bi bi-search"></i> <?= __('View') ?></a>
+                    <a target="_blank" class="btn btn-secondary btn-sm" href="<?= $this->getAbsoluteUrl($page->getUrl()) ?>"><i class="mx-md-2 bi bi-search"></i> <?= __('View') ?></a>
                 </td>
             </tr>
             <?php

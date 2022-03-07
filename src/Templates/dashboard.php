@@ -41,22 +41,21 @@ $User = $this->getUser();
 
             <hr/>
             <p>
-                <a href="" class="btn btn-secondary btn-sm"><i class="bi bi-person-circle"></i> <?= __('Show your profile') ?></a>
+                <a href="" class="btn btn-secondary btn-sm"><i class="mx-md-2 bi bi-person-circle"></i> <?= __('Show your profile') ?></a>
             </p>
         </div>
     </div>
 </div>
-
 
 <h3><?= __('You need help?') ?></h3>
 <p class="lh-lg">
     <?= __('<strong>%s</strong> takes care about any problems you may have.', $configService->agency_name) ?>
 </p>
 <p>
-    <i class="bi bi-envelope-heart"></i> <a href="mailto:<?=
+    <i class="mx-md-2 bi bi-envelope-heart"></i> <a href="mailto:<?=
     $configService->agency_email ?>"><?=
         $configService->agency_email ?></a><br/>
-    <i class="bi bi-globe"></i> <a href="<?=
+    <i class="mx-md-2 bi bi-globe"></i> <a href="<?=
     $configService->agency_website ?>"><?=
         $configService->agency_website ?></a>
 </p>

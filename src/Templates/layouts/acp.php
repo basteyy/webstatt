@@ -3,9 +3,11 @@
 use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Models\Abstractions\UserAbstraction;
 use basteyy\Webstatt\Services\ConfigService;
+use function basteyy\VariousPhpSnippets\__;
 
 /** @var ConfigService $configService */
 $configService = $this->getConfig();
+
 /** @var UserAbstraction $User */
 $User = $this->getUser();
 ?>
@@ -16,15 +18,23 @@ $User = $this->getUser();
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <title><?= $title ?? 'ACP' ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" media="(prefers-color-scheme: light)">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/css/bootstrap-night.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <link href="https://rsms.me/inter/inter.css" rel="stylesheet" crossorigin="anonymous">
+    <style>
+        :root {
+            --bs-body-font-family: 'Inter var', sans-serif;
+        }
+    </style>
+    <meta name="color-scheme" content="light dark">
 
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/admin/dashboard">
-            <i class="bi bi-speedometer"></i> Dashboard
+    <div class="container-xxl">
+        <a class="navbar-brand" href="<?= $this->getAbsoluteUrl('/admin/dashboard') ?>">
+            <?= __('Webstatt') ?>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation">
@@ -33,52 +43,25 @@ $User = $this->getUser();
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-                <?php
-                if (isset($additional_admin_nav_items)) {
-                    foreach ($additional_admin_nav_items as $item) {
-                        echo $item;
-                    }
-                }
-                ?>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="/admin/content" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <?= \basteyy\VariousPhpSnippets\__('Content') ?>
+                <li class="nav-item mx-lg-3">
+                    <a class="nav-link" href="<?= $this->getAbsoluteUrl('/admin/dashboard') ?>" role="button"><i class="mx-md-2 bi bi-speedometer"></i> <?= __('Dashboard') ?>
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li>
-                            <a class="dropdown-item" href="/admin/content" title="Übersicht der Inhalte">
-                                <i class="bi bi-newspaper"></i> <?= \basteyy\VariousPhpSnippets\__('List the content') ?>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/admin/content/add" title="Einen neuen Inhalt anlegen">
-                                <i class="bi bi-plus"></i> <?= \basteyy\VariousPhpSnippets\__('Add new content') ?>
-                            </a>
-                        </li>
-                    </ul>
                 </li>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <?= \basteyy\VariousPhpSnippets\__('Users') ?>
+                <li class="nav-item dropdown mx-lg-3">
+                    <a class="nav-link dropdown-toggle" href="<?= $this->getAbsoluteUrl('/admin/content') ?>" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        <i class="mx-md-2 bi bi-newspaper"></i> <?= __('Content') ?>
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-
+                    <ul class="dropdown-menu p-md-4" aria-labelledby="navbarDropdown">
                         <li>
-                            <a class="dropdown-item" href="/admin/me" title="Dein Profil verwalten">
-                                <i class="bi bi-person-circle"></i> <?= \basteyy\VariousPhpSnippets\__('Your Profile') ?>
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/content') ?>" title="<?= __('Content Pages Overview') ?>">
+                                <i class="mx-md-2 bi bi-view-list"></i> <?= __('List the content') ?>
                             </a>
                         </li>
-
                         <li>
-                            <a class="dropdown-item" href="/admin/me/email">
-                                <i class="bi bi-envelope"></i> <?= \basteyy\VariousPhpSnippets\__('Change your E-Mail') ?>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item" href="/admin/me/password">
-                                <i class="bi bi-unlock"></i> <?= \basteyy\VariousPhpSnippets\__('Change your password') ?>
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/content/add') ?>" title="<?= __('Create a new Content Page') ?>">
+                                <i class="mx-md-2 bi bi-plus-circle"></i> <?= __('Add new content') ?>
                             </a>
                         </li>
 
@@ -87,28 +70,90 @@ $User = $this->getUser();
                         </li>
 
                         <li>
-                            <a class="dropdown-item" href="/admin/users">
-                                <i class="bi bi-people"></i> <?= \basteyy\VariousPhpSnippets\__('User-management') ?>
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/files') ?>" title="<?= __('Content Settings') ?>">
+                                <i class="mx-md-2 bi bi-gear"></i> <?= __('Content Settings') ?>
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+
+
+                <li class="nav-item dropdown mx-lg-3">
+                    <a class="nav-link dropdown-toggle" href="<?= $this->getAbsoluteUrl('/admin/content') ?>" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        <i class="mx-md-2 bi bi-download"></i> <?= __('Files') ?>
+                    </a>
+                    <ul class="dropdown-menu p-md-4" aria-labelledby="navbarDropdown">
+                        <li>
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/files') ?>" title="<?= __('Manage uploaded files in your website') ?>">
+                                <i class="mx-md-2 bi bi-newspaper"></i> <?= __('Manage files') ?>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/files/upload') ?>" title="<?= __('Upload new files') ?>">
+                                <i class="mx-md-2 bi bi-newspaper"></i> <?= __('Upload files') ?>
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown mx-lg-3">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="mx-md-2 bi bi-person"></i> <?= __('Your Account') ?>
+                    </a>
+                    <ul class="dropdown-menu p-md-4" aria-labelledby="navbarDropdown">
+
+                        <li>
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/me') ?>" title="<?= __('Manage your profil') ?>">
+                                <i class="mx-md-2 bi bi-person-circle"></i> <?= __('Your Profile') ?>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/me/email') ?>">
+                                <i class="mx-md-2 bi bi-envelope"></i> <?= __('Change your E-Mail') ?>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/me/password') ?>">
+                                <i class="mx-md-2 bi bi-unlock"></i> <?= __('Change your password') ?>
                             </a>
                         </li>
                     </ul>
                 </li>
             </ul>
 
-
+            <?php
+            if (isset($additional_admin_nav_items)) {
+                foreach ($additional_admin_nav_items as $item) {
+                    echo $item;
+                }
+            }
+            ?>
             <ul class="navbar-nav me-0 mb-2 mb-lg-0">
 
-                <li class="nav-item mx-lg-5">
-                    <a class="nav-item nav-link" href="/admin/logout?t=<?= time() ?>">
-                        <i class="bi bi-box-arrow-right"></i> <?= \basteyy\VariousPhpSnippets\__('Logout') ?>
+                <?php
+                if($this->getUser()->isAdmin()) {
+                    echo $this->fetch('Webstatt::layouts/partials/admin_settings_dropdown');
+                }
+                ?>
+
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="<?= $this->getAbsoluteUrl('/') ?>" title="<?= __('Go to the website') ?>">
+                        <i class="mx-md-2 bi bi-globe"></i> <?= __('Website') ?>
                     </a>
                 </li>
 
-                <li class="nav-item mx-lg-5">
-                    <a class="nav-link" aria-current="page" href="/" title="Zur Website wechseln">
-                        <i class="bi bi-globe"></i> <?= \basteyy\VariousPhpSnippets\__('Website') ?>
+                <li class="nav-item">
+                    <a class="nav-item nav-link" href="<?= $this->getAbsoluteUrl('/admin/logout?t=') ?><?= time() ?>">
+                        <i class="mx-md-2 bi bi-box-arrow-right"></i> <?= __('Logout') ?>
                     </a>
                 </li>
+
             </ul>
             <!--<form class="d-flex">
                 <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -160,7 +205,7 @@ $User = $this->getUser();
             </div>
             <div class="nav col-md-4 justify-content-end list-unstyled d-flex">
                 <p>
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="bi bi-info"></i> Webstatt</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#webstattInfoModel"><i class="mx-md-2 bi bi-info"></i> Webstatt</button>
                 </p>
             </div>
 
@@ -169,55 +214,53 @@ $User = $this->getUser();
     </div>
 </div>
 
-
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="webstattInfoModel" tabindex="-1" aria-labelledby="webstattInfoModelLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title" id="exampleModalLabel">👍 Du benutzt Webstatt!</h2>
+                <h2 class="modal-title" id="webstattInfoModelLabel"><?= __('Yes! You are using Webstatt!') ?></h2>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
 
                 <div class="alert alert-info" role="alert">
-                    <?= \basteyy\VariousPhpSnippets\__('Thanks for using webstatt!') ?>
+                    <?= __('Thanks for using webstatt!') ?>
                 </div>
                 <p class="lh-lg">
-                    Webstatt ist ein Content Management System. Dies ermöglicht den Betrieb von Websites - so, wie du es vermutlich gerade machst.
+                    <?= __('Webstatt is a content management system. This allows you to run websites - the way you\'re probably doing right now.') ?>
                 </p>
 
-                <h3 class="h4 fw-bold">Du 🤝 <?= $configService->agency_name ?>  🤝 Webstatt</h3>
+                <h3 class="h5 fw-bold"><?= __('You') ?> + <?= $configService->agency_name ?> + Webstatt = 🤝</h3>
                 <p class="lh-lg">
-                    Damit alles gut läuft, wurde
-                    die Website für dich von <strong><?= $configService->agency_name ?></strong> aufgesetzt. Bei Problemen kannst du dich gerne an <a href="mailto:<?=
-                    $configService->agency_email ?>"><?=
-                        $configService->agency_email ?></a> wenden. Mehr Informationen findest du unter <a href="<?=
-                    $configService->agency_website ?>"><?=
-                        $configService->agency_website ?></a>
+                    <?= __('Your website was set up by <strong>%1$s</strong>. In case, you find help here: <a href="mailto:%2$s">%2$s</a>. For more information, check out <a href="%3$s">%3$s</a>.',
+                        $configService->agency_name,
+                        $configService->agency_email,
+                        $configService->agency_website
+                    ) ?>
                 </p>
 
-                <hr />
+                <hr/>
 
-                <h3 class="h6 fw-bold">Mehr über Webstatt lernen</h3>
+                <h3 class="h6 fw-bold"><?= __('More about webstatt') ?></h3>
                 <p>
-                    <a href="https://webstatt.org" class="btn btn-secondary btn-sm"><i class="bi bi-globe"></i> Website</a>
-                    <a href="https://github.com/basteyy/webstatt" class="btn btn-secondary btn-sm"><i class="bi bi-github"></i> Github</a>
-                    <a href="https://webstatt.org" class="btn btn-secondary btn-sm"><i class="bi bi-chat"></i> Community</a>
-                    <a href="https://www.patreon.com/webstatt" class="btn btn-secondary btn-sm"><i class="bi bi-emoji-neutral"></i> Unterstützen</a>
+                    <a href="https://webstatt.org" class="btn btn-secondary btn-sm"><i class="mx-md-2 bi bi-globe"></i> <?= __('Website') ?></a>
+                    <a href="https://github.com/basteyy/webstatt" class="btn btn-secondary btn-sm"><i class="mx-md-2 bi bi-github"></i> <?= __('Github') ?></a>
+                    <a href="https://webstatt.org" class="btn btn-secondary btn-sm"><i class="mx-md-2 bi bi-chat"></i> <?= __('Community') ?></a>
+                    <a href="https://www.patreon.com/webstatt" class="btn btn-secondary btn-sm"><i class="mx-md-2 bi bi-emoji-neutral"></i> <?= __('Support') ?></a>
                 </p>
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><?= \basteyy\VariousPhpSnippets\__('Fine') ?></button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><?= __('Fine') ?></button>
             </div>
         </div>
     </div>
 </div>
-
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
         crossorigin="anonymous"></script>
 <script src="<?= $this->getAbsoluteUrl('/js/vendor/confirmbutton.js') ?>"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"/>
+
+
 </body>
 </html>

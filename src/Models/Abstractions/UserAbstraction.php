@@ -33,14 +33,55 @@ final class UserAbstraction
     {
         $this->raw_user_data = $user_data;
 
-        $this->email        = $user_data['email'] ?? false;
-        $this->password     = $user_data['password'] ?? false;
-        $this->salt         = $user_data['salt'] ?? false;
-        $this->role         = UserRole::from($user_data['role']) ?? UserRole::ANONYMOUS;
-        $this->secret       = $user_data['secret'] ?? false;
-        $this->name         = $user_data['name'] ?? '';
-        $this->alias        = $user_data['alias'] ?? '';
-        $this->id           = $user_data[$configService->database_primary_key];
+        $this->email = $user_data['email'] ?? false;
+        $this->password = $user_data['password'] ?? false;
+        $this->salt = $user_data['salt'] ?? false;
+        $this->role = UserRole::from($user_data['role']) ?? UserRole::ANONYMOUS;
+        $this->secret = $user_data['secret'] ?? false;
+        $this->name = $user_data['name'] ?? '';
+        $this->alias = $user_data['alias'] ?? '';
+        $this->id = $user_data[$configService->database_primary_key];
+    }
+
+    /**
+     * Returns true if the user is not at least a user
+     * @return bool
+     */
+    public function isAnonymous(): bool
+    {
+        return !$this->isUser();
+    }
+
+    /**
+     * Return true, if the user is at least user (or above)
+     * @return bool
+     */
+    public function isUser(): bool
+    {
+        return $this->isAdmin() || $this->getRole() === UserRole::USER;
+    }
+
+    /**
+     * Return true, if the user is admin or super admin
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->isSuperAdmin() || $this->getRole() === UserRole::ADMIN;
+    }
+
+    /**
+     * Return true, if the user is  super admin
+     * @return bool
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->getRole() === UserRole::SUPER_ADMIN;
+    }
+
+    public function getRole(): UserRole
+    {
+        return $this->role;
     }
 
     public function getId(): int
@@ -61,11 +102,6 @@ final class UserAbstraction
     public function getSalt(): string
     {
         return $this->salt;
-    }
-
-    public function getRole(): UserRole
-    {
-        return $this->role;
     }
 
     public function getSecret(): string

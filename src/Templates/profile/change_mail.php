@@ -15,7 +15,7 @@ $User = $this->getUser();
 ?>
 
 <h1>
-    <i class="bi bi-envelope"></i> <?= __('Change your e-mail address') ?>
+    <i class="mx-md-2 bi bi-envelope"></i> <?= __('Change your e-mail address') ?>
 </h1>
 
 <form method="post" action="<?= $this->getCurrentUrl() ?>" autocomplete="off">
