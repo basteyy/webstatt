@@ -12,22 +12,25 @@ declare(strict_types=1);
 
 namespace basteyy\Webstatt\Controller;
 
-use basteyy\ScssPhpBuilder\ScssPhpBuilder;
+use basteyy\Webstatt\Controller\Traits\DatabaseTrait;
+use basteyy\Webstatt\Controller\Traits\RequestTrait;
+use basteyy\Webstatt\Controller\Traits\ResponseTrait;
+use basteyy\Webstatt\Controller\Traits\SassCompilerTrait;
 use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Helper\UserSession;
 use basteyy\Webstatt\Models\Abstractions\UserAbstraction;
+use basteyy\Webstatt\Services\AccessService;
 use basteyy\Webstatt\Services\ConfigService;
 use League\Plates\Engine;
-use League\Plates\Extension\ExtensionInterface;
-use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use SleekDB\Exceptions\InvalidArgumentException;
-use SleekDB\Exceptions\InvalidConfigurationException;
-use SleekDB\Exceptions\IOException;
-use SleekDB\Store;
-use Slim\Psr7\Response;
-use function basteyy\VariousPhpSnippets\__;
 
+/**
+ * The Main Controller.
+ * @see
+ */
 class Controller
 {
     /** @var UserRole $minimum_user_role Minimum level of user role */
@@ -45,19 +48,39 @@ class Controller
     /** @var ConfigService $configService Provider for the current config */
     private ConfigService $configService;
 
+    /** @var AccessService $accessService Provider for accessing checks */
+    private AccessService $accessService;
+
     /** @var array $_activeDatabases A cache for the flat files databases */
     private array $_activeDatabases;
+
+    /** @var ServerRequestInterface $request Request Object */
+    private ServerRequestInterface $request;
+
+    /** Sass Compiler Trait */
+    use SassCompilerTrait;
+
+    /** Database Trait */
+    use DatabaseTrait;
+
+    /** Response Trait (Redirects, Rendering) */
+    use ResponseTrait;
+
+    /** Request Trait */
+    use RequestTrait;
 
     /**
      * @throws InvalidArgumentException
      */
-    public function __construct(Engine $engine, ConfigService $configService)
+    public function __construct(Engine $engine, ConfigService $configService, AccessService $accessService, ServerRequestInterface $request)
     {
 
+        /** @var RequestInterface request Make the request global in the Controller */
+        $this->request = $request;
 
         $this->engine = $engine;
-
         $this->configService = $configService;
+        $this->accessService = $accessService;
 
         $this->_current_user_data =
             UserSession::activeUserSession() ? new UserAbstraction(($this->getUserDatabase())->findById(UserSession::getUserSessionData()), $configService) : null;
@@ -92,175 +115,38 @@ class Controller
     }
 
     /**
-     * Return the database instance for the users
-     * @throws InvalidConfigurationException
-     * @throws IOException
-     * @throws InvalidArgumentException
-     */
-    protected function getUserDatabase(): Store
-    {
-        return $this->getDatabase($this->configService->database_users_name);
-    }
-
-    /**
-     * @throws InvalidConfigurationException
-     * @throws IOException
-     * @throws InvalidArgumentException
-     */
-    private function getDatabase(string $database): Store
-    {
-
-        if (!isset($this->_activeDatabases) || !isset($this->_activeDatabases[$database])) {
-
-            if (!is_dir(ROOT . DS . $this->configService->database_folder)) {
-                mkdir(ROOT . DS . $this->configService->database_folder, 0755, true);
-            }
-
-            $this->_activeDatabases[$database] = new Store($database, ROOT . DS . $this->configService->database_folder, [
-                'timeout'     => false,
-                'primary_key' => $this->configService->database_primary_key
-            ]);
-        }
-
-        return $this->_activeDatabases[$database];
-    }
-
-    /**
-     * Return the database instance for the pages
-     * @throws InvalidConfigurationException
-     * @throws IOException
-     * @throws InvalidArgumentException
-     */
-    protected function getContentPagesDatabase(): Store
-    {
-        return $this->getDatabase($this->configService->database_pages_name);
-    }
-
-    protected function redirect(string $redirect_uri, int $status_code = 302, ?ResponseInterface $response = null): ResponseInterface
-    {
-
-        if (!$response) {
-            $response = new Response();
-        }
-
-        return $response->withHeader('location', $redirect_uri)->withStatus($status_code);
-    }
-
-    protected function render_404(): Response
-    {
-        $response = new Response();
-        $response->withStatus(404);
-        $response->getBody()->write(__('File not found'));
-        return $response;
-    }
-
-    protected function render(string $template, ?array $data = [], ?ResponseInterface $response = null): ResponseInterface
-    {
-
-        if (!$this->getEngine()->exists($template) && !str_starts_with($template, 'Webstatt::')) {
-            $template = 'Webstatt::' . $template;
-        }
-
-        if (!$response) {
-            $response = new Response();
-        }
-
-        $this->getEngine()->loadExtension(new class($this->getConfigService()) implements ExtensionInterface {
-
-            private ConfigService $configService;
-
-            public function __construct(ConfigService $configService)
-            {
-                $this->configService = $configService;
-            }
-
-            public function register(Engine $engine)
-            {
-                $engine->registerFunction('getConfig', fn() => $this->configService);
-            }
-        });
-
-        /** Patch user data to template if exists */
-        $this->getEngine()->loadExtension(new class($this->getCurrentUserData()) implements ExtensionInterface {
-
-            private UserAbstraction|null $data;
-
-            public function __construct(UserAbstraction|null $userData)
-            {
-                $this->data = $userData;
-            }
-
-            public function register(Engine $engine)
-            {
-                $engine->registerFunction('getUser', fn() => $this->data);
-            }
-
-            public function __toString(): string
-            {
-                return (string)$this->data;
-            }
-        });
-
-        $this->sassRenderStrategy();
-
-        $response->getBody()->write(
-            $this->getEngine()->render($template, $data ?? [])
-        );
-
-        return $response;
-    }
-
-    protected function getEngine(): Engine
-    {
-        return $this->engine;
-    }
-
-    protected function getConfigService(): ConfigService
-    {
-        return $this->configService;
-    }
-
-    /**
      * Method returns the current user array if logged in.
-     * @return array
+     * @return UserAbstraction|null
      */
     protected function getCurrentUserData(): UserAbstraction|null
     {
         return $this->_current_user_data ?? null;
     }
 
-    protected function sassRenderStrategy(): void
+    /**
+     * Get the Engine (Template) Class
+     * @return Engine
+     */
+    protected function getEngine(): Engine
     {
-
-        $sass_starting_file = PUB . 'sass' . DS . 'style.scss';
-        $css_final_file = PUB . 'css' . DS . 'style.css';
-
-        if (file_exists($sass_starting_file)) {
-
-            $compile = true;
-
-            if (file_exists(PUB . 'css' . DS . 'style.css')) {
-                if (filemtime($css_final_file) >= filemtime($sass_starting_file)) {
-                    $compile = false;
-                }
-            }
-
-
-            if ($compile) {
-                $scss = new ScssPhpBuilder();
-                $scss->addFolder(PUB . 'sass' . DS);
-                $scss->addOutputeFile($css_final_file);
-                $scss->addStartingFile($sass_starting_file);
-                $scss->compileToOutputfile();
-            }
-
-        }
-
-        // Do nothing
+        return $this->engine;
     }
 
-    protected function isPost(): bool
+    /**
+     * Get the ConfigService
+     * @return ConfigService
+     */
+    protected function getConfigService(): ConfigService
     {
-        return 'POST' === $_SERVER['REQUEST_METHOD'];
+        return $this->configService;
+    }
+
+    /**
+     * Get the AccessService
+     * @return AccessService
+     */
+    protected function getAccessService(): AccessService
+    {
+        return $this->accessService;
     }
 }

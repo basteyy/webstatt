@@ -49,29 +49,19 @@ $User = $this->getUser();
                 </li>
 
                 <li class="nav-item dropdown mx-lg-3">
-                    <a class="nav-link dropdown-toggle" href="<?= $this->getAbsoluteUrl('/admin/content') ?>" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                    <a class="nav-link dropdown-toggle" href="<?= $this->getAbsoluteUrl('/admin/content/pages') ?>" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
                        aria-expanded="false">
                         <i class="mx-md-2 bi bi-newspaper"></i> <?= __('Content') ?>
                     </a>
                     <ul class="dropdown-menu p-md-4" aria-labelledby="navbarDropdown">
                         <li>
-                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/content') ?>" title="<?= __('Content Pages Overview') ?>">
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/content/pages') ?>" title="<?= __('Content Pages Overview') ?>">
                                 <i class="mx-md-2 bi bi-view-list"></i> <?= __('List the content') ?>
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/content/add') ?>" title="<?= __('Create a new Content Page') ?>">
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/content/pages/add') ?>" title="<?= __('Create a new Page') ?>">
                                 <i class="mx-md-2 bi bi-plus-circle"></i> <?= __('Add new content') ?>
-                            </a>
-                        </li>
-
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/files') ?>" title="<?= __('Content Settings') ?>">
-                                <i class="mx-md-2 bi bi-gear"></i> <?= __('Content Settings') ?>
                             </a>
                         </li>
 
@@ -80,7 +70,7 @@ $User = $this->getUser();
 
 
                 <li class="nav-item dropdown mx-lg-3">
-                    <a class="nav-link dropdown-toggle" href="<?= $this->getAbsoluteUrl('/admin/content') ?>" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                    <a class="nav-link dropdown-toggle" href="<?= $this->getAbsoluteUrl('/admin/files') ?>" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
                        aria-expanded="false">
                         <i class="mx-md-2 bi bi-download"></i> <?= __('Files') ?>
                     </a>

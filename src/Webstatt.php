@@ -20,6 +20,7 @@ use basteyy\Webstatt\Helper\AdminNavbarItem;
 use basteyy\Webstatt\Helper\EngineExtensions\ContentPageLayoutHelper;
 use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Helper\UserSession;
+use basteyy\Webstatt\Services\AccessService;
 use basteyy\Webstatt\Services\ConfigService;
 use DI\Bridge\Slim\Bridge;
 use DI\ContainerBuilder;
@@ -32,6 +33,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use SleekDB\Store;
 use Slim\App;
 use Slim\Factory\ServerRequestCreatorFactory;
@@ -106,7 +108,7 @@ class Webstatt
                 $config['debug'] = $options['debug'];
             }
 
-            /** Construct the CongiS ervcie */
+            /** Construct the Congi Servcie */
             $configService = new ConfigService($config);
 
             /** APCu installed and enabled to use it */
@@ -123,6 +125,10 @@ class Webstatt
             if (!is_dir(TEMP)) {
                 mkdir(TEMP, 0755, true);
             }
+
+            /** Access Service Initiation */
+            $accessService = new AccessService($configService);
+
 
             /** Yes, I create  the request here manually. See below for the why */
             /** @var Request $request */
@@ -158,6 +164,10 @@ class Webstatt
 
             $builder->addDefinitions([
                 ConfigService::class => $configService,
+
+                AccessService::class => $accessService,
+
+                ServerRequestInterface::class => $this->request,
 
                 /** Session */
                 'session'            => function () {
