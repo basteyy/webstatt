@@ -15,7 +15,7 @@ namespace basteyy\Webstatt;
 use basteyy\PlatesLocalAssetsCopy\PlatesLocalAssetsCopy;
 use basteyy\PlatesUrlToolset\PlatesUrlToolset;
 use basteyy\VariousPhpSnippets\i18n;
-use basteyy\Webstatt\Controller\Content\DispatchContentController;
+use basteyy\Webstatt\Controller\Pages\DispatchPageController;
 use basteyy\Webstatt\Helper\AdminNavbarItem;
 use basteyy\Webstatt\Helper\EngineExtensions\ContentPageLayoutHelper;
 use basteyy\Webstatt\Helper\FlashMessages;
@@ -118,7 +118,8 @@ class Webstatt
 
             /** APCu TTL */
             if (APCU_SUPPORT) {
-                define('APCU_TTL', $configService->caching_apcu_ttl ?? 360);
+                define('APCU_TTL_LONG', $configService->caching_apcu_ttl_long ?? 720);
+                define('APCU_TTL_SHORT', $configService->caching_apcu_ttl_short ?? 10);
             }
 
             /** Make the temp folder */
@@ -211,19 +212,6 @@ class Webstatt
             /** Register the User Session Middleware */
             $this->app->add(UserSession::class);
 
-            if (file_exists(SRC . 'routes' . DS . 'WebsiteRoutes.php')) {
-                include SRC . 'Routes' . DS . 'WebsiteRoutes.php';
-
-                /** Dispatch the content page routes */
-                $pages = new Store($configService->database_pages_name, ROOT . DS . $configService->database_folder, [
-                    'timeout'     => false,
-                    'primary_key' => $configService->database_primary_key
-                ]);
-
-                foreach ($pages->findAll() as $page) {
-                    $this->app->get('/' . $page['url'], DispatchContentController::class);
-                }
-            }
 
             if (str_starts_with($this->request->getUri()->getPath(), '/admin') && file_exists(SRC . 'routes' . DS . 'AdminRoutes.php')) {
 
@@ -233,6 +221,22 @@ class Webstatt
 
                 /** Include the Admin Routes */
                 include SRC . 'Routes' . DS . 'AdminRoutes.php';
+            } else {
+
+                if (file_exists(SRC . 'routes' . DS . 'WebsiteRoutes.php')) {
+                    include SRC . 'Routes' . DS . 'WebsiteRoutes.php';
+                }
+
+                /** Dispatch the content page routes */
+                $pages = new Store($configService->database_pages_name, ROOT . DS . $configService->database_folder, [
+                    'timeout'     => false,
+                    'primary_key' => $configService->database_primary_key
+                ]);
+
+                foreach ($pages->findAll() as $page) {
+                    $this->app->get('/' . $page['url'], DispatchPageController::class);
+                }
+
             }
 
         } catch (Exception|NotCallableException|Throwable $exception) {
@@ -324,7 +328,7 @@ class Webstatt
                 $this->getApp()->getContainer()->get(Engine::class)->addData(['additional_admin_nav_items' => $this->template_navbar_items], 'Webstatt::layouts/acp');
             }
 
-            /** Content Pages Layout */
+            /** Pages Layout */
             $this->getApp()->getContainer()->get(Engine::class)->loadExtension(
                 new ContentPageLayoutHelper($this->template_layouts)
             );

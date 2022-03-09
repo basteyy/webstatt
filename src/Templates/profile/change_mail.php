@@ -14,7 +14,7 @@ $configService = $this->getConfig();
 $User = $this->getUser();
 ?>
 
-<h1>
+<h1 class="my-md-5">
     <i class="mx-md-2 bi bi-envelope"></i> <?= __('Change your e-mail address') ?>
 </h1>
 

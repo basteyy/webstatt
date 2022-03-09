@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace basteyy\Webstatt\Controller\Traits;
 
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Slim\Psr7\Request;
 
 /**
@@ -22,7 +22,9 @@ use Slim\Psr7\Request;
  */
 trait RequestTrait {
 
-    private RequestInterface $request;
+
+    /** @var ServerRequestInterface $request Request Object */
+    private ServerRequestInterface $request;
 
     /**
      * Shortcut for checking, if the current Request MEthod ist post

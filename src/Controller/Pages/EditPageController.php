@@ -10,10 +10,10 @@
 
 declare(strict_types=1);
 
-namespace basteyy\Webstatt\Controller\Content;
+namespace basteyy\Webstatt\Controller\Pages;
 
 use basteyy\Webstatt\Controller\Controller;
-use basteyy\Webstatt\Enums\ContentType;
+use basteyy\Webstatt\Enums\PageType;
 use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Models\Abstractions\PageAbstraction;
@@ -28,7 +28,7 @@ use SleekDB\Exceptions\JsonException;
 use function basteyy\VariousPhpSnippets\__;
 use function basteyy\VariousPhpSnippets\varDebug;
 
-class EditContentController extends Controller
+class EditPageController extends Controller
 {
     protected UserRole $minimum_user_role = UserRole::USER;
 
@@ -44,7 +44,7 @@ class EditContentController extends Controller
 
         if (!$page) {
             FlashMessages::addErrorMessage(__('Page not found.'));
-            return $this->redirect('/admin/content');
+            return $this->redirect('/admin/pages');
         }
 
 
@@ -52,14 +52,14 @@ class EditContentController extends Controller
 
 
             // Change Content Type?
-            if(ContentType::tryFrom($request->getParsedBody()['contentType']) !== ContentType::tryFrom($page['contentType'])) {
-                if($this->getCurrentUserData()->getRole() !== UserRole::SUPER_ADMIN) {
+            if(PageType::tryFrom($request->getParsedBody()['contentType']) !== PageType::tryFrom($page['contentType'])) {
+                if($this->getCurrentUser()->getRole() !== UserRole::SUPER_ADMIN) {
                     FlashMessages::addErrorMessage(__('You are not allowed to change the content type of a document.'));
                     return $this->redirect('/admin/content/edit/' . $content_page_secret);
                 }
 
                 $patched_page = new PageAbstraction($page, $this->getConfigService());
-                $patched_page->changeContentTypeTo(ContentType::tryFrom($request->getParsedBody()['contentType']) === ContentType::MARKDOWN ? ContentType::HTML_PHP : ContentType::MARKDOWN);
+                $patched_page->changeContentTypeTo(PageType::tryFrom($request->getParsedBody()['contentType']) === PageType::MARKDOWN ? PageType::HTML_PHP : PageType::MARKDOWN);
             }
 
             $patched_page = new PageAbstraction(array_merge($page, $request->getParsedBody()), $this->getConfigService());
@@ -74,7 +74,7 @@ class EditContentController extends Controller
 
         }
 
-        return $this->render('Webstatt::content/edit', [
+        return $this->render('Webstatt::pages/edit', [
             'page' => new PageAbstraction($page, $this->getConfigService())
         ]);
     }

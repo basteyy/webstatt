@@ -12,7 +12,9 @@ declare(strict_types=1);
 
 namespace basteyy\Webstatt\Controller\Traits;
 
+use basteyy\Webstatt\Helper\EngineExtensions\GetUserEngineExtension;
 use basteyy\Webstatt\Models\Abstractions\UserAbstraction;
+use basteyy\Webstatt\Models\Entities\UserEntity;
 use basteyy\Webstatt\Services\ConfigService;
 use League\Plates\Engine;
 use League\Plates\Extension\ExtensionInterface;
@@ -46,6 +48,17 @@ trait ResponseTrait {
     }
 
     /**
+     * Redirect inside the Webstatt Namespace Scope
+     * @param string $redirect_uri
+     * @param int $status_code
+     * @param ResponseInterface|null $response
+     * @return ResponseInterface
+     */
+    protected function adminRedirect(string $redirect_uri, int $status_code = 302, ?ResponseInterface $response = null): ResponseInterface {
+        return $this->redirect('/admin/' . ltrim(rtrim($redirect_uri, '/'), '/'), $status_code, $response);
+    }
+
+    /**
      * Render a File Not Found - Error. Method creates a new Response object!
      * @return Response
      */
@@ -55,6 +68,10 @@ trait ResponseTrait {
         $response->withStatus(404);
         $response->getBody()->write(__('File not found'));
         return $response;
+    }
+
+    protected function adminRender(string $template, ?array $data = [], ?ResponseInterface $response = null): ResponseInterface {
+        return $this->render('Webstatt::' . $template, $data, $response);
     }
 
     /**
@@ -91,25 +108,7 @@ trait ResponseTrait {
         });
 
         /** Patch user data to template if exists */
-        $this->getEngine()->loadExtension(new class($this->getCurrentUserData()) implements ExtensionInterface {
-
-            private UserAbstraction|null $data;
-
-            public function __construct(UserAbstraction|null $userData)
-            {
-                $this->data = $userData;
-            }
-
-            public function register(Engine $engine)
-            {
-                $engine->registerFunction('getUser', fn() => $this->data);
-            }
-
-            public function __toString(): string
-            {
-                return (string)$this->data;
-            }
-        });
+        $this->getEngine()->loadExtension(new GetUserEngineExtension($this->getCurrentUser()));
 
         $this->sassRenderStrategy();
 

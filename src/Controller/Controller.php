@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace basteyy\Webstatt\Controller;
 
 use basteyy\Webstatt\Controller\Traits\DatabaseTrait;
+use basteyy\Webstatt\Controller\Traits\ModelTrait;
 use basteyy\Webstatt\Controller\Traits\RequestTrait;
 use basteyy\Webstatt\Controller\Traits\ResponseTrait;
 use basteyy\Webstatt\Controller\Traits\SassCompilerTrait;
@@ -20,12 +21,15 @@ use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Helper\UserSession;
 use basteyy\Webstatt\Models\Abstractions\UserAbstraction;
+use basteyy\Webstatt\Models\Entities\UserEntity;
 use basteyy\Webstatt\Services\AccessService;
 use basteyy\Webstatt\Services\ConfigService;
+use http\Client\Curl\User;
 use League\Plates\Engine;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SleekDB\Exceptions\InvalidArgumentException;
+use function basteyy\VariousPhpSnippets\varDebug;
 
 /**
  * The Main Controller.
@@ -39,8 +43,8 @@ class Controller
     /** @var UserRole $exact_user_role In case the controller is allowed for a specific user role only */
     protected UserRole $exact_user_role;
 
-    /** @var UserAbstraction|null In case the user is logged in, this holds the user data */
-    protected UserAbstraction|null $_current_user_data;
+    /** @var UserEntity|null In case the user is logged in, this holds the user data */
+    protected UserEntity|null $_current_user_data;
 
     /** @var Engine $engine The Template Rendering Engine */
     private Engine $engine;
@@ -69,11 +73,15 @@ class Controller
     /** Request Trait */
     use RequestTrait;
 
+    /** Model Trait */
+    use ModelTrait;
+
     /**
      * @throws InvalidArgumentException
      */
     public function __construct(Engine $engine, ConfigService $configService, AccessService $accessService, ServerRequestInterface $request)
     {
+
 
         /** @var RequestInterface request Make the request global in the Controller */
         $this->request = $request;
@@ -82,8 +90,11 @@ class Controller
         $this->configService = $configService;
         $this->accessService = $accessService;
 
+
+        /** @var UserEntity _current_user_data */
         $this->_current_user_data =
-            UserSession::activeUserSession() ? new UserAbstraction(($this->getUserDatabase())->findById(UserSession::getUserSessionData()), $configService) : null;
+            UserSession::activeUserSession() ? $this->getUsersModel()->findById(UserSession::getUserSessionData()) : null;
+
 
         $role = $this->_current_user_data ? $this->_current_user_data->getRole() : UserRole::ANONYMOUS;
 
@@ -112,13 +123,20 @@ class Controller
 
         }
 
+        if(isset($this->loadModels)) {
+            foreach($this->loadModels as $model) {
+                if(class_exists($model)) {
+                    $this->getModel($model);
+                }
+            }
+        }
     }
 
     /**
      * Method returns the current user array if logged in.
      * @return UserAbstraction|null
      */
-    protected function getCurrentUserData(): UserAbstraction|null
+    protected function getCurrentUser(): UserEntity|null
     {
         return $this->_current_user_data ?? null;
     }

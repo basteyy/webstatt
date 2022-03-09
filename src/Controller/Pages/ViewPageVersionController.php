@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-namespace basteyy\Webstatt\Controller\Content;
+namespace basteyy\Webstatt\Controller\Pages;
 
 use basteyy\Webstatt\Controller\Controller;
 use basteyy\Webstatt\Enums\UserRole;
@@ -25,7 +25,7 @@ use SleekDB\Exceptions\IOException;
 use SplFileInfo;
 use function basteyy\VariousPhpSnippets\__;
 
-class ViewContentVersionController extends Controller
+class ViewPageVersionController extends Controller
 {
     protected UserRole $minimum_user_role = UserRole::USER;
 
@@ -60,7 +60,7 @@ class ViewContentVersionController extends Controller
             return $this->redirect('/admin/content/edit/' . $content_page_secret);
         }
 
-        return $this->render('Webstatt::content/version', [
+        return $this->render('Webstatt::pages/version', [
             'page'         => $page,
             'version_body' => $version_content
         ]);

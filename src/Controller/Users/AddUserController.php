@@ -16,6 +16,7 @@ use basteyy\Webstatt\Controller\Controller;
 use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Helper\UserPasswordStrategy;
+use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SleekDB\Exceptions\IdNotAllowedException;
@@ -24,6 +25,7 @@ use SleekDB\Exceptions\IOException;
 use SleekDB\Exceptions\JsonException;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
+use function basteyy\VariousPhpSnippets\__;
 use function basteyy\VariousPhpSnippets\getRandomString;
 
 class AddUserController extends Controller
@@ -35,6 +37,7 @@ class AddUserController extends Controller
      * @throws JsonException
      * @throws InvalidArgumentException
      * @throws IdNotAllowedException
+     * @throws Exception
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
@@ -45,30 +48,36 @@ class AddUserController extends Controller
             $email = $request->getParsedBody()['email'];
             $password = $request->getParsedBody()['password'];
             $role = $request->getParsedBody()['role'];
-            $db = $this->getUserDatabase();
+            $db = $this->getUsersModel();
 
-            if(null === UserRole::tryFrom($role) ) {
+            if (null === UserRole::tryFrom($role)) {
 
-                FlashMessages::addErrorMessage(sprintf('Ungültige Benutzerrolle %s', $role));
+                FlashMessages::addErrorMessage(__('Invalid user role %s', $role));
 
-            }  elseif(strlen($password) < 8) {
+            } elseif (strlen($password) < 8) {
 
-                FlashMessages::addErrorMessage(sprintf('Passwort muss mindestens %s Zeichen enthalten', 8));
+                FlashMessages::addErrorMessage(__('Password needs at least %s signs', 8));
 
-            } elseif(null === $db->findOneBy(['email', '=', $email])) {
+            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+                FlashMessages::addErrorMessage(__('The mail address looks invalid'));
+
+            } elseif (null !== $db->getRaw()->findOneBy(['email', '=', $email])) {
+
+                FlashMessages::addErrorMessage(__('A user with the email address %s is already in the system', $email));
+
+            } else {
 
                 $salt = getRandomString(16);
-                $db->insert([
+                $db->getRaw()->insert([
                     'email'    => $email,
                     'password' => UserPasswordStrategy::getHash($password, $salt),
                     'salt'     => $salt,
                     'role'     => $role,
-                    'secret' => getRandomString(24)
+                    'secret'   => getRandomString(24)
                 ]);
 
-                return $this->redirect('/admin/users#user_id_' . $db->getLastInsertedId() );
-            } else {
-                FlashMessages::addErrorMessage('Dieser Nutzer kann nicht hinzugefügt werden.');
+                return $this->redirect('/admin/users#user_id_' . $db->getRaw()->getLastInsertedId());
             }
 
             return $this->redirect('/admin/users/add');

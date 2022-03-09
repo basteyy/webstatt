@@ -10,10 +10,10 @@
 
 declare(strict_types=1);
 
-namespace basteyy\Webstatt\Controller\Content;
+namespace basteyy\Webstatt\Controller\Pages;
 
 use basteyy\Webstatt\Controller\Controller;
-use basteyy\Webstatt\Enums\ContentType;
+use basteyy\Webstatt\Enums\PageType;
 use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Models\Abstractions\PageAbstraction;
@@ -29,7 +29,7 @@ use SplFileInfo;
 use function basteyy\VariousPhpSnippets\__;
 use function basteyy\VariousPhpSnippets\varDebug;
 
-class RestoreContentVersionController extends Controller
+class RestorePageVersionController extends Controller
 {
     protected UserRole $minimum_user_role = UserRole::USER;
 

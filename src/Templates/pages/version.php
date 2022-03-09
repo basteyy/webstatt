@@ -1,6 +1,6 @@
 <?php
 
-use basteyy\Webstatt\Enums\ContentType;
+use basteyy\Webstatt\Enums\PageType;
 use function basteyy\VariousPhpSnippets\__;
 
 $this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
@@ -8,7 +8,7 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
 /** @var \basteyy\Webstatt\Models\Abstractions\PageAbstraction $page */
 ?>
 
-<h1><?= __('View content page version') ?></h1>
+<h1 class="my-md-5"><?= __('View content page version') ?></h1>
 
 
 <p class="text-xs mt-2 alert alert-danger">

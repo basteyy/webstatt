@@ -7,7 +7,7 @@ if($page->hasLayout()) {
     $this->layout($page->getLayout(), ['page' => $page]);
 }
 
-if(\basteyy\Webstatt\Enums\ContentType::HTML_PHP === $page->getContentType() ) {
+if(\basteyy\Webstatt\Enums\PageType::HTML_PHP === $page->getContentType() ) {
 
     if(!file_exists($page->getAbsoluteFilePath())) {
         throw new \Exception(\basteyy\VariousPhpSnippets\__('Cant include %s', $page->getAbsoluteFilePath()));
@@ -15,7 +15,7 @@ if(\basteyy\Webstatt\Enums\ContentType::HTML_PHP === $page->getContentType() ) {
 
     include $page->getAbsoluteFilePath();
 
-} elseif ( \basteyy\Webstatt\Enums\ContentType::MARKDOWN === $page->getContentType() ) {
+} elseif ( \basteyy\Webstatt\Enums\PageType::MARKDOWN === $page->getContentType() ) {
     echo $page->getParsedBody();
 } else {
     echo $page->getBody();

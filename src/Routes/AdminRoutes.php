@@ -11,18 +11,21 @@
 /** @var $app App */
 declare(strict_types=1);
 
-use basteyy\Webstatt\Controller\Content\AddContentController;
-use basteyy\Webstatt\Controller\Content\ContentOverview;
-use basteyy\Webstatt\Controller\Content\EditContentController;
-use basteyy\Webstatt\Controller\Content\RestoreContentVersionController;
-use basteyy\Webstatt\Controller\Content\ViewContentVersionController;
+use basteyy\Webstatt\Controller\Account\ChangeAccountPasswordController;
+use basteyy\Webstatt\Controller\Account\UserChangeMailController;
+use basteyy\Webstatt\Controller\Account\UserProfilController;
 use basteyy\Webstatt\Controller\DashboardController;
 use basteyy\Webstatt\Controller\Files\FilesOverviewController;
 use basteyy\Webstatt\Controller\LoginController;
 use basteyy\Webstatt\Controller\LogoutController;
-use basteyy\Webstatt\Controller\Profile\UserChangeMailController;
-use basteyy\Webstatt\Controller\Profile\UserProfilController;
+use basteyy\Webstatt\Controller\Pages\AddPageController;
+use basteyy\Webstatt\Controller\Pages\EditPageController;
+use basteyy\Webstatt\Controller\Pages\PagesOverviewController;
+use basteyy\Webstatt\Controller\Pages\RestorePageVersionController;
+use basteyy\Webstatt\Controller\Pages\ViewPageVersionController;
+use basteyy\Webstatt\Controller\Settings\SettingsOverviewController;
 use basteyy\Webstatt\Controller\Users\AddUserController;
+use basteyy\Webstatt\Controller\Users\EditUserController;
 use basteyy\Webstatt\Controller\Users\ListUsersController;
 use basteyy\Webstatt\Controller\Users\RemoveUserController;
 use Slim\App;
@@ -54,6 +57,9 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
 
         /** Change E-Mail */
         $proxy->any('/email', UserChangeMailController::class);
+
+        /** Change password */
+        $proxy->any('/password', ChangeAccountPasswordController::class);
     });
 
     /** User Management Routes */
@@ -67,26 +73,29 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
 
         /** Delete a User */
         $proxy->any('/delete/{user_secret}', RemoveUserController::class);
+
+        /* Edit a user */
+        $proxy->any('/edit/{user_secret}', EditUserController::class);
     });
 
 
-    /** Content Pages Routes */
-    $proxy->group('/content/pages', function (RouteCollectorProxy $proxy) {
+    /** Pages Routes */
+    $proxy->group('/pages', function (RouteCollectorProxy $proxy) {
 
-        /** List all Content Pages */
-        $proxy->any('', ContentOverview::class);
+        /** List all Pages */
+        $proxy->any('', PagesOverviewController::class);
 
-        /** Add a new Content Page */
-        $proxy->any('/add', AddContentController::class);
+        /** Add a new Page */
+        $proxy->any('/add', AddPageController::class);
 
-        /** Edit a Content Page */
-        $proxy->any('/edit/{content_page_secret}', EditContentController::class);
+        /** Edit a Page */
+        $proxy->any('/edit/{content_page_secret}', EditPageController::class);
 
         /** View a version of a page */
-        $proxy->any('/edit/{content_page_secret}/version/{version_file_name}', ViewContentVersionController::class);
+        $proxy->any('/edit/{content_page_secret}/version/{version_file_name}', ViewPageVersionController::class);
 
         /** Restore a version of a page */
-        $proxy->any('/edit/{content_page_secret}/restore/{version_file_name}', RestoreContentVersionController::class);
+        $proxy->any('/edit/{content_page_secret}/restore/{version_file_name}', RestorePageVersionController::class);
     });
 
 
@@ -97,9 +106,12 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
 
     /** Global Settings */
     $proxy->group('/settings', function (RouteCollectorProxy $proxy) {
-        $proxy->get('', \basteyy\Webstatt\Controller\Settings\SettingsOverviewController::class);
-    });
+        $proxy->get('', SettingsOverviewController::class);
 
+        /* Email Settings */
+        $proxy->any('/email', \basteyy\Webstatt\Controller\Settings\MailSettingsController::class);
+
+    });
 
 
 });

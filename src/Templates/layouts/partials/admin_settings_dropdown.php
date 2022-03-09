@@ -16,8 +16,8 @@ use function basteyy\VariousPhpSnippets\__;
         </li>
 
         <li>
-            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/me') ?>" title="<?= __('Manage who\'s is allowed to access what admin-module') ?>">
-                <i class="mx-md-2 bi bi-bricks mx-md-2"></i> <?= __('Global Configuration') ?>
+            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/settings/email') ?>" title="<?= __('Manage the mail settings') ?>">
+                <i class="mx-md-2 bi bi-mailbox mx-md-2"></i> <?= __('E-Mail Settings') ?>
             </a>
         </li>
 

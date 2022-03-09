@@ -7,7 +7,7 @@ $this->layout('Webstatt::layouts/acp', ['title' => 'Inhalte']);
 ?>
 
 
-<h1><?= __('Manage your pages') ?></h1>
+<h1 class="my-md-5"><?= __('Manage your pages') ?></h1>
 <div class="table-responsive">
     <table class="table table-striped table-hover">
         <thead>

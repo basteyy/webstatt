@@ -1,6 +1,6 @@
 <?php
 
-use basteyy\Webstatt\Enums\ContentType;
+use basteyy\Webstatt\Enums\PageType;
 use function basteyy\VariousPhpSnippets\__;
 
 $this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
@@ -8,7 +8,7 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
 /** @var \basteyy\Webstatt\Models\Abstractions\PageAbstraction $page */
 ?>
 
-<h1><?= __('Edit a content page') ?></h1>
+<h1 class="my-md-5"><?= __('Edit a content page') ?></h1>
 
 
 <!-- Modal -->
@@ -64,7 +64,7 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
 
             <?php
             if(0 !== $this->getConfig()->pages_max_versions ) {
-                echo $this->fetch('Webstatt::content/editors/versions', ['page' => $page]);
+                echo $this->fetch('Webstatt::pages/editors/versions', ['page' => $page]);
             }
             ?>
         </div>
@@ -78,7 +78,7 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
             <select class="form-select" id="_type" name="contentType" <?= $this->getUser()->getRole() !== \basteyy\Webstatt\Enums\UserRole::SUPER_ADMIN ? 'disabled':'' ?>>
                 <optgroup label="<?= __('Please select') ?>">
                     <?php
-                    foreach (ContentType::cases() as $case) {
+                    foreach (PageType::cases() as $case) {
                         printf('<option value="%1$s"%3$s>%2$s</option>', $case->name, $case->value, $page->getContentType() === $case ? ' selected' : '');
                     }
                     ?>
@@ -98,7 +98,7 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
         </div>
         <?php
         if($this->getLayouts() !== null && count($this->getLayouts()) > 0 ) {
-            echo $this->fetch('Webstatt::content/layouts_select', ['page' => $page]);
+            echo $this->fetch('Webstatt::pages/layouts_select', ['page' => $page]);
         }
         ?>
     </div>
@@ -106,10 +106,10 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
     <div class="col-12 text-end"><input type="submit" class="btn btn-primary" value="<?= __('Save') ?>"/></div>
 
     <?php
-    if($page->getContentType() === ContentType::MARKDOWN) {
-        echo $this->fetch('Webstatt::content/editors/markdown', ['page' => $page]);
-    } elseif ( $page->getContentType() === ContentType::HTML_PHP) {
-        echo $this->fetch('Webstatt::content/editors/html_php', ['page' => $page]);
+    if($page->getContentType() === PageType::MARKDOWN) {
+        echo $this->fetch('Webstatt::pages/editors/markdown', ['page' => $page]);
+    } elseif ( $page->getContentType() === PageType::HTML_PHP) {
+        echo $this->fetch('Webstatt::pages/editors/html_php', ['page' => $page]);
     } else {
         print __('Unable to edit content. Content Type %s is not supported.', $page->getContentType()->value);
     }

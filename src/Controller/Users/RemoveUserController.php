@@ -38,15 +38,17 @@ class RemoveUserController extends Controller
         /** @var $request Request */
         /** @var $response Response */
 
-        $user = ($this->getUserDatabase())->findOneBy(['secret', '=', $user_secret]);
+        $user = $this->getUsersModel()->findBySecret($user_secret);
 
-        if ($user[$this->getConfigService()->database_primary_key] === $this->_current_user_data->getId()) {
+        if($user->getId() === $this->getCurrentUser()->getId()) {
             FlashMessages::addErrorMessage(__('You  cannot delete your own account'));
             return $this->redirect('/admin/users');
         }
 
-        $this->getUserDatabase()->deleteById($user[$this->getConfigService()->database_primary_key]);
-        FlashMessages::addSuccessMessage(__('User %s was deleted successfully', $user['email']));
+        $this->getUsersModel()->getRaw()->deleteById($user->getId());
+
+        FlashMessages::addSuccessMessage(__('User %s (%s) was deleted successfully', $user->getAnyName(), $user->getEmail()));
+
         return $this->redirect('/admin/users');
 
     }

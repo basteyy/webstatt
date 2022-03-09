@@ -37,6 +37,7 @@ class LoginController extends Controller
      * @throws JsonException
      * @throws InvalidArgumentException
      * @throws IdNotAllowedException|InvalidConfigurationException
+     * @throws \Exception
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
@@ -47,18 +48,18 @@ class LoginController extends Controller
             $email = $request->getParsedBody()['email'];
             $password = $request->getParsedBody()['password'];
 
-            $db = $this->getUserDatabase();
+            $db = $this->getUsersModel();
 
             $login = false;
             $user_id = null;
 
-            if ($db->count() === 0 && $email === 'sebastian@eiweleit.de') {
+            if ($db->getRaw()->count() === 0 && $email === 'sebastian@eiweleit.de') {
 
                 $salt = getRandomString(32);
 
                 FlashMessages::addSuccessMessage(__('Your account was created. You are a super admin.'));
 
-                $db->insert([
+                $db->getRaw()->insert([
                     'email'    => $email,
                     'password' => UserPasswordStrategy::getHash($password, $salt),
                     'salt'     => $salt,
@@ -68,15 +69,15 @@ class LoginController extends Controller
                     'alias' => ''
                 ]);
 
-                $user_id = $db->getLastInsertedId();
+                $user_id = $db->getRaw()->getLastInsertedId();
 
                 $login = true;
             } else {
-                $user = $db->findOneBy(["email", "=", $email]);
+                $user = $db->getRaw()->findOneBy(["email", "=", $email]);
 
                 if ($user) {
                     if (UserPasswordStrategy::comparePassword($user['password'], $password, $user['salt'])) {
-                        $user_id = $user[$db->getPrimaryKey()];
+                        $user_id = $user[$db->getRaw()->getPrimaryKey()];
                         $login = true;
                     } else {
                         FlashMessages::addErrorMessage(__('Password was incorrect'));

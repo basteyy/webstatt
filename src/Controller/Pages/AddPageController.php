@@ -10,13 +10,15 @@
 
 declare(strict_types=1);
 
-namespace basteyy\Webstatt\Controller\Content;
+namespace basteyy\Webstatt\Controller\Pages;
 
 use basteyy\Webstatt\Controller\Controller;
-use basteyy\Webstatt\Enums\ContentType;
 use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Models\Abstractions\PageAbstraction;
+use basteyy\Webstatt\Models\Entities\PageEntity;
+use basteyy\Webstatt\Models\PagesModel;
+use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SleekDB\Exceptions\IdNotAllowedException;
@@ -27,7 +29,7 @@ use SleekDB\Exceptions\JsonException;
 use function basteyy\VariousPhpSnippets\__;
 use function basteyy\VariousPhpSnippets\varDebug;
 
-class AddContentController extends Controller
+class AddPageController extends Controller
 {
     protected UserRole $minimum_user_role = UserRole::USER;
 
@@ -37,25 +39,41 @@ class AddContentController extends Controller
      * @throws InvalidArgumentException
      * @throws IdNotAllowedException
      * @throws InvalidConfigurationException
+     * @throws Exception
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
 
         if ($this->isPost()) {
 
-            $content = new PageAbstraction(
-                $request->getParsedBody(),
-                $this->getConfigService()
-            );
+            /* Inspect the new URL */
+            $url = $request->getParsedBody()['url'];
 
-            $this->getContentPagesDatabase()->insert($content->toArray());
+            if(in_array($url, ['', '/']) && !isset($request->getParsedBody()['is_startpage'])) {
+                FlashMessages::addErrorMessage(__('Invalid URL %s.', $url));
+            } else {
 
-            FlashMessages::addSuccessMessage(__('New content page created'));
+                /** @var PagesModel $pages */
+                $pages = $this->loadModel(PagesModel::class);
 
-            return $this->redirect('/admin/content/edit/' . $this->getContentPagesDatabase()->getLastInsertedId());
+                /** @var PageEntity $test */
+                $test = $pages->create($request->getParsedBody());
+
+                varDebug($pages->save($test));
+
+                #$this->getContentPagesDatabase()->insert($content->toArray());
+
+                FlashMessages::addSuccessMessage(__('New page created'));
+
+            }
+
+
+
+
+            return $this->redirect('/admin/pages/edit/' .  $content->getSecret());
 
         }
 
-        return $this->render('Webstatt::content/add');
+        return $this->render('Webstatt::pages/add');
     }
 }

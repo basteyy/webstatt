@@ -13,7 +13,7 @@ $configService = $this->getConfig();
 $User = $this->getUser();
 ?>
 
-<h1><i class="mx-md-2 bi bi-person-circle"></i> <?= \basteyy\VariousPhpSnippets\__('Your profil') ?></h1>
+<h1 class="my-md-5"><i class="mx-md-2 bi bi-person-circle"></i> <?= \basteyy\VariousPhpSnippets\__('Your profil') ?></h1>
 
 
 <form method="post" action="<?= $this->getCurrentUrl() ?>" autocomplete="off">

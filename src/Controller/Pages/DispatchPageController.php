@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-namespace basteyy\Webstatt\Controller\Content;
+namespace basteyy\Webstatt\Controller\Pages;
 
 use basteyy\Webstatt\Controller\Controller;
 use basteyy\Webstatt\Enums\UserRole;
@@ -26,7 +26,7 @@ use SleekDB\Exceptions\JsonException;
 use function basteyy\VariousPhpSnippets\__;
 use function basteyy\VariousPhpSnippets\varDebug;
 
-class DispatchContentController extends Controller
+class DispatchPageController extends Controller
 {
     protected UserRole $minimum_user_role = UserRole::ANONYMOUS;
 
@@ -46,7 +46,7 @@ class DispatchContentController extends Controller
             return $this->render_404();
         }
 
-        return $this->render('Webstatt::content/dispatch', [
+        return $this->render('Webstatt::pages/dispatch', [
             'page' => new PageAbstraction($page)
         ]);
     }

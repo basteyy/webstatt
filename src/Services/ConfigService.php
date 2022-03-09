@@ -24,12 +24,6 @@ final class ConfigService
     readonly string $database_primary_key;
 
     /** @var string  */
-    readonly string $database_pages_name;
-
-    /** @var string  */
-    readonly string $database_users_name;
-
-    /** @var string  */
     readonly string $database_folder;
 
     /** @var string $website Define the state of your website (production or development) */
@@ -65,8 +59,14 @@ final class ConfigService
     /** @var bool $caching_apcu_disabled Disable/Enable APCu Caching */
     readonly bool $caching_apcu_disabled;
 
-    /** @var int $caching_apcu_ttl The TTL of APCu-Cache */
-    readonly int $caching_apcu_ttl;
+    /** @var int $caching_apcu_ttl The TTL of long stored APCu-Cache */
+    readonly int $caching_apcu_ttl_long;
+
+    /** @var int $caching_apcu_ttl The TTL of short stored APCu-Cache */
+    readonly int $caching_apcu_ttl_short;
+
+    /** @var string $website_url Basic URL of the project */
+    readonly string $website_url;
 
     /**
      * @throws ReflectionException
@@ -74,6 +74,10 @@ final class ConfigService
     public function __construct(array $config)
     {
         $reflection = new ReflectionClass($this);
+
+        if(isset($config['website_url'])) {
+            $config['website_url'] = $this->prepareBaseDomain($config['website_url']);
+        }
 
         foreach ($config as $name => $value) {
             $this->{$name} = $reflection->hasProperty($name) !== null && $reflection->getProperty($name)->hasType() ? match ($reflection->getProperty($name)->getType()->getName
@@ -84,6 +88,26 @@ final class ConfigService
             } : $value;
         }
 
+    }
+
+    /**
+     * Returns the project/current base URL.
+     * @param string $url
+     * @return string
+     */
+    private function prepareBaseDomain(string $url) : string {
+
+        if('auto' === $url ) {
+            // Generate the basic url
+            return $this->prepareBaseDomain($_SERVER['SERVER_NAME']);
+        }
+
+
+        if(str_starts_with($url, 'http')) {
+            return $url;
+        }
+
+        return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http') . '://' . $url;
     }
 
     /**

@@ -6,7 +6,7 @@ use function basteyy\VariousPhpSnippets\__;
 $this->layout('Webstatt::layouts/acp', ['title' => __('Add a new user')]);
 ?>
 
-<h1><?= __('Add a new user') ?></h1>
+<h1 class="my-md-5"><?= __('Add a new user') ?></h1>
 
 <form method="post" action="<?= $this->getCurrentUrl() ?>">
 

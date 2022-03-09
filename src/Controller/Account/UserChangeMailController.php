@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-namespace basteyy\Webstatt\Controller\Profile;
+namespace basteyy\Webstatt\Controller\Account;
 
 use basteyy\Webstatt\Controller\Controller;
 use basteyy\Webstatt\Enums\UserRole;
@@ -22,6 +22,7 @@ use SleekDB\Exceptions\IdNotAllowedException;
 use SleekDB\Exceptions\InvalidArgumentException;
 use SleekDB\Exceptions\IOException;
 use SleekDB\Exceptions\JsonException;
+use function basteyy\VariousPhpSnippets\__;
 
 class UserChangeMailController extends Controller
 {
@@ -35,12 +36,11 @@ class UserChangeMailController extends Controller
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $user = $this->getCurrentUserData();
+        $user = $this->getCurrentUser();
 
         if(!$user) {
             throw new \Exception('You are not logged in.');
         }
-
 
         if($this->isPost()) {
 
@@ -49,23 +49,25 @@ class UserChangeMailController extends Controller
                     FILTER_VALIDATE_EMAIL) ? $request->getParsedBody()['email_confirm'] : false;
 
             if(!UserPasswordStrategy::comparePassword($user->getPassword(), $request->getParsedBody()['password'], $user->getSalt())) {
-                FlashMessages::addErrorMessage('Passwort war nicht korrekt.');
+                FlashMessages::addErrorMessage(__('Password was incorrect'));
             } elseif(!$mail) {
-                FlashMessages::addErrorMessage('E-Mailadresse nicht gültig oder nicht korrekt bestätigt.');
-            } elseif(($this->getUserDatabase())->findOneBy([
+                FlashMessages::addErrorMessage(__('New mail address is not correct/not confirmed'));
+            } elseif(($this->getUsersModel())->getRaw()->findBy([
                     ['email', '=', $mail], 'AND', ['email', '!=', $user->getEmail()]
                 ])) {
-                FlashMessages::addErrorMessage('E-Mailadresse bereits vergeben.');
+                FlashMessages::addErrorMessage(__('New mail address is already taken'));
 
             } else {
-                $this->getUserDatabase()->updateById($user->getId(), [
+
+                $this->getUsersModel()->patch($user, [
                     'email' => $mail
                 ]);
-                FlashMessages::addSuccessMessage('Deine E-Mailadresse wurde geändert.');
+
+                FlashMessages::addSuccessMessage(__('Changes saved'));
             }
 
 
-            return $this->redirect('/admin/me/email');
+            return $this->redirect('/admin/account/email');
         }
 
         return $this->render('Webstatt::profile/change_mail', [

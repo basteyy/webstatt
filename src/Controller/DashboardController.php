@@ -20,11 +20,13 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SleekDB\Exceptions\IdNotAllowedException;
 use SleekDB\Exceptions\InvalidArgumentException;
+use SleekDB\Exceptions\InvalidConfigurationException;
 use SleekDB\Exceptions\IOException;
 use SleekDB\Exceptions\JsonException;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use function basteyy\VariousPhpSnippets\getRandomString;
+use function basteyy\VariousPhpSnippets\varDebug;
 
 class DashboardController extends Controller
 {
@@ -32,16 +34,16 @@ class DashboardController extends Controller
 
     /**
      * @throws IOException
-     * @throws JsonException
      * @throws InvalidArgumentException
-     * @throws IdNotAllowedException
+     * @throws InvalidConfigurationException
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         /** @var $request Request */
         /** @var $response Response */
 
-
-        return $this->render('Webstatt::dashboard');
+        return $this->render('Webstatt::dashboard', [
+            'users' => $this->getUsersModel()->getAll()
+        ]);
     }
 }

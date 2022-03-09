@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace basteyy\Webstatt\Models\Abstractions;
 
-use basteyy\Webstatt\Enums\ContentType;
+use basteyy\Webstatt\Enums\PageType;
 use basteyy\Webstatt\Services\ConfigService;
 use DirectoryIterator;
 use Exception;
@@ -22,7 +22,6 @@ use SplFileInfo;
 use function basteyy\VariousPhpSnippets\__;
 use function basteyy\VariousPhpSnippets\getRandomString;
 use function basteyy\VariousPhpSnippets\slugify;
-use function basteyy\VariousPhpSnippets\varDebug;
 
 final class PageAbstraction
 {
@@ -34,7 +33,7 @@ final class PageAbstraction
     private string $body;
     private string $secret;
     private string $layout;
-    private ContentType $contentType;
+    private PageType $contentType;
     private bool $online;
     private ConfigService $configService;
     /**
@@ -96,7 +95,7 @@ final class PageAbstraction
         $this->description = $data['description'] ?? '';
         $this->keywords = $data['keywords'] ?? '';
         $this->body = $data['body'] ?? '';
-        $this->contentType = !isset($data['contentType']) ? ContentType::MARKDOWN : ContentType::tryFrom($data['contentType']) ?? ContentType::MARKDOWN;
+        $this->contentType = !isset($data['contentType']) ? PageType::MARKDOWN : PageType::tryFrom($data['contentType']) ?? PageType::MARKDOWN;
         $this->online = $data['online'] ?? false;
         $this->id = $data['_id'] ?? -1;
 
@@ -189,12 +188,12 @@ final class PageAbstraction
     #[Pure] private function getFileExtension(bool $leading_dot = true): string
     {
         return ($leading_dot ? '.' : '') . match ($this->getContentType()) {
-                ContentType::HTML_PHP => $this->file_html_php_extension,
-                ContentType::MARKDOWN => $this->file_markdown_extension
+                PageType::HTML_PHP => $this->file_html_php_extension,
+                PageType::MARKDOWN => $this->file_markdown_extension
             };
     }
 
-    public function getContentType(): ContentType
+    public function getContentType(): PageType
     {
         return $this->contentType;
     }
@@ -204,7 +203,7 @@ final class PageAbstraction
         if (APCU_SUPPORT) {
 
             if (!apcu_exists($this->hash)) {
-                apcu_add($this->hash, (new Parsedown())->parse($this->loadBody()), APCU_TTL);
+                apcu_add($this->hash, (new Parsedown())->parse($this->loadBody()), APCU_TTL_LONG);
             }
 
             return apcu_fetch($this->hash) . PHP_EOL . '<!-- Cached Version from ' . date('d.m.Y H:i:s', apcu_key_info($this->hash)['creation_time']) . ' -->';
@@ -238,9 +237,9 @@ final class PageAbstraction
             mkdir($folder = $this->path . DIRECTORY_SEPARATOR . $this->backup_folder_name, 0755, true);
         }
 
-        if (APCU_SUPPORT && $this->getContentType() === ContentType::MARKDOWN) {
+        if (APCU_SUPPORT && $this->getContentType() === PageType::MARKDOWN) {
             apcu_delete($this->hash);
-            apcu_add($this->hash, (new Parsedown())->parse($body), APCU_TTL);
+            apcu_add($this->hash, (new Parsedown())->parse($body), APCU_TTL_LONG);
         }
 
         file_put_contents($this->getAbsoluteFilePath(), $body);
@@ -317,14 +316,14 @@ final class PageAbstraction
 
     /**
      * Change the current page content context to $changeContentType
-     * @param ContentType $changeToContentType
+     * @param PageType $changeToContentType
      * @return void
      */
-    public function changeContentTypeTo(ContentType $changeToContentType): void
+    public function changeContentTypeTo(PageType $changeToContentType): void
     {
         $versions = $this->getAllVersions();
 
-        $new_extension = '.' . ($changeToContentType === ContentType::MARKDOWN ? $this->file_html_php_extension : $this->file_markdown_extension);
+        $new_extension = '.' . ($changeToContentType === PageType::MARKDOWN ? $this->file_html_php_extension : $this->file_markdown_extension);
 
         foreach ($versions as $timestamp => $path) {
             copy($path, str_replace($this->getFileExtension(true), $new_extension, $path));

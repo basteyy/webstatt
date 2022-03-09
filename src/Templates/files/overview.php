@@ -15,7 +15,7 @@ $User = $this->getUser();
 ?>
 
 
-<h1>
+<h1 class="my-md-5">
     <?= __('Files overview') ?>
 </h1>
 

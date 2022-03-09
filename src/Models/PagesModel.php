@@ -10,10 +10,9 @@
 
 declare(strict_types=1);
 
-namespace basteyy\Webstatt\Enums;
+namespace basteyy\Webstatt\Models;
 
-enum ContentType: string
-{
-    case MARKDOWN = 'MARKDOWN';
-    case HTML_PHP = 'HTML_PHP';
+use basteyy\Webstatt\Models\Abstractions\PageAbstraction;
+
+final class PagesModel extends Model {
 }

@@ -10,12 +10,19 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Dashboard')]);
 /** @var ConfigService $configService */
 $configService = $this->getConfig();
 
-/** @var UserAbstraction $User */
+/** @var \basteyy\Webstatt\Models\Entities\UserEntity $User */
 $User = $this->getUser();
+
 ?>
 
 
-<h1>
+<?php if(!$User->hasName() ) { ?>
+    <p class="alert alert-warning">
+        <?= __('You have not set a name to your profile. To free the full potential, please enter name'); ?>
+    </p>
+<?php } ?>
+
+<h1 class="my-md-5">
     <?= __('Dashboard') ?>
 </h1>
 
@@ -30,9 +37,24 @@ $User = $this->getUser();
         </div>
         <div class="col-md">
             <h2><?= __('Users') ?></h2>
+            <p class="text-xs">
+                <?= __('There are %s users in the system', count($users)) ?>
+            </p>
+            <hr />
+            <?php
+            /** @var \basteyy\Webstatt\Models\Entities\UserEntity $user */
+            foreach ( $users as $user) {
+                print __('<a href="%1$s">%2$s</a>', '/admin/u/' . $user->getSecret(), $user->getAnyName()) . PHP_EOL;
+
+            }
+            ?>
         </div>
         <div class="col-md">
             <h2><?= __('Your account') ?></h2>
+
+            <p>
+                <?= __('Name') ?>: <?= $this->getUser()->hasName() ? $this->getUser()->getName() : '<a href="">Set name</a>'?>
+            </p>
 
             <p>
                 <?= __('E-Mail') ?>: <?= $this->getUser()->email ?>
@@ -41,7 +63,8 @@ $User = $this->getUser();
 
             <hr/>
             <p>
-                <a href="" class="btn btn-secondary btn-sm"><i class="mx-md-2 bi bi-person-circle"></i> <?= __('Show your profile') ?></a>
+                <a href="/admin/u/<?= $this->getUser()->getSecret() ?>" class="btn btn-secondary btn-sm"><i class="mx-md-2 bi bi-person-circle"></i> <?= __('Show your profile')
+                    ?></a>
             </p>
         </div>
     </div>

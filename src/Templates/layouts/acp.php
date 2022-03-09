@@ -24,12 +24,39 @@ $User = $this->getUser();
     <style>
         :root {
             --bs-body-font-family: 'Inter var', sans-serif;
+            --webstatt-green-rgb: 139, 180, 26;
+            --webstatt-text-rgb: 255,255,255;
+            --webstatt-green: rgb(var(--webstatt-green-rgb), 1);
+            --webstatt-not-green: rgb(var(--webstatt-text-rgb), 1);
+
+        }
+        @media(prefers-color-scheme: dark){
+            :root {
+                --webstatt-green: rgb(var(--webstatt-green-rgb), .3);
+                --webstatt-not-green: rgb(var(--webstatt-text-rgb), .5);
+            }
+        }
+
+        .above-navbar a, .above-navbar, .above-navbar a:hover {
+            color: var(--webstatt-not-green);
+        }
+
+        .above-navbar {
+            background-color: var(--webstatt-green);
         }
     </style>
     <meta name="color-scheme" content="light dark">
 
 </head>
 <body>
+
+<nav class="text-end p-2 above-navbar d-flex justify-content-between align-items-baseline">
+    <span><?= __('Hi %s', $this->getUser()->getAnyName()) ?></span>
+    <a class="nav-link" href="<?= $this->getAbsoluteUrl('/admin/logout?t=') ?><?= time() ?>">
+        <i class="mx-md-2 bi bi-box-arrow-right"></i> <?= __('Logout') ?>
+    </a>
+</nav>
+
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-xxl">
@@ -49,18 +76,18 @@ $User = $this->getUser();
                 </li>
 
                 <li class="nav-item dropdown mx-lg-3">
-                    <a class="nav-link dropdown-toggle" href="<?= $this->getAbsoluteUrl('/admin/content/pages') ?>" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                    <a class="nav-link dropdown-toggle" href="<?= $this->getAbsoluteUrl('/admin/pages') ?>" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
                        aria-expanded="false">
                         <i class="mx-md-2 bi bi-newspaper"></i> <?= __('Content') ?>
                     </a>
                     <ul class="dropdown-menu p-md-4" aria-labelledby="navbarDropdown">
                         <li>
-                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/content/pages') ?>" title="<?= __('Content Pages Overview') ?>">
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/pages') ?>" title="<?= __('Pages Overview') ?>">
                                 <i class="mx-md-2 bi bi-view-list"></i> <?= __('List the content') ?>
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/content/pages/add') ?>" title="<?= __('Create a new Page') ?>">
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/pages/add') ?>" title="<?= __('Create a new Page') ?>">
                                 <i class="mx-md-2 bi bi-plus-circle"></i> <?= __('Add new content') ?>
                             </a>
                         </li>
@@ -97,20 +124,30 @@ $User = $this->getUser();
                     <ul class="dropdown-menu p-md-4" aria-labelledby="navbarDropdown">
 
                         <li>
-                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/me') ?>" title="<?= __('Manage your profil') ?>">
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/account') ?>" title="<?= __('Manage your profil') ?>">
                                 <i class="mx-md-2 bi bi-person-circle"></i> <?= __('Your Profile') ?>
                             </a>
                         </li>
 
                         <li>
-                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/me/email') ?>">
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/account/email') ?>">
                                 <i class="mx-md-2 bi bi-envelope"></i> <?= __('Change your E-Mail') ?>
                             </a>
                         </li>
 
                         <li>
-                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/me/password') ?>">
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/account/password') ?>">
                                 <i class="mx-md-2 bi bi-unlock"></i> <?= __('Change your password') ?>
+                            </a>
+                        </li>
+
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/account/settings') ?>">
+                                <i class="mx-md-2 bi bi-gear"></i> <?= __('Change your settings') ?>
                             </a>
                         </li>
                     </ul>
@@ -135,12 +172,6 @@ $User = $this->getUser();
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="<?= $this->getAbsoluteUrl('/') ?>" title="<?= __('Go to the website') ?>">
                         <i class="mx-md-2 bi bi-globe"></i> <?= __('Website') ?>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-item nav-link" href="<?= $this->getAbsoluteUrl('/admin/logout?t=') ?><?= time() ?>">
-                        <i class="mx-md-2 bi bi-box-arrow-right"></i> <?= __('Logout') ?>
                     </a>
                 </li>
 
