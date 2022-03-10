@@ -20,6 +20,8 @@ use basteyy\Webstatt\Helper\AdminNavbarItem;
 use basteyy\Webstatt\Helper\EngineExtensions\ContentPageLayoutHelper;
 use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Helper\UserSession;
+use basteyy\Webstatt\Models\Entities\PageEntity;
+use basteyy\Webstatt\Models\PagesModel;
 use basteyy\Webstatt\Services\AccessService;
 use basteyy\Webstatt\Services\ConfigService;
 use DI\Bridge\Slim\Bridge;
@@ -90,53 +92,53 @@ class Webstatt
 
         try {
 
-            /** Try to load default config from config.ini */
+            /* Try to load default config from config.ini */
             if (!file_exists(PACKAGE_ROOT . DS . 'config.ini')) {
                 throw new Exception(sprintf('No default-config file found at "%s"', PACKAGE_ROOT . DS . 'config.ini'));
             }
 
-            /** Load the default config */
+            /* Load the default config */
             $config = parse_ini_file(PACKAGE_ROOT . DS . 'config.ini', false);
 
-            /** Try to load the config from the config.ini in root folder */
+            /* Try to load the config from the config.ini in root folder */
             if (file_exists(ROOT . DS . 'config.ini')) {
                 $config = array_merge($config, parse_ini_file(ROOT . DS . 'config.ini', false));
             }
 
-            /** Is Debug-Mode forced? */
+            /* Is Debug-Mode forced? */
             if (isset($options['debug']) && is_bool($options['debug'])) {
                 $config['debug'] = $options['debug'];
             }
 
-            /** Construct the Congi Servcie */
+            /* Construct the Congi Servcie */
             $configService = new ConfigService($config);
 
-            /** APCu installed and enabled to use it */
+            /* APCu installed and enabled to use it */
             if (!defined('APCU_SUPPORT')) {
                 define('APCU_SUPPORT', !$configService->caching_apcu_disabled && function_exists('apcu_enabled') && apcu_enabled());
             }
 
-            /** APCu TTL */
+            /* APCu TTL */
             if (APCU_SUPPORT) {
                 define('APCU_TTL_LONG', $configService->caching_apcu_ttl_long ?? 720);
                 define('APCU_TTL_SHORT', $configService->caching_apcu_ttl_short ?? 10);
             }
 
-            /** Make the temp folder */
+            /* Make the temp folder */
             if (!is_dir(TEMP)) {
                 mkdir(TEMP, 0755, true);
             }
 
-            /** Access Service Initiation */
+            /* Access Service Initiation */
             $accessService = new AccessService($configService);
 
 
-            /** Yes, I create  the request here manually. See below for the why */
+            /* Yes, I create  the request here manually. See below for the why */
             /** @var Request $request */
             $this->request = (ServerRequestCreatorFactory::create())->createServerRequestFromGlobals();
 
             if ('POST' !== $this->request->getMethod()) {
-                /** I know, normally a middleware should do that. But that's seems faster to me */
+                /* I know, normally a middleware should do that. But that's seems faster to me */
                 if (str_ends_with($this->request->getUri()->getPath(), '/')) {
 
                     $url =
@@ -147,7 +149,7 @@ class Webstatt
                         // Fragment?
                         (strlen($this->request->getUri()->getFragment()) > 0 ? '#' . $this->request->getUri()->getFragment() : '');
 
-                    /** In case there is no domainname (by using ip address) */
+                    /* In case there is no domainname (by using ip address) */
                     if (strlen($url) !== 0) {
                         http_response_code(301);
                         header('location: ' . $url);
@@ -156,11 +158,11 @@ class Webstatt
                 }
             }
 
-            /** Lets build the awesome container */
+            /* Let's build the awesome container */
             $builder = new ContainerBuilder();
             $builder->useAnnotations(false);
 
-            /** We need the request object later a few times inside the DI definitions */
+            /* We need the request object later a few times inside the DI definitions */
             $request = $this->request;
 
             $builder->addDefinitions([
@@ -170,13 +172,13 @@ class Webstatt
 
                 ServerRequestInterface::class => $this->request,
 
-                /** Session */
+                /* Session */
                 'session'            => function () {
                     /** @see https://github.com/bryanjhv/slim-session */
                     return new Helper();
                 },
 
-                /** Template Engine */
+                /* Template Engine */
                 Engine::class        => function () use ($request) {
 
                     $engine = new Engine();
@@ -193,11 +195,11 @@ class Webstatt
                 }
             ]);
 
-            /** Build the app from DI Builder */
+            /* Build the app from DI Builder */
             $this->app = Bridge::create($builder->build());
 
 
-            /** Session @see https://github.com/bryanjhv/slim-session */
+            /* Session @see https://github.com/bryanjhv/slim-session */
             $this->app->add(
                 new Session([
                     'name'        => $configService->session_name,
@@ -206,35 +208,53 @@ class Webstatt
                 ])
             );
 
-            /** Register the FlashMessages Middleware */
+            /* Register the FlashMessages Middleware */
             $this->app->add(FlashMessages::class);
 
-            /** Register the User Session Middleware */
+            /* Register the User Session Middleware */
             $this->app->add(UserSession::class);
-
 
             if (str_starts_with($this->request->getUri()->getPath(), '/admin') && file_exists(SRC . 'routes' . DS . 'AdminRoutes.php')) {
 
-                /** In the admin Szenario, there will be the l18n helper loaded */
+                /* In the admin Szenario, there will be the l18n helper loaded */
                 i18n::addTranslationFolder(SRC . 'Resources' . DS . 'Languages');
                 i18n::setTranslationLanguage('de_DE');
 
-                /** Include the Admin Routes */
+                /* Include the Admin Routes */
                 include SRC . 'Routes' . DS . 'AdminRoutes.php';
             } else {
 
+                /* Static Webstatt Website Routes? */
                 if (file_exists(SRC . 'routes' . DS . 'WebsiteRoutes.php')) {
                     include SRC . 'Routes' . DS . 'WebsiteRoutes.php';
                 }
 
-                /** Dispatch the content page routes */
-                $pages = new Store($configService->database_pages_name, ROOT . DS . $configService->database_folder, [
-                    'timeout'     => false,
-                    'primary_key' => $configService->database_primary_key
-                ]);
+                /** @var string $pages_apcu_key Name of the routes-array inside cache*/
+                $pages_apcu_key = 'pages_routes';
 
-                foreach ($pages->findAll() as $page) {
-                    $this->app->get('/' . $page['url'], DispatchPageController::class);
+                /* Cache enabled and cache exists? */
+                if((APCU_SUPPORT && !apcu_exists($pages_apcu_key)) || !APCU_SUPPORT) {
+
+                    $pages = [];
+
+                    /** @var PageEntity $page */
+                    foreach((new PagesModel($configService))->getAllOnlinePages() as $page) {
+                        $pages[] = $page->getUrl();
+                    }
+
+                    /* Put to cache, in case its enabled */
+                    if(APCU_SUPPORT) {
+                        /* Store to cache */
+                        apcu_add($pages_apcu_key, $pages, APCU_TTL_LONG);
+                    }
+
+                } else {
+                    /* Routes from cache */
+                    $pages = apcu_fetch($pages_apcu_key);
+                }
+
+                foreach ($pages as $x => $url) {
+                    $this->app->get('/' . $url, DispatchPageController::class);
                 }
 
             }

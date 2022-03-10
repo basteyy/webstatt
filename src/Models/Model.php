@@ -158,4 +158,9 @@ class Model implements ModelInterface
         return $this->configService->database_primary_key;
     }
 
+
+    protected function getDatabaseName() : string {
+        return $this->database_name;
+    }
+
 }

@@ -21,8 +21,6 @@ use function basteyy\VariousPhpSnippets\__;
             </a>
         </li>
 
-
-
         <li>
             <hr class="dropdown-divider">
         </li>

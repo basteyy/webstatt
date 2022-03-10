@@ -17,4 +17,6 @@ class PageEntity extends Entity implements EntityInterface {
     protected string $url;
     protected string $nothere;
 
+
+
 }
