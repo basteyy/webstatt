@@ -24,7 +24,6 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Add a new user')]);
         </div>
     </div>
 
-
     <div class="row mb-3">
         <label for="_role" class="col-sm-2 col-form-label"><?= __('User-role') ?></label>
         <div class="col-sm-10">
@@ -47,6 +46,15 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Add a new user')]);
             </select>
         </div>
     </div>
+
+    <?php if($this->getConfig()->getMailConfig()['activate_mail_system']) { ?>
+    <div class="row m-2">
+        <div class="form-check form-switch offset-md-2">
+            <input class="form-check-input" type="checkbox" role="switch" id="_send_welcome_mail" name="send_welcome_mail" checked>
+            <label class="form-check-label" for="_send_welcome_mail"><?= __('Send a mail to the new user') ?></label>
+        </div>
+    </div>
+    <?php } ?>
 
 
     <button type="submit" class="btn btn-primary">

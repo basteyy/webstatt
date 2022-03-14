@@ -1,6 +1,8 @@
+<?php
+/** @var \basteyy\Webstatt\Models\Entities\PageEntity $page */
+?>
 
-
-<textarea id="_body" name="body" class="form-text"><?= $page->getBody() ?></textarea>
+<textarea id="_body" name="body" class="form-text"><?= $page->getStorage()->getBody(false) ?></textarea>
 
 
 <link rel="stylesheet" href="<?= $this->cacheLocal('https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css') ?>"

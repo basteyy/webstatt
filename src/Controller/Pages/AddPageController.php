@@ -27,6 +27,7 @@ use SleekDB\Exceptions\InvalidConfigurationException;
 use SleekDB\Exceptions\IOException;
 use SleekDB\Exceptions\JsonException;
 use function basteyy\VariousPhpSnippets\__;
+use function basteyy\VariousPhpSnippets\getRandomString;
 use function basteyy\VariousPhpSnippets\varDebug;
 
 class AddPageController extends Controller
@@ -47,30 +48,37 @@ class AddPageController extends Controller
         if ($this->isPost()) {
 
             /* Inspect the new URL */
-            $url = $request->getParsedBody()['url'];
+            $data = [
+                'url'          => $request->getParsedBody()['url'],
+                'name'         => $request->getParsedBody()['name'],
+                'title'        => $request->getParsedBody()['title'],
+                'description'  => $request->getParsedBody()['description'],
+                'keywords'     => $request->getParsedBody()['keywords'],
+                'pageType'     => $request->getParsedBody()['PageType'],
+                'layout'       => $request->getParsedBody()['layout'],
+                'online'    => (bool)$request->getParsedBody()['online'],
+                'startpage' => (bool)$request->getParsedBody()['startpage'],
+                'secret'       => getRandomString(18)
+                //'body'        => $request->getParsedBody()['body'],
+            ];
 
-            if(in_array($url, ['', '/']) && !isset($request->getParsedBody()['is_startpage'])) {
-                FlashMessages::addErrorMessage(__('Invalid URL %s.', $url));
+            if (in_array($data['url'], ['', '/']) && !isset($request->getParsedBody()['startpage'])) {
+                FlashMessages::addErrorMessage(__('Invalid URL %s.', $data['url']));
             } else {
 
+                /* Add the / to the url */
+                if (!str_starts_with($data['url'], '/')) {
+                    $data['url'] = '/' . $data['url'];
+                }
+
                 /** @var PagesModel $pages */
-                $pages = $this->loadModel(PagesModel::class);
-
-                /** @var PageEntity $test */
-                $test = $pages->create($request->getParsedBody());
-
-                varDebug($pages->save($test));
-
-                #$this->getContentPagesDatabase()->insert($content->toArray());
+                $page = $this->getPagesModel()->create($data);
 
                 FlashMessages::addSuccessMessage(__('New page created'));
 
             }
 
-
-
-
-            return $this->redirect('/admin/pages/edit/' .  $content->getSecret());
+            return $this->redirect('/admin/pages/edit/' . $page->getSecret());
 
         }
 

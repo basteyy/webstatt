@@ -1,14 +1,17 @@
 <?php
 
 use basteyy\Webstatt\Enums\PageType;
+use basteyy\Webstatt\Enums\UserRole;
+use basteyy\Webstatt\Models\Entities\PageEntity;
 use function basteyy\VariousPhpSnippets\__;
 
-$this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
+$this->layout('Webstatt::layouts/acp', ['title' => __('Edit a page')]);
 
-/** @var \basteyy\Webstatt\Models\Abstractions\PageAbstraction $page */
+/** @var PageEntity $page */
+
 ?>
 
-<h1 class="my-md-5"><?= __('Edit a content page') ?></h1>
+<h1 class="my-md-5"><?= __('Edit a page') ?></h1>
 
 
 <!-- Modal -->
@@ -33,11 +36,22 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
         <div class="row g-3">
             <div class="col-12">
                 <label for="_url" class="form-label"><?= __('Url of the page') ?></label>
-                <input type="text" class="form-control" id="_url" name="url" placeholder="<?= __('Url of the page') ?>" required value="<?= $page->getUrl()?>" />
+                <input type="text" class="form-control" id="_url" name="url" placeholder="<?= __('Url of the page') ?>" required value="<?= $page->getUrl() ?>"/>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="_startpage" name="startpage" <?= $page->getStartpage() ? 'checked':'' ?>>
+                    <label class="form-check-label" for="_startpage"><?= __('Page is homepage/startpage of the website') ?></label>
+                </div>
             </div>
             <div class="col-12">
                 <label for="_name" class="form-label"><?= __('Intern name of the page') ?></label>
                 <input type="text" class="form-control" id="_name" name="name" placeholder="<?= __('Intern name of the page') ?>" required value="<?= $page->getName() ?>">
+            </div>
+
+            <div class="col-12">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="_is_page_online" name="online" <?= $page->getOnline() ? 'checked':'' ?>>
+                    <label class="form-check-label" for="_is_page_online"><?= __('Page is online') ?></label>
+                </div>
             </div>
         </div>
     </div>
@@ -49,21 +63,21 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
 
             <div class="col-12">
                 <label for="_title" class="form-label"><?= __('SEO Title Tag') ?></label>
-                <input type="text" class="form-control" id="_title" name="title" placeholder="<?= __('SEO Title Tag') ?>" value="<?= $page->getTitle()?>">
+                <input type="text" class="form-control" id="_title" name="title" placeholder="<?= __('SEO Title Tag') ?>" value="<?= $page->getTitle() ?>">
             </div>
 
             <div class="col-12">
                 <label for="_description" class="form-label"><?= __('SEO Description Tag') ?></label>
-                <input type="text" class="form-control" id="_description" name="description" placeholder="<?= __('SEO Description Tag') ?>" value="<?= $page->getDescription()?>">
+                <input type="text" class="form-control" id="_description" name="description" placeholder="<?= __('SEO Description Tag') ?>" value="<?= $page->getDescription() ?>">
             </div>
 
             <div class="col-12">
                 <label for="_keywords" class="form-label"><?= __('SEO Keywords Tag') ?></label>
-                <input type="text" class="form-control" id="_keywords" name="keywords" placeholder="<?= __('SEO Keywords Tag') ?>" value="<?= $page->getKeywords()?>">
+                <input type="text" class="form-control" id="_keywords" name="keywords" placeholder="<?= __('SEO Keywords Tag') ?>" value="<?= $page->getKeywords() ?>">
             </div>
 
             <?php
-            if(0 !== $this->getConfig()->pages_max_versions ) {
+            if (0 !== $this->getConfig()->pages_max_versions) {
                 echo $this->fetch('Webstatt::pages/editors/versions', ['page' => $page]);
             }
             ?>
@@ -75,29 +89,32 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
         <div class="col-12">
 
             <label for="_type" class="form-label"><?= __('Type') ?></label>
-            <select class="form-select" id="_type" name="contentType" <?= $this->getUser()->getRole() !== \basteyy\Webstatt\Enums\UserRole::SUPER_ADMIN ? 'disabled':'' ?>>
+            <select class="form-select" id="_type" name="PageType" <?= $this->getUser()->getRole() !== UserRole::SUPER_ADMIN ? 'disabled' : '' ?>>
                 <optgroup label="<?= __('Please select') ?>">
                     <?php
                     foreach (PageType::cases() as $case) {
-                        printf('<option value="%1$s"%3$s>%2$s</option>', $case->name, $case->value, $page->getContentType() === $case ? ' selected' : '');
+                        printf('<option value="%1$s"%3$s>%2$s</option>', $case->name, $case->value, $page->getPageType() === $case ? ' selected' : '');
                     }
                     ?>
                 </optgroup>
             </select>
 
-            <?php if($this->getUser()->getRole() === \basteyy\Webstatt\Enums\UserRole::SUPER_ADMIN ) { ?>
+            <?php
+            if ($this->getUser()->getRole() === UserRole::SUPER_ADMIN) { ?>
                 <p class="text-xs mt-2 alert alert-info">
                     <?= __('Content types specifies how the content is processed by the system. <a title="Learn more about markdown" href="https://www.markdownguide.org" target="_blank">MARKDOWN</a> means that the content will be processed as Markdown afterwards. The second variant is currently HTML_PHP, where extensive processing is possible.') ?>
                 </p>
-            <?php } else { ?>
+            <?php
+            } else { ?>
 
                 <p class="text-xs mt-2 alert alert-danger">
                     <?= __('You cannot change the content type of the document. <a href="#" data-bs-toggle="modal" data-bs-target="#data_type_change_limitations">Read here</a> why.') ?>
                 </p>
-            <?php } ?>
+            <?php
+            } ?>
         </div>
         <?php
-        if($this->getLayouts() !== null && count($this->getLayouts()) > 0 ) {
+        if ($this->getLayouts() !== null && count($this->getLayouts()) > 0) {
             echo $this->fetch('Webstatt::pages/layouts_select', ['page' => $page]);
         }
         ?>
@@ -106,12 +123,12 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
     <div class="col-12 text-end"><input type="submit" class="btn btn-primary" value="<?= __('Save') ?>"/></div>
 
     <?php
-    if($page->getContentType() === PageType::MARKDOWN) {
+    if ($page->getPageType() === PageType::MARKDOWN) {
         echo $this->fetch('Webstatt::pages/editors/markdown', ['page' => $page]);
-    } elseif ( $page->getContentType() === PageType::HTML_PHP) {
+    } elseif ($page->getPageType() === PageType::HTML_PHP) {
         echo $this->fetch('Webstatt::pages/editors/html_php', ['page' => $page]);
     } else {
-        print __('Unable to edit content. Content Type %s is not supported.', $page->getContentType()->value);
+        print __('Unable to edit content. Content Type %s is not supported.', $page->getPageType());
     }
 
     ?>

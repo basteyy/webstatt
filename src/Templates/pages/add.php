@@ -29,8 +29,8 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Add a new page')]);
 
 
                 <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="_is_startpage" name="is_startpage">
-                    <label class="form-check-label" for="_is_startpage"><?= __('Page is homepage/startpage of the website') ?></label>
+                    <input class="form-check-input" type="checkbox" role="switch" id="_startpage" name="startpage">
+                    <label class="form-check-label" for="_startpage"><?= __('Page is homepage/startpage of the website') ?></label>
                 </div>
             </div>
             <div class="col-12">
@@ -40,7 +40,7 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Add a new page')]);
 
             <div class="col-12">
                 <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="_is_page_online" name="is_online">
+                    <input class="form-check-input" type="checkbox" role="switch" id="_is_page_online" name="online">
                     <label class="form-check-label" for="_is_page_online"><?= __('Page is online') ?></label>
                 </div>
             </div>
@@ -75,7 +75,7 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Add a new page')]);
         <div class="row g-3">
             <div class="col-12">
                 <label for="_type" class="form-label"><?= __('Type') ?></label>
-                <select class="form-select" id="_type" name="contentType">
+                <select class="form-select" id="_type" name="PageType">
                     <optgroup label="<?= __('Please select') ?>">
                         <?php
                         foreach (PageType::cases() as $case) {
@@ -104,16 +104,16 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Add a new page')]);
 
 <script>
     let _url = document.querySelector('input#_url'),
-        _is_startpage = document.querySelector('input#_is_startpage'),
+        _startpage = document.querySelector('input#_startpage'),
         _emptyUrlError = document.querySelector('#_emptyUrlError');
 
-    _is_startpage.addEventListener('change', function () {
+    _startpage.addEventListener('change', function () {
         console.log('Hide Warning');
         _emptyUrlError.classList.add('visually-hidden');
     })
 
     document.querySelector('form#_createPageForm').addEventListener('submit', function (e) {
-        if(!_is_startpage.checked && ( _url.value === '/'  || _url.value.length < 2 )) {
+        if(!_startpage.checked && ( _url.value === '/'  || _url.value.length < 2 )) {
             e.preventDefault();
             _emptyUrlError.classList.remove('visually-hidden');
             return false;

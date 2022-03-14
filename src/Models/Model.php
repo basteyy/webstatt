@@ -12,13 +12,17 @@ declare(strict_types=1);
 
 namespace basteyy\Webstatt\Models;
 
+use basteyy\Webstatt\Enums\PageType;
 use basteyy\Webstatt\Models\Entities\Entity;
 use basteyy\Webstatt\Models\Entities\EntityInterface;
+use basteyy\Webstatt\Models\Entities\PageEntity;
 use basteyy\Webstatt\Services\ConfigService;
 use Exception;
+use ReflectionException;
 use SleekDB\Exceptions\InvalidArgumentException;
 use SleekDB\Exceptions\InvalidConfigurationException;
 use SleekDB\Exceptions\IOException;
+use SleekDB\Exceptions\JsonException;
 use SleekDB\Store;
 use function basteyy\VariousPhpSnippets\__;
 use function basteyy\VariousPhpSnippets\varDebug;
@@ -46,8 +50,49 @@ class Model implements ModelInterface
         }
     }
 
+    /**
+     * @param EntityInterface $entity
+     * @param array $data
+     * @return void
+     * @throws IOException
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigurationException
+     * @throws JsonException
+     * @throws Exception
+     * @todo Implement strict types like __construct
+     */
     public function patch(EntityInterface $entity, array $data): void
     {
+
+        $reflection = new \ReflectionClass($entity);
+
+        foreach($data as $name => $value) {
+            if($reflection->hasProperty($name) && $reflection->getProperty($name)->hasType()) {
+
+                /* Enum? */
+                if($name !== $this->configService->database_primary_key && $reflection->getProperty($name)->getType()->isBuiltin()) {
+
+                    $data[$name] = match ($reflection->getProperty($name)->getType()->getName()) {
+                        'int' => (int)$value,
+                        'bool' => (bool)$value,
+                        default => $value,
+                    };
+
+                } else {
+
+                    $enum = $reflection->getProperty($name)->getType()->getName();
+
+                    if(is_string($value)) {
+                        $data[$name] = $enum::tryFrom($value);
+                    } elseif((new \ReflectionEnum($value))->getName() === $enum) {
+                        $data[$name] = $value;
+                    } else {
+                        throw new \Exception(__('Invalid enum type %s cannot assigned to enum %s', (new \ReflectionEnum($value))->getName(), $enum));
+                    }
+                }
+            }
+        }
+
         $this->getRaw()->updateById($entity->getId(), $data);
     }
 
@@ -85,32 +130,58 @@ class Model implements ModelInterface
     /**
      * @throws InvalidArgumentException
      */
-    public function findById(int $id): EntityInterface
+    public function findById(int $id, bool $use_cache = true): EntityInterface
     {
-        return $this->create($this->getRaw()->findById($id));
+        return $this->createEntities($this->getRaw()->findById($id));
     }
 
-    public function create(array $data): EntityInterface
+    /**
+     * Method turns array elements to the entities
+     * @param array $entries
+     * @return array|EntityInterface|null
+     * @throws ReflectionException
+     */
+    protected function createEntities(array $entries): array|EntityInterface|null
     {
-        /* New element, when there is no primary id */
-        if (!isset($data[$this->configService->database_primary_key])) {
-            $data['__new'] = true;
+        if (count($entries) === 0) {
+            return null;
         }
 
         $entity_class_name = $this->getEntityName();
 
-        return new $entity_class_name($data, $this->configService->database_primary_key);
+        if (!isset($entries[0][$this->getPrimaryIdName()])) {
+
+            /* New element, when there is no primary id */
+            if (!isset($entries[$this->configService->database_primary_key])) {
+                $entries['__new'] = true;
+            }
+
+            return new $entity_class_name($entries, $this->getPrimaryIdName());
+        }
+
+        $pages = [];
+        foreach ($entries as $entry) {
+
+            /* New element, when there is no primary id */
+            if (!isset($entry[$this->configService->database_primary_key])) {
+                $entry['__new'] = true;
+            }
+
+            $pages[] = new $entity_class_name($entry, $this->getPrimaryIdName());
+        }
+        return $pages;
     }
 
     /**
      * Build the entity name for current table
+     * @param bool $use_cache
      * @return string
      */
-    private function getEntityName(): string
+    private function getEntityName(bool $use_cache = true): string
     {
         $called_class = get_called_class();
 
-        if (APCU_SUPPORT && apcu_exists($called_class)) {
+        if ($use_cache && APCU_SUPPORT && apcu_exists($called_class)) {
             return apcu_fetch($called_class);
         }
 
@@ -141,7 +212,7 @@ class Model implements ModelInterface
             if (class_exists($class)) {
 
                 /* Cache the result */
-                if (APCU_SUPPORT && apcu_exists($called_class)) {
+                if ($use_cache && APCU_SUPPORT && apcu_exists($called_class)) {
                     apcu_add($called_class, $class, APCU_TTL_SHORT);
                 }
 
@@ -153,13 +224,28 @@ class Model implements ModelInterface
         return Entity::class;
     }
 
-
-    protected function getPrimaryIdName() : string {
+    protected function getPrimaryIdName(): string
+    {
         return $this->configService->database_primary_key;
     }
 
+    /**
+     * @inheritDoc
+     * @param array $entity_data
+     * @return EntityInterface
+     * @throws ReflectionException
+     */
+    public function create(array $entity_data): EntityInterface
+    {
 
-    protected function getDatabaseName() : string {
+        /* save to Sleek */
+        $data = $this->getRaw()->insert($entity_data);
+
+        return $this->createEntities($data);
+    }
+
+    protected function getDatabaseName(): string
+    {
         return $this->database_name;
     }
 

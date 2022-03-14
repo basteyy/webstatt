@@ -70,6 +70,10 @@ class Webstatt
 
     public function __construct(array $options = [])
     {
+        if (!defined('FAST_HASH')) {
+            define('FAST_HASH', 'xxh3');
+        }
+
         /** Yes, i'am lazy */
         define('DS', DIRECTORY_SEPARATOR);
 
@@ -129,9 +133,15 @@ class Webstatt
                 mkdir(TEMP, 0755, true);
             }
 
+            /* Some more definitions */
+
+            /** @ar string W_PAGE_STORAGE_PATH Path where the content/the versions of pages are stored */
+            define('W_PAGE_STORAGE_PATH', ROOT . rtrim($configService->pages_private_folder, '/') . DS);
+
+            define('W_PAGES_ROUTES_CACHE_KEY', 'pages_routing_cache');
+
             /* Access Service Initiation */
             $accessService = new AccessService($configService);
-
 
             /* Yes, I create  the request here manually. See below for the why */
             /** @var Request $request */
@@ -229,32 +239,29 @@ class Webstatt
                     include SRC . 'Routes' . DS . 'WebsiteRoutes.php';
                 }
 
-                /** @var string $pages_apcu_key Name of the routes-array inside cache*/
-                $pages_apcu_key = 'pages_routes';
-
                 /* Cache enabled and cache exists? */
-                if((APCU_SUPPORT && !apcu_exists($pages_apcu_key)) || !APCU_SUPPORT) {
+                if((APCU_SUPPORT && !apcu_exists(W_PAGES_ROUTES_CACHE_KEY)) || !APCU_SUPPORT) {
 
                     $pages = [];
 
                     /** @var PageEntity $page */
-                    foreach((new PagesModel($configService))->getAllOnlinePages() as $page) {
+                    foreach((new PagesModel($configService))->getAllOnlinePages(false) as $page) {
                         $pages[] = $page->getUrl();
                     }
 
                     /* Put to cache, in case its enabled */
                     if(APCU_SUPPORT) {
                         /* Store to cache */
-                        apcu_add($pages_apcu_key, $pages, APCU_TTL_LONG);
+                        apcu_add(W_PAGES_ROUTES_CACHE_KEY, $pages, APCU_TTL_LONG);
                     }
 
                 } else {
                     /* Routes from cache */
-                    $pages = apcu_fetch($pages_apcu_key);
+                    $pages = apcu_fetch(W_PAGES_ROUTES_CACHE_KEY);
                 }
 
                 foreach ($pages as $x => $url) {
-                    $this->app->get('/' . $url, DispatchPageController::class);
+                    $this->app->get($url, DispatchPageController::class);
                 }
 
             }
@@ -272,10 +279,7 @@ class Webstatt
      */
     private function handleException(Throwable $exception)
     {
-
         (new Run())->pushHandler(new PrettyPageHandler())->handleException($exception);
-
-
         #if (isset($configService) && ($configService->debug || $configService->website === 'development')) {
         #    (new Run())->pushHandler(new PrettyPageHandler())->handleException($exception);
         #} else {

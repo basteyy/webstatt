@@ -15,6 +15,7 @@ namespace basteyy\Webstatt\Controller\Users;
 use basteyy\Webstatt\Controller\Controller;
 use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Helper\FlashMessages;
+use basteyy\Webstatt\Helper\MailHelper;
 use basteyy\Webstatt\Helper\UserPasswordStrategy;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
@@ -76,6 +77,24 @@ class AddUserController extends Controller
                     'role'     => $role,
                     'secret'   => getRandomString(24)
                 ]);
+
+                /* Send a Welcome Mail ? */
+                if(isset($request->getParsedBody()['send_welcome_mail'])) {
+
+                    $mailhelper = new MailHelper($this->getConfigService());
+
+                    if($mailhelper->isEnabled()) {
+                        $mail = $mailhelper->newMail();
+                        $mail->addAddress($email);
+                        $mail->isHTML();
+                        $mail->Subject = __('A new account was created for you');
+                        $mail->Body = $this->getEngine()->render('Webstatt::mail/account_created', [
+                            'user' => $this->getUsersModel()->findById($db->getRaw()->getLastInsertedId())
+                        ]);
+                        $mail->send();
+                    }
+
+                }
 
                 return $this->redirect('/admin/users#user_id_' . $db->getRaw()->getLastInsertedId());
             }

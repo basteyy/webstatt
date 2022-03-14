@@ -14,6 +14,7 @@ namespace basteyy\Webstatt\Controller;
 
 use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Helper\FlashMessages;
+use basteyy\Webstatt\Helper\MailHelper;
 use basteyy\Webstatt\Helper\UserPasswordStrategy;
 use basteyy\Webstatt\Helper\UserSession;
 use Psr\Http\Message\ResponseInterface;
@@ -41,7 +42,6 @@ class DashboardController extends Controller
     {
         /** @var $request Request */
         /** @var $response Response */
-
         return $this->render('Webstatt::dashboard', [
             'users' => $this->getUsersModel()->getAll()
         ]);

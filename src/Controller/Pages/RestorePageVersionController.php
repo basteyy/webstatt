@@ -41,16 +41,14 @@ class RestorePageVersionController extends Controller
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, string $content_page_secret, string $version_file_name): ResponseInterface
     {
-        $page = ($this->getContentPagesDatabase())->findOneBy(['secret', '=', $content_page_secret]);
+        $page = $this->getPagesModel()->findOneBySecret($content_page_secret, false);
 
         if (!$page) {
             FlashMessages::addErrorMessage(__('Page not found.'));
-            return $this->redirect('/admin/content');
+            return $this->redirect('/admin/pages');
         }
 
-        $page = new PageAbstraction($page, $this->getConfigService());
-
-        foreach ($page->getAllVersions() as $timestamp => $path) {
+        foreach ($page->getStorage()->getAllVersions() as $timestamp => $path) {
 
             $file = new SplFileInfo($path);
 
@@ -64,10 +62,10 @@ class RestorePageVersionController extends Controller
             return $this->redirect('/admin/content/edit/' . $content_page_secret);
         }
 
-        $page->updateBody($version_content);
+        $page->getStorage()->writeBody($version_content);
 
         FlashMessages::addSuccessMessage(__('Version %s restored', $version_file_name));
-        return $this->redirect('/admin/content/edit/' . $content_page_secret);
+        return $this->redirect('/admin/pages/edit/' . $content_page_secret);
 
     }
 }

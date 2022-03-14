@@ -36,17 +36,17 @@ class ViewPageVersionController extends Controller
      * @throws Exception
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, string $content_page_secret, string $version_file_name): ResponseInterface
+
     {
-        $page = ($this->getContentPagesDatabase())->findOneBy(['secret', '=', $content_page_secret]);
+        $page = $this->getPagesModel()->findOneBySecret($content_page_secret, false);
 
         if (!$page) {
             FlashMessages::addErrorMessage(__('Page not found.'));
-            return $this->redirect('/admin/content');
+            return $this->redirect('/admin/pages');
         }
 
-        $page = new PageAbstraction($page, $this->getConfigService());
 
-        foreach ($page->getAllVersions() as $timestamp => $path) {
+        foreach ($page->getStorage()->getAllVersions() as $timestamp => $path) {
 
             $file = new SplFileInfo($path);
 

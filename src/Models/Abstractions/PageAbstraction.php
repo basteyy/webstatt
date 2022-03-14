@@ -33,7 +33,7 @@ final class PageAbstraction
     private string $body;
     private string $secret;
     private string $layout;
-    private PageType $contentType;
+    private PageType $pageType;
     private bool $online;
     private ConfigService $configService;
     /**
@@ -95,7 +95,7 @@ final class PageAbstraction
         $this->description = $data['description'] ?? '';
         $this->keywords = $data['keywords'] ?? '';
         $this->body = $data['body'] ?? '';
-        $this->contentType = !isset($data['contentType']) ? PageType::MARKDOWN : PageType::tryFrom($data['contentType']) ?? PageType::MARKDOWN;
+        $this->pageType = !isset($data['pageType']) ? PageType::MARKDOWN : PageType::tryFrom($data['pageType']) ?? PageType::MARKDOWN;
         $this->online = $data['online'] ?? false;
         $this->id = $data['_id'] ?? -1;
 
@@ -152,52 +152,6 @@ final class PageAbstraction
         return strlen($this->layout) > 0 && 'NONE' !== $this->layout;
     }
 
-    public function getBody(): string
-    {
-        return $this->loadBody();
-    }
-
-    /**
-     * Loads the body form file
-     * @return string
-     */
-    private function loadBody(): string
-    {
-        return file_exists($this->getAbsoluteFilePath()) ? file_get_contents($this->getAbsoluteFilePath()) : '';
-    }
-
-    /**
-     * Return the absolute filepath for the file
-     * @return string
-     */
-    #[Pure] public function getAbsoluteFilePath(): string
-    {
-        return $this->getPath() . DIRECTORY_SEPARATOR . $this->file_name . $this->getFileExtension();
-    }
-
-    public function getPath(): string
-    {
-        return $this->path;
-    }
-
-    /**
-     * Return the current file extension based on the content type
-     * @param bool $leading_dot
-     * @return string
-     */
-    #[Pure] private function getFileExtension(bool $leading_dot = true): string
-    {
-        return ($leading_dot ? '.' : '') . match ($this->getContentType()) {
-                PageType::HTML_PHP => $this->file_html_php_extension,
-                PageType::MARKDOWN => $this->file_markdown_extension
-            };
-    }
-
-    public function getContentType(): PageType
-    {
-        return $this->contentType;
-    }
-
     public function getParsedBody(): string
     {
         if (APCU_SUPPORT) {
@@ -212,118 +166,18 @@ final class PageAbstraction
         return (new Parsedown())->parse($this->loadBody());
     }
 
-    public function getOnline(): bool
-    {
-        return $this->online;
-    }
 
-    public function getId(): int
-    {
-        return $this->id;
-    }
 
     /**
-     * Updates the body
-     * @param string $body
+     * Change the current page content context to $changepageType
+     * @param PageType $changeTopageType
      * @return void
      */
-    public function updateBody(string $body): void
-    {
-        if ($this->isDifferentBody($body)) {
-            $this->makeBackup();
-        }
-
-        if (!is_dir($this->path . DIRECTORY_SEPARATOR . $this->backup_folder_name)) {
-            mkdir($folder = $this->path . DIRECTORY_SEPARATOR . $this->backup_folder_name, 0755, true);
-        }
-
-        if (APCU_SUPPORT && $this->getContentType() === PageType::MARKDOWN) {
-            apcu_delete($this->hash);
-            apcu_add($this->hash, (new Parsedown())->parse($body), APCU_TTL_LONG);
-        }
-
-        file_put_contents($this->getAbsoluteFilePath(), $body);
-    }
-
-    /**
-     * Checks if the new body is different from the old one
-     * @param string $new_body
-     * @return bool
-     */
-    private function isDifferentBody(string $new_body)
-    {
-        return strlen($this->loadBody()) > 0 && hash('xxh3', $new_body) !== hash('xxh3', $this->loadBody());
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function makeBackup(): void
-    {
-        if (!isset($this->configService)) {
-            throw new Exception(__('To use the Versioning, you need to provide the configService to the %s', __CLASS__));
-        }
-
-        $folder = $this->path . DIRECTORY_SEPARATOR . $this->backup_folder_name;
-        $version_name = 'v_' . date('d_m_H_i_s') . $this->getFileExtension();
-
-        if ($this->configService->pages_max_versions !== 0) {
-
-            $versions = $this->getAllVersions();
-
-            if ($this->configService->pages_max_versions !== -1 && count($versions) >= $this->configService->pages_max_versions) {
-                // Delete the oldest version
-                unlink($versions[key($versions)]);
-            }
-
-            if (!is_dir($folder)) {
-                mkdir($folder, 0755, true);
-            }
-
-            file_put_contents($folder . $version_name, $this->loadBody());
-        }
-
-
-    }
-
-    public function getAllVersions(): array
-    {
-        $folder = $this->path . DIRECTORY_SEPARATOR . $this->backup_folder_name;
-
-        if (!is_dir($folder)) {
-            return [];
-        }
-
-        $dir = new DirectoryIterator($folder);
-
-        foreach ($dir as $file) {
-            /** @var SplFileInfo $file */
-            if ($file->isFile() && $file->getExtension() === $this->getFileExtension(false)) {
-                // Valid look file .. :-)
-                $versions[$file->getMTime()] = $file->getRealPath();
-            }
-        }
-
-        if (!isset($versions)) {
-            return [];
-        }
-
-        ksort($versions);
-
-        return $versions;
-
-    }
-
-    /**
-     * Change the current page content context to $changeContentType
-     * @param PageType $changeToContentType
-     * @return void
-     */
-    public function changeContentTypeTo(PageType $changeToContentType): void
+    public function changepageTypeTo(PageType $changeTopageType): void
     {
         $versions = $this->getAllVersions();
 
-        $new_extension = '.' . ($changeToContentType === PageType::MARKDOWN ? $this->file_html_php_extension : $this->file_markdown_extension);
+        $new_extension = '.' . ($changeTopageType === PageType::MARKDOWN ? $this->file_html_php_extension : $this->file_markdown_extension);
 
         foreach ($versions as $timestamp => $path) {
             copy($path, str_replace($this->getFileExtension(true), $new_extension, $path));
@@ -367,7 +221,7 @@ final class PageAbstraction
             'online'      => $this->online,
             'secret'      => $this->secret,
             'layout'      => $this->layout,
-            'contentType' => $this->contentType
+            'pageType' => $this->pageType
         ];
     }
 

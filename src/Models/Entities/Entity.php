@@ -21,7 +21,7 @@ use function basteyy\VariousPhpSnippets\varDebug;
 class Entity implements EntityInterface {
 
     private string $primary_id_name;
-    private array $accessable_properties;
+    private array $accessible_properties;
     private ReflectionClass $reflectionClass;
 
     /**
@@ -39,14 +39,24 @@ class Entity implements EntityInterface {
 
         foreach ($data as $name => $value) {
 
-            /* Only existing property's from the data will be patched to the class */
-            if($name === $primary_id_name || $skip_property_checking || $this->reflectionClass->hasProperty($name)) {
+            if($name === $primary_id_name) {
+                // Thats the ID
+                $this->{$primary_id_name} = $value;
 
-                $this->accessable_properties[] = $name;
+            } elseif($skip_property_checking || $this->reflectionClass->hasProperty($name)) {
+                /* Only existing property's from the data will be patched to the class */
+
+                $this->accessible_properties[] = $name;
 
                 /* Enum? */
-                if($name === $primary_id_name || $this->reflectionClass->getProperty($name)->getType()->isBuiltin()) {
-                    $this->{$name} = $value;
+                if($name !== $primary_id_name && $this->reflectionClass->getProperty($name)->getType()->isBuiltin()) {
+
+                    $this->{$name} = match ($this->reflectionClass->getProperty($name)->getType()->getName()) {
+                        'int' => (int)$value,
+                        'bool' => (bool)$value,
+                        default => $value,
+                    };
+
                 } else {
                     $enum = $this->reflectionClass->getProperty($name)->getType()->getName();
                     $this->{$name} = $enum::tryFrom($value);
@@ -66,14 +76,12 @@ class Entity implements EntityInterface {
     public function __call(string $name, array $arguments)
     {
         if(substr($name, 0, 3) === 'get' ) {
-            $var = strtolower(substr($name, 3));
+            $var = lcfirst(substr($name, 3));
 
-            // Only public or protected properties are accessible by magic __call
-            if(in_array($var, $this->accessable_properties) && $this->reflectionClass->hasProperty($var) && !$this->reflectionClass->getProperty($var)->isPrivate()) {
+            if($this->_isAccessibleProperty($var)) {
                 return $this->{$var};
             }
         }
-
     }
 
     /**
@@ -85,8 +93,17 @@ class Entity implements EntityInterface {
             throw new Exception(__('Unknown property %s in %s', $name, get_called_class()));
         }
 
-        return $this->{$name};
+        if($this->_isAccessibleProperty($name)) {
+            return $this->{$name};
+        }
     }
 
+    /**
+     * @throws ReflectionException
+     */
+    private function _isAccessibleProperty(string $property_name) : bool {
+        return in_array($property_name, $this->accessible_properties) && $this->reflectionClass->hasProperty($property_name) && !$this->reflectionClass->getProperty
+            ($property_name)->isPrivate();
+    }
 
 }

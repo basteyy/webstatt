@@ -93,7 +93,7 @@ class Controller
 
         /** @var UserEntity _current_user_data */
         $this->_current_user_data =
-            UserSession::activeUserSession() ? $this->getUsersModel()->findById(UserSession::getUserSessionData()) : null;
+            UserSession::activeUserSession() ? $this->getUsersModel()->findById(UserSession::getUserSessionData(), false) : null;
 
 
         $role = $this->_current_user_data ? $this->_current_user_data->getRole() : UserRole::ANONYMOUS;

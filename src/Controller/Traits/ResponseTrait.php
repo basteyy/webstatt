@@ -92,6 +92,9 @@ trait ResponseTrait {
             $response = new Response();
         }
 
+        /**
+         * @todo Export extension to new file/standalone file
+         */
         $this->getEngine()->loadExtension(new class($this->getConfigService()) implements ExtensionInterface {
 
             private ConfigService $configService;

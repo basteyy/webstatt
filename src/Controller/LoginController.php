@@ -14,6 +14,7 @@ namespace basteyy\Webstatt\Controller;
 
 use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Helper\FlashMessages;
+use basteyy\Webstatt\Helper\MailHelper;
 use basteyy\Webstatt\Helper\UserPasswordStrategy;
 use basteyy\Webstatt\Helper\UserSession;
 use Psr\Http\Message\ResponseInterface;
@@ -59,6 +60,7 @@ class LoginController extends Controller
 
                 FlashMessages::addSuccessMessage(__('Your account was created. You are a super admin.'));
 
+
                 $db->getRaw()->insert([
                     'email'    => $email,
                     'password' => UserPasswordStrategy::getHash($password, $salt),
@@ -70,6 +72,23 @@ class LoginController extends Controller
                 ]);
 
                 $user_id = $db->getRaw()->getLastInsertedId();
+
+                /* Send welcome mail, if mail is marked as working */
+                if($this->getConfigService()->getMailConfig()['activate_mail_system']) {
+
+                    $mailhelper = new MailHelper($this->getConfigService());
+
+                    if($mailhelper->isEnabled()) {
+                        $mail = $mailhelper->newMail();
+                        $mail->addAddress($email);
+                        $mail->Subject = 'Welcome to a new Webstatt Installation';
+                        $mail->Body = $this->getEngine()->render('Webstatt::mail/account_created', [
+                            'user' => $this->getUsersModel()->findById($user_id)
+                        ]);
+                        $mail->send();
+                    }
+
+                }
 
                 $login = true;
             } else {

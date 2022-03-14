@@ -3,7 +3,7 @@
 use basteyy\Webstatt\Models\Abstractions\PageAbstraction;
 use function basteyy\VariousPhpSnippets\__;
 
-/** @var PageAbstraction $page */
+/** @var \basteyy\Webstatt\Models\Entities\PageEntity $page */
 ?>
 
 <div class="col-12">
@@ -17,7 +17,7 @@ use function basteyy\VariousPhpSnippets\__;
         <option selected></option>
         <optgroup label="<?= __('Please select') ?>">
             <?php
-            foreach ($page->getAllVersions() as $version) {
+            foreach ($page->getStorage()->getAllVersions() as $version) {
 
                 $file = new SplFileInfo($version);
 

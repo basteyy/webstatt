@@ -36,10 +36,11 @@ class DispatchPageController extends Controller
      * @throws InvalidArgumentException
      * @throws IdNotAllowedException
      * @throws InvalidConfigurationException
+     * @throws \ReflectionException
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $page = $this->getContentPagesDatabase()->findOneBy(['url', '=', substr($request->getUri()->getPath(), 1)]);
+        $page = $this->getPagesModel()->findOneByUrl($request->getUri()->getPath());
 
         if(!isset($page)) {
             FlashMessages::addErrorMessage(__('Page not found'));
@@ -47,7 +48,7 @@ class DispatchPageController extends Controller
         }
 
         return $this->render('Webstatt::pages/dispatch', [
-            'page' => new PageAbstraction($page)
+            'page' => $page
         ]);
     }
 }

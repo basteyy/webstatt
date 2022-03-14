@@ -12,8 +12,10 @@ declare(strict_types=1);
 
 namespace basteyy\Webstatt\Services;
 
+use basteyy\Webstatt\Enums\ConfigFile;
 use ReflectionClass;
 use ReflectionException;
+use function basteyy\VariousPhpSnippets\varDebug;
 
 /**
  * Abstraction of the config.ini as a service
@@ -68,6 +70,9 @@ final class ConfigService
     /** @var string $website_url Basic URL of the project */
     readonly string $website_url;
 
+    readonly string $config_folder;
+    readonly string $config_mail_config_file_name;
+
     /**
      * @throws ReflectionException
      */
@@ -119,4 +124,56 @@ final class ConfigService
     {
         return $this->{$name} ?? null;
     }
+
+    /**
+     * Return the Config Folder for the configs
+     * @return string
+     */
+    public function getConfigFolder() : string {
+
+        if(!is_dir(ROOT . DIRECTORY_SEPARATOR . $this->config_folder)) {
+            mkdir(ROOT . DIRECTORY_SEPARATOR . $this->config_folder, 0755, true);
+        }
+
+        return ROOT . DIRECTORY_SEPARATOR . $this->config_folder . DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * Return the Mail Config File Path
+     * @return string
+     */
+    public function getMailConfigPath() : string {
+        return $this->getConfigFolder() . $this->config_mail_config_file_name;
+    }
+
+    /**
+     * Return the Mail Config
+     * @return array
+     */
+    public function getMailConfig() : array {
+        return $this->loadAdditionalConfigFile(ConfigFile::MAIL);
+    }
+
+    /**
+     * Load a specific config file
+     * @param ConfigFile $configFile
+     * @return array
+     */
+    protected function loadAdditionalConfigFile(ConfigFile $configFile) : array {
+
+        if(APCU_SUPPORT && apcu_exists($configFile->cacheName())) {
+            return apcu_fetch($configFile->cacheName());
+        }
+
+        $config = parse_ini_file(match($configFile){
+            ConfigFile::MAIL => $this->getMailConfigPath()
+        }, false, INI_SCANNER_TYPED);
+
+        if(APCU_SUPPORT) {
+            apcu_add($configFile->cacheName(), $config, APCU_TTL_LONG);
+        }
+
+        return $config;
+    }
+
 }
