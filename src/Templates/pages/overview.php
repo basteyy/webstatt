@@ -15,6 +15,7 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Overview of your pages')]
         <thead>
         <tr>
             <th scope="col">#</th>
+            <th scope="col"><?= __('Startpage') ?></th>
             <th scope="col"><?= __('Online') ?></th>
             <th scope="col"><?= __('Page Type') ?></th>
             <th scope="col"><?= __('Name') ?></th>
@@ -28,7 +29,8 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Overview of your pages')]
             ?>
             <tr>
                 <td><?= $page->getId() ?></td>
-                <td><?= $page->getOnline() ? __('yes') : __('no')?></td>
+                <td><?= $page->getStartpage() ? '<span class="badge rounded-pill bg-primary ">'.__('yes').'</span>' : '' ?></td>
+                <td><?= $page->getOnline() ? '<span class="badge rounded-pill bg-success">' . __('yes') .'</span>' : '<span class="badge rounded-pill bg-danger">'.__('no').'</span>'?></td>
                 <td><?= $page->getPageType()->value ?></td>
                 <td><?= $page->getName() ?></td>
                 <td>
@@ -38,8 +40,13 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Overview of your pages')]
                     </ul>
                 </td>
                 <td>
-                    <a class="btn btn-primary btn-sm" href="<?= $this->getAbsoluteUrl('/admin/pages/edit/%s', $page->getSecret()) ?>"><?= __('Edit') ?></a>
-                    <a target="_blank" class="btn btn-secondary btn-sm" href="<?= $this->getAbsoluteUrl($page->getUrl()) ?>"><i class="mx-md-2 bi bi-search"></i> <?= __('View') ?></a>
+                    <div class="btn-group" role="group" aria-label="<?= __('Options') ?>">
+                        <a class="btn btn-primary btn-sm" href="<?= $this->getAbsoluteUrl('/admin/pages/edit/%s', $page->getSecret()) ?>"><i class="bi bi-gear"></i>
+                            <?= __('Edit') ?></a>
+                        <a target="_blank" class="btn btn-secondary btn-sm" href="<?= $this->getAbsoluteUrl($page->getUrl()) ?>"><i class="bi bi-search"></i> <?= __('View') ?></a>
+                        <a target="_blank" class="btn btn-danger btn-sm" href="<?= $this->getAbsoluteUrl($page->getUrl()) ?>"><i class="bi bi-search"></i> <?= __('Delete')
+                            ?></a>
+                    </div>
                 </td>
             </tr>
             <?php

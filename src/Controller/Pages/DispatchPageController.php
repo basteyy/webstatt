@@ -40,6 +40,20 @@ class DispatchPageController extends Controller
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+        if('/' === $request->getUri()->getPath() ) {
+            /* Startpage */
+            $startpage = $this->getPagesModel()->getStartpage();
+
+
+
+            if($startpage) {
+                return $this->render('Webstatt::pages/dispatch', [
+                    'page' => $startpage
+                ]);
+            }
+        }
+
+
         $page = $this->getPagesModel()->findOneByUrl($request->getUri()->getPath());
 
         if(!isset($page)) {

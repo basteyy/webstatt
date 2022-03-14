@@ -139,6 +139,7 @@ class Webstatt
             define('W_PAGE_STORAGE_PATH', ROOT . rtrim($configService->pages_private_folder, '/') . DS);
 
             define('W_PAGES_ROUTES_CACHE_KEY', 'pages_routing_cache');
+            define('W_PAGES_STARTPAGE_CACHE_KEY', 'pages_startpage');
 
             /* Access Service Initiation */
             $accessService = new AccessService($configService);
@@ -224,7 +225,17 @@ class Webstatt
             /* Register the User Session Middleware */
             $this->app->add(UserSession::class);
 
-            if (str_starts_with($this->request->getUri()->getPath(), '/admin') && file_exists(SRC . 'routes' . DS . 'AdminRoutes.php')) {
+            /* Startpage */
+
+            if(!isset($pagesModel)) {
+                $pagesModel = (new PagesModel($configService));
+            }
+
+            $startpage = $pagesModel->getStartpage();
+
+            if('/' === $this->request->getUri()->getPath() || '' === $this->request->getUri()->getPath() && $startpage) {
+                $this->app->get('/', DispatchPageController::class);
+            } elseif (str_starts_with($this->request->getUri()->getPath(), '/admin') && file_exists(SRC . 'routes' . DS . 'AdminRoutes.php')) {
 
                 /* In the admin Szenario, there will be the l18n helper loaded */
                 i18n::addTranslationFolder(SRC . 'Resources' . DS . 'Languages');
@@ -242,10 +253,14 @@ class Webstatt
                 /* Cache enabled and cache exists? */
                 if((APCU_SUPPORT && !apcu_exists(W_PAGES_ROUTES_CACHE_KEY)) || !APCU_SUPPORT) {
 
+                    if(!isset($pagesModel)) {
+                        $pagesModel = (new PagesModel($configService));
+                    }
+
                     $pages = [];
 
                     /** @var PageEntity $page */
-                    foreach((new PagesModel($configService))->getAllOnlinePages(false) as $page) {
+                    foreach($pagesModel->getAllOnlinePages(false) as $page) {
                         $pages[] = $page->getUrl();
                     }
 

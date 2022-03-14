@@ -25,6 +25,34 @@ final class PagesModel extends Model
     protected string $database_name = 'pages';
 
     /**
+     * @param bool $use_cache
+     * @return array|PageEntity
+     * @throws ReflectionException
+     */
+    public function getStartpage(bool $use_cache = false) : null|PageEntity
+    {
+        if($use_cache && APCU_SUPPORT && apcu_exists(W_PAGES_STARTPAGE_CACHE_KEY)) {
+            return $this->createEntities( apcu_fetch(W_PAGES_STARTPAGE_CACHE_KEY));
+        }
+
+        $entity = $this->_findByArgumentsArray(
+            [
+                ['startpage', '=', true], ['online', '=', true]
+            ]
+        );
+
+        if($use_cache && APCU_SUPPORT) {
+            apcu_add(W_PAGES_STARTPAGE_CACHE_KEY, $entity, APCU_TTL_LONG);
+        }
+
+        if($entity) {
+            return $this->createEntities($entity);
+        }
+
+        return null;
+    }
+
+    /**
      * @throws IOException
      * @throws ReflectionException
      * @throws InvalidConfigurationException
@@ -33,6 +61,15 @@ final class PagesModel extends Model
     public function findOneByUrl(string $url, bool $use_cache = true): PageEntity|null
     {
         return $this->_findByOneArgument('url', '=', $url, false, true, $use_cache);
+    }
+
+
+    private function _findByArgumentsArray(
+        array $find_argument,
+        bool   $multiple_results = false
+    ): array|null
+    {
+        return $multiple_results ? $this->getRaw()->findBy($find_argument) : $this->getRaw()->findOneBy($find_argument);
     }
 
     /**
@@ -62,7 +99,7 @@ final class PagesModel extends Model
         if ($use_cache && APCU_SUPPORT && apcu_exists($key)) {
             $data = apcu_fetch($key);
         } else {
-            $data = $multiple_results ? $this->getRaw()->findBy([$search_field, $operator, $search_value]) : $this->getRaw()->findOneBy([$search_field, $operator, $search_value]);
+                $data = $this->_findByArgumentsArray([$search_field, $operator, $search_value]);
         }
 
         if (!$data) {
@@ -106,6 +143,12 @@ final class PagesModel extends Model
      */
     public function getAllOnlinePages(bool $use_cache = true): array
     {
-        return $this->_findByOneArgument('online', '=', true, true, true, $use_cache) ?? [];
+        $pages = $this->_findByOneArgument('online', '=', true, true, true, $use_cache);
+
+        if(!is_array($pages)) {
+            return [$pages];
+        }
+
+        return  $pages ?? [];
     }
 }

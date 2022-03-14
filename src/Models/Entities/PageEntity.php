@@ -26,6 +26,7 @@ class PageEntity extends Entity implements EntityInterface
     protected string $keywords;
     protected string $path;
     protected bool $online;
+    protected bool $startpage;
     protected string $secret;
     protected string $layout;
     protected PageType $pageType;

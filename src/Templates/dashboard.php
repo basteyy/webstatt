@@ -44,7 +44,8 @@ $User = $this->getUser();
             <?php
             /** @var \basteyy\Webstatt\Models\Entities\UserEntity $user */
             foreach ( $users as $user) {
-                print __('<a href="%1$s">%2$s</a>', '/admin/u/' . $user->getSecret(), $user->getAnyName()) . PHP_EOL;
+                print __('%2$s', '/admin/u/' . $user->getSecret(), $user->getAnyName()) . PHP_EOL;
+                //print __('<a href="%1$s">%2$s</a>', '/admin/u/' . $user->getSecret(), $user->getAnyName()) . PHP_EOL;
 
             }
             ?>

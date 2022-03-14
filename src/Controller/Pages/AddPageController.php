@@ -28,6 +28,7 @@ use SleekDB\Exceptions\IOException;
 use SleekDB\Exceptions\JsonException;
 use function basteyy\VariousPhpSnippets\__;
 use function basteyy\VariousPhpSnippets\getRandomString;
+use function basteyy\VariousPhpSnippets\slugify;
 use function basteyy\VariousPhpSnippets\varDebug;
 
 class AddPageController extends Controller
@@ -49,7 +50,7 @@ class AddPageController extends Controller
 
             /* Inspect the new URL */
             $data = [
-                'url'          => $request->getParsedBody()['url'],
+                'url'          => '/' . slugify($request->getParsedBody()['url']),
                 'name'         => $request->getParsedBody()['name'],
                 'title'        => $request->getParsedBody()['title'],
                 'description'  => $request->getParsedBody()['description'],

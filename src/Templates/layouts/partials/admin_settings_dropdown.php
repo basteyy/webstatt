@@ -31,5 +31,15 @@ use function basteyy\VariousPhpSnippets\__;
             </a>
         </li>
 
+        <li>
+            <hr class="dropdown-divider">
+        </li>
+
+        <li>
+            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/cache/reset') ?>?return=<?=  $this->getCurrentUrl() ?>">
+                <i class="mx-md-2 bi bi-calendar-check"></i> <?= __('Reset Cache') ?>
+            </a>
+        </li>
+
     </ul>
 </li>

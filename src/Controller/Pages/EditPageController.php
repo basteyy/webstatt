@@ -26,6 +26,7 @@ use SleekDB\Exceptions\InvalidConfigurationException;
 use SleekDB\Exceptions\IOException;
 use SleekDB\Exceptions\JsonException;
 use function basteyy\VariousPhpSnippets\__;
+use function basteyy\VariousPhpSnippets\slugify;
 use function basteyy\VariousPhpSnippets\varDebug;
 
 class EditPageController extends Controller
@@ -52,7 +53,7 @@ class EditPageController extends Controller
 
             /* Copy the parsed body to a new array and unset fields, which are not allowed to store in the database */
             $data = [
-                'url'         => $request->getParsedBody()['url'],
+                'url'         => '/' . slugify($request->getParsedBody()['url']),
                 'name'        => $request->getParsedBody()['name'],
                 'title'       => $request->getParsedBody()['title'],
                 'description' => $request->getParsedBody()['description'],
@@ -66,6 +67,15 @@ class EditPageController extends Controller
             ];
 
             $body = $request->getParsedBody()['body'];
+
+            if($data['startpage']) {
+                /* Remove startpage from other startpage */
+                $old_startpage = $this->getPagesModel()->getStartpage();
+                if($old_startpage && $old_startpage->getId() !== $page->getId()) {
+                    $this->getPagesModel()->patch($old_startpage, ['startpage' => false]);
+                    FlashMessages::addErrorMessage(__('Former startpage %s (#%s) is not the startpage anymore', $old_startpage->getName(), $old_startpage->getId()));
+                }
+            }
 
             if (in_array($data['url'], ['', '/']) && !isset($request->getParsedBody()['startpage'])) {
                 FlashMessages::addErrorMessage(__('Invalid URL %s.', $data['url']));

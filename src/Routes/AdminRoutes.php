@@ -14,6 +14,7 @@ declare(strict_types=1);
 use basteyy\Webstatt\Controller\Account\ChangeAccountPasswordController;
 use basteyy\Webstatt\Controller\Account\UserChangeMailController;
 use basteyy\Webstatt\Controller\Account\UserProfilController;
+use basteyy\Webstatt\Controller\Cache\CacheResetController;
 use basteyy\Webstatt\Controller\DashboardController;
 use basteyy\Webstatt\Controller\Files\FilesOverviewController;
 use basteyy\Webstatt\Controller\LoginController;
@@ -23,6 +24,7 @@ use basteyy\Webstatt\Controller\Pages\EditPageController;
 use basteyy\Webstatt\Controller\Pages\PagesOverviewController;
 use basteyy\Webstatt\Controller\Pages\RestorePageVersionController;
 use basteyy\Webstatt\Controller\Pages\ViewPageVersionController;
+use basteyy\Webstatt\Controller\Settings\MailSettingsController;
 use basteyy\Webstatt\Controller\Settings\SettingsOverviewController;
 use basteyy\Webstatt\Controller\Users\AddUserController;
 use basteyy\Webstatt\Controller\Users\EditUserController;
@@ -48,6 +50,9 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
 
     /** View Dashboard */
     $proxy->any('/dashboard', DashboardController::class);
+
+    /** Reset Cache */
+    $proxy->any('/cache/reset', CacheResetController::class);
 
     /** User Account */
     $proxy->group('/account', function (RouteCollectorProxy $proxy) {
@@ -109,7 +114,7 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
         $proxy->get('', SettingsOverviewController::class);
 
         /* Email Settings */
-        $proxy->any('/email', \basteyy\Webstatt\Controller\Settings\MailSettingsController::class);
+        $proxy->any('/email', MailSettingsController::class);
 
     });
 
