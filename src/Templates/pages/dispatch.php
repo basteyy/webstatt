@@ -13,11 +13,11 @@ if($page->hasLayout()) {
 
 if(\basteyy\Webstatt\Enums\PageType::HTML_PHP === $page->pageType ) {
 
-    if(!file_exists($page->getAbsoluteFilePath())) {
-        throw new \Exception(\basteyy\VariousPhpSnippets\__('Cant include %s', $page->getAbsoluteFilePath()));
+    if(!file_exists($page->getStorage()->getAbsoluteFilePath())) {
+        throw new \Exception(\basteyy\VariousPhpSnippets\__('Cant include %s', $page->getStorage()->getAbsoluteFilePath()));
     }
 
-    include $page->getAbsoluteFilePath();
+    include $page->getStorage()->getAbsoluteFilePath();
 
 } elseif ( \basteyy\Webstatt\Enums\PageType::MARKDOWN === $page->getPageType() ) {
 

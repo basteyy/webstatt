@@ -99,7 +99,7 @@ final class PagesModel extends Model
         if ($use_cache && APCU_SUPPORT && apcu_exists($key)) {
             $data = apcu_fetch($key);
         } else {
-                $data = $this->_findByArgumentsArray([$search_field, $operator, $search_value]);
+            $data = $this->_findByArgumentsArray([$search_field, $operator, $search_value], $multiple_results);
         }
 
         if (!$data) {

@@ -66,6 +66,10 @@ class EditPageController extends Controller
                     : $page->getPageType()
             ];
 
+            if($data['url'] === '/n-a') {
+                $data['url'] = '/';
+            }
+
             $body = $request->getParsedBody()['body'];
 
             if($data['startpage']) {

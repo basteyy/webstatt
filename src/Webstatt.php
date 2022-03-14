@@ -119,7 +119,7 @@ class Webstatt
 
             /* APCu installed and enabled to use it */
             if (!defined('APCU_SUPPORT')) {
-                define('APCU_SUPPORT', !$configService->caching_apcu_disabled && function_exists('apcu_enabled') && apcu_enabled());
+                define('APCU_SUPPORT', !$configService->caching_apcu_disabled && !$options['debug'] && function_exists('apcu_enabled') && apcu_enabled());
             }
 
             /* APCu TTL */

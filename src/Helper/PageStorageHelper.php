@@ -111,7 +111,7 @@ final class PageStorageHelper {
      * @see file_exists()
      * @return string
      */
-    #[Pure] private function loadFromFile(): string
+    private function loadFromFile(): string
     {
         return file_exists($this->getAbsoluteFilePath()) ? file_get_contents($this->getAbsoluteFilePath()) : '';
     }
@@ -120,7 +120,7 @@ final class PageStorageHelper {
      * Return the absolute file path of the file
      * @return string
      */
-    #[Pure] private function getAbsoluteFilePath(): string
+    public function getAbsoluteFilePath(): string
     {
         return $this->getFolderRealPath() . $this->file_name . $this->getFileExtension();
     }

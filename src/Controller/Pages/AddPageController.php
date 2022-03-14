@@ -63,6 +63,10 @@ class AddPageController extends Controller
                 //'body'        => $request->getParsedBody()['body'],
             ];
 
+            if($data['url'] === '/n-a') {
+                $data['url'] = '/';
+            }
+
             if (in_array($data['url'], ['', '/']) && !isset($request->getParsedBody()['startpage'])) {
                 FlashMessages::addErrorMessage(__('Invalid URL %s.', $data['url']));
             } else {
