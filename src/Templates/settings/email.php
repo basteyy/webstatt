@@ -32,7 +32,7 @@ $configService = $this->getConfig();
         <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" role="switch" id="_activate_mail_system" name="activate_mail_system"<?= isset($mail_config['activate_mail_system'])
             && $mail_config['activate_mail_system'] ?' checked':''?>>
-            <label class="form-check-label" for="_activate_mail_system"><?= __('Activate email-systen') ?></label>
+            <label class="form-check-label" for="_activate_mail_system"><?= __('Activate email-system') ?></label>
         </div>
     </div>
 

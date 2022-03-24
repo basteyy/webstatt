@@ -37,12 +37,13 @@ trait ResponseTrait {
      * @param ResponseInterface|null $response
      * @return ResponseInterface
      */
-    protected function redirect(string $redirect_uri, int $status_code = 302, ?ResponseInterface $response = null): ResponseInterface
+    protected function redirect(string $redirect_uri = null, int $status_code = 302, ?ResponseInterface $response = null): ResponseInterface
     {
-
         if (!$response) {
             $response = new Response();
         }
+
+        $redirect_uri = $redirect_uri ? rtrim($redirect_uri, '/') : $this->getCurrentUrl();
 
         return $response->withHeader('location', $redirect_uri)->withStatus($status_code);
     }
@@ -54,8 +55,15 @@ trait ResponseTrait {
      * @param ResponseInterface|null $response
      * @return ResponseInterface
      */
-    protected function adminRedirect(string $redirect_uri, int $status_code = 302, ?ResponseInterface $response = null): ResponseInterface {
-        return $this->redirect('/admin/' . ltrim(rtrim($redirect_uri, '/'), '/'), $status_code, $response);
+    protected function adminRedirect(string $redirect_uri = null, int $status_code = 302, ?ResponseInterface $response = null): ResponseInterface {
+
+        $redirect_uri = $redirect_uri ? '/admin/' . ltrim(rtrim($redirect_uri, '/'), '/') : $this->getCurrentUrl();
+
+        return $this->redirect($redirect_uri, $status_code, $response);
+    }
+
+    private function getCurrentUrl() : string {
+        return $this->request->getUri()->getPath() . (strlen($this->request->getUri()->getQuery()) > 0 ? '?' . $this->request->getUri()->getQuery() : '');
     }
 
     /**

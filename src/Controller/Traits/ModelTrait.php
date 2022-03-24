@@ -12,7 +12,9 @@ declare(strict_types=1);
 
 namespace basteyy\Webstatt\Controller\Traits;
 
+use basteyy\Webstatt\Models\ModelInterface;
 use basteyy\Webstatt\Models\PagesModel;
+use basteyy\Webstatt\Models\SnippetsModel;
 use basteyy\Webstatt\Models\UsersModel;
 
 trait ModelTrait {
@@ -33,6 +35,16 @@ trait ModelTrait {
     }
 
     /**
+     * @return SnippetsModel
+     */
+    protected function getSnippetsModel() : SnippetsModel {
+        if(!isset($this->snippets)) {
+            $this->snippets = $this->getModel(SnippetsModel::class);
+        }
+        return $this->snippets;
+    }
+
+    /**
      * Shortcut for loading pages model
      * @return PagesModel
      */
@@ -48,7 +60,7 @@ trait ModelTrait {
      * @param string $model_name
      * @return mixed
      */
-    protected function getModel(string $model_name): mixed
+    protected function getModel(string $model_name): ModelInterface
     {
         if(!isset($this->models[$model_name])) {
             $this->_models[$model_name] = new $model_name($this->getConfigService());

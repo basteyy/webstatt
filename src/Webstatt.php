@@ -125,6 +125,7 @@ class Webstatt
             /* APCu TTL */
             if (APCU_SUPPORT) {
                 define('APCU_TTL_LONG', $configService->caching_apcu_ttl_long ?? 720);
+                define('APCU_TTL_MEDIUM', $configService->caching_apcu_ttl_medium ?? 60);
                 define('APCU_TTL_SHORT', $configService->caching_apcu_ttl_short ?? 10);
             }
 

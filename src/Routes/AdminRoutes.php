@@ -16,6 +16,7 @@ use basteyy\Webstatt\Controller\Account\UserChangeMailController;
 use basteyy\Webstatt\Controller\Account\UserProfilController;
 use basteyy\Webstatt\Controller\Cache\CacheResetController;
 use basteyy\Webstatt\Controller\DashboardController;
+use basteyy\Webstatt\Controller\Files\DeleteFileController;
 use basteyy\Webstatt\Controller\Files\FilesOverviewController;
 use basteyy\Webstatt\Controller\LoginController;
 use basteyy\Webstatt\Controller\LogoutController;
@@ -26,6 +27,8 @@ use basteyy\Webstatt\Controller\Pages\RestorePageVersionController;
 use basteyy\Webstatt\Controller\Pages\ViewPageVersionController;
 use basteyy\Webstatt\Controller\Settings\MailSettingsController;
 use basteyy\Webstatt\Controller\Settings\SettingsOverviewController;
+use basteyy\Webstatt\Controller\Snippets\AddSnippetController;
+use basteyy\Webstatt\Controller\Snippets\ListSnippetsController;
 use basteyy\Webstatt\Controller\Users\AddUserController;
 use basteyy\Webstatt\Controller\Users\EditUserController;
 use basteyy\Webstatt\Controller\Users\ListUsersController;
@@ -101,12 +104,35 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
 
         /** Restore a version of a page */
         $proxy->any('/edit/{content_page_secret}/restore/{version_file_name}', RestorePageVersionController::class);
+
+    });
+
+    /* Snippets */
+    $proxy->group('/snippets', function (RouteCollectorProxy $proxy) {
+
+        /* Snippets Overview */
+        $proxy->any('', ListSnippetsController::class);
+
+        /* Add a new snippet */
+        $proxy->any('/add', AddSnippetController::class);
+
     });
 
 
     /** Files Routes */
     $proxy->group('/files', function (RouteCollectorProxy $proxy) {
         $proxy->get('', FilesOverviewController::class);
+        $proxy->post('', FilesOverviewController::class);
+
+        $proxy->get('/delete', DeleteFileController::class);
+
+
+        $proxy->get('/edit', \basteyy\Webstatt\Controller\Files\EditFileController::class);
+        $proxy->post('/edit', \basteyy\Webstatt\Controller\Files\EditFileController::class);
+
+        $proxy->get('/rename', \basteyy\Webstatt\Controller\Files\RenameController::class);
+        $proxy->post('/rename', \basteyy\Webstatt\Controller\Files\RenameController::class);
+
     });
 
     /** Global Settings */

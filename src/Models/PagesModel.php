@@ -63,56 +63,6 @@ final class PagesModel extends Model
         return $this->_findByOneArgument('url', '=', $url, false, true, $use_cache);
     }
 
-
-    private function _findByArgumentsArray(
-        array $find_argument,
-        bool   $multiple_results = false
-    ): array|null
-    {
-        return $multiple_results ? $this->getRaw()->findBy($find_argument) : $this->getRaw()->findOneBy($find_argument);
-    }
-
-    /**
-     * Search for one/or all, where search_field is search_value.
-     * @param string $search_field Field which is searched
-     * @param string $operator Operator
-     * @param mixed $search_value Value of search
-     * @param bool $multiple_results Return all results or just one
-     * @param bool $create_entities Create the entity directly
-     * @return array|null|PageEntity
-     * @throws IOException
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigurationException
-     * @throws ReflectionException
-     */
-    private function _findByOneArgument(
-        string $search_field,
-        string $operator,
-        mixed  $search_value,
-        bool   $multiple_results = false,
-        bool   $create_entities = true,
-        bool   $use_cache = true
-    ): array|null|PageEntity
-    {
-        $key = hash('xxh3', $search_field . $operator . $search_value);
-
-        if ($use_cache && APCU_SUPPORT && apcu_exists($key)) {
-            $data = apcu_fetch($key);
-        } else {
-            $data = $this->_findByArgumentsArray([$search_field, $operator, $search_value], $multiple_results);
-        }
-
-        if (!$data) {
-            return null;
-        }
-
-        if (APCU_SUPPORT) {
-            apcu_add($key, $data, APCU_TTL_LONG);
-        }
-
-        return $create_entities ? $this->createEntities($data) : $data;
-    }
-
     /**
      * @throws IOException
      * @throws ReflectionException

@@ -64,6 +64,10 @@ final class ConfigService
     /** @var int $caching_apcu_ttl The TTL of long stored APCu-Cache */
     readonly int $caching_apcu_ttl_long;
 
+
+    /** @var int $caching_apcu_ttl The TTL of medium stored APCu-Cache */
+    readonly int $caching_apcu_ttl_medium;
+
     /** @var int $caching_apcu_ttl The TTL of short stored APCu-Cache */
     readonly int $caching_apcu_ttl_short;
 

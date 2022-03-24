@@ -38,6 +38,7 @@ trait DatabaseTrait {
         return $this->getDatabase($this->configService->database_pages_name);
     }
 
+
     /**
      * Return the database instance for the users
      * @throws InvalidConfigurationException

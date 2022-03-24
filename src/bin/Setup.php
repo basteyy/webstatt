@@ -47,9 +47,8 @@ class Setup
         $source = self::clean_path(self::$root . DIRECTORY_SEPARATOR . self::$image_folder);
         $target = self::clean_path(self::$app_public_folder . DIRECTORY_SEPARATOR . self::$app_public_img_sub_folder);
 
+
         if ($target && $source) {
-
-
             self::copy_asset(
                 $source,
                 $target,

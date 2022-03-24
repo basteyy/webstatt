@@ -92,30 +92,46 @@ $User = $this->getUser();
                             </a>
                         </li>
 
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/pages/snippets') ?>" title="<?= __('Snippets') ?>">
+                                <i class="mx-md-2 bi bi-plus-circle"></i> <?= __('Snippets') ?>
+                            </a>
+                        </li>
+
                     </ul>
                 </li>
 
-
-                <li class="nav-item dropdown mx-lg-3">
-                    <a class="nav-link dropdown-toggle" href="<?= $this->getAbsoluteUrl('/admin/files') ?>" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
-                       aria-expanded="false">
-                        <i class="mx-md-2 bi bi-download"></i> <?= __('Files') ?>
+                <li class="nav-item mx-lg-3">
+                    <a class="nav-link" href="<?= $this->getAbsoluteUrl('/admin/files') ?>" role="button"><i class="mx-md-2 bi bi-speedometer"></i> <?= __('Filebrowser') ?>
                     </a>
-                    <ul class="dropdown-menu p-md-4" aria-labelledby="navbarDropdown">
-                        <li>
-                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/files') ?>" title="<?= __('Manage uploaded files in your website') ?>">
-                                <i class="mx-md-2 bi bi-newspaper"></i> <?= __('Manage files') ?>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/files/upload') ?>" title="<?= __('Upload new files') ?>">
-                                <i class="mx-md-2 bi bi-newspaper"></i> <?= __('Upload files') ?>
-                            </a>
-                        </li>
-
-                    </ul>
                 </li>
+
+
+                <!--
+                                <li class="nav-item dropdown mx-lg-3">
+                                    <a class="nav-link dropdown-toggle" href="<?= $this->getAbsoluteUrl('/admin/files') ?>" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                                       aria-expanded="false">
+                                        <i class="mx-md-2 bi bi-download"></i> <?= __('Files') ?>
+                                    </a>
+                                    <ul class="dropdown-menu p-md-4" aria-labelledby="navbarDropdown">
+                                        <li>
+                                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/files') ?>" title="<?= __('Manage uploaded files in your website') ?>">
+                                                <i class="mx-md-2 bi bi-newspaper"></i> <?= __('Manage files') ?>
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/files/upload') ?>" title="<?= __('Upload new files') ?>">
+                                                <i class="mx-md-2 bi bi-newspaper"></i> <?= __('Upload files') ?>
+                                            </a>
+                                        </li>
+
+                                    </ul>
+                                </li>-->
 
                 <li class="nav-item dropdown mx-lg-3">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
