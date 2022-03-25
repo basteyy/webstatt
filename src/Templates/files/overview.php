@@ -40,12 +40,19 @@ $User = $this->getUser();
     if($upper_folder) {
         ?>
         <tr>
-            <td colspan="2"><i class="bi bi-arrow-up"></i> <a href="<?= $this->getAbsoluteUrl('/admin/files') ?>?folder=<?= base64_encode($upper_folder) ?>"><?= $upper_folder ?></a></td>
-        </tr>
-        <tr>
-            <td colspan="2"><i class="bi bi-folder"></i> <?= $folder_real_path ?></td>
+            <td colspan="2"><?= $folder_real_path ?></td>
         </tr>
     <?php
+
+
+        if($upper_folder !== $folder_real_path) {
+            ?>
+            <tr>
+                <td colspan="2"><i class="bi bi-arrow-up"></i> <a href="<?= $this->getAbsoluteUrl('/admin/files') ?>?folder=<?= base64_encode($upper_folder) ?>"><?= $upper_folder ?></a></td>
+            </tr>
+
+            <?php
+        }
     }
 
 
@@ -56,13 +63,11 @@ $User = $this->getUser();
         if($file->isDir()) {
             ?>
             <tr>
-                <td><i class="bi bi-folder"></i> <?= $file->getBasename() ?></td>
+                <td><i class="bi bi-folder"></i> <a href="<?= $this->getAbsoluteUrl('/admin/files') ?>?folder=<?= base64_encode($file->getRealPath()) ?>" class=""><?= $file->getBasename() ?></a></td>
                 <td>
                     <div class="btn-group">
                         <a href="<?= $this->getAbsoluteUrl('admin/files/rename/') ?>?folder=<?=
                         base64_encode($file->getRealPath()) ?>" class="btn btn-sm btn-primary"><i class="bi bi-chat"></i> <?= __('Rename') ?></a>
-                        <a href="<?= $this->getAbsoluteUrl('/admin/files') ?>?folder=<?= base64_encode($file->getRealPath()) ?>" class="btn btn-sm btn-primary"><i class="bi
-                        bi-door-open"></i> <?= __('Open') ?></a>
                     </div></td>
 
             </tr>

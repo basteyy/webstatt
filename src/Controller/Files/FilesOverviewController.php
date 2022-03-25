@@ -75,7 +75,7 @@ class FilesOverviewController extends Controller
                 return $this->adminRedirect();
             }
 
-            $request->getUploadedFiles()['file']->moveTo($current_folder . $request->getUploadedFiles()['file']->getClientFilename());
+            $request->getUploadedFiles()['file']->moveTo($current_folder . strtolower($request->getUploadedFiles()['file']->getClientFilename()));
             FlashMessages::addSuccessMessage(__('File %s was uploaded to %s', $request->getUploadedFiles()['file']->getClientFilename(), $current_folder));
             return $this->adminRedirect();
 

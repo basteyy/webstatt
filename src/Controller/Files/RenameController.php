@@ -57,13 +57,58 @@ class RenameController extends Controller
         }
 
         if(isset($request->getQueryParams()['file'])) {
-            return $this->renameFile(new \SplFileInfo(base64_decode($request->getQueryParams()['file'])));
+            return $this->renameFile($request, $response, new \SplFileInfo(base64_decode($request->getQueryParams()['file'])));
         } elseif ( $request->getQueryParams()['folder']) {
             return $this->renameFolder($request, $response, new \SplFileInfo(base64_decode($request->getQueryParams()['folder'])));
         } else {
             FlashMessages::addErrorMessage(__('Required data nit found!'));
             return $this->adminRedirect('/files');
         }
+
+    }
+
+    private function renameFile(ServerRequestInterface $request, ResponseInterface $response, \SplFileInfo $file) : ResponseInterface {
+
+        if (!str_starts_with($file->getRealPath(), $this->getBaseFolder())) {
+            FlashMessages::addErrorMessage(__('Selected folder %s is out of allowed folder scope %s', $file->getRealPath(), $this->getBaseFolder()));
+            return $this->adminRedirect('files');
+        }
+
+        if($this->isPost()) {
+            $name = $request->getParsedBody()['file_name'];
+
+            // Add fiel extension?
+            if(!str_ends_with(strtolower($name), strtolower($file->getExtension()))) {
+                $name .= '.' . $file->getExtension();
+            }
+
+            $absolute_file_path = dirname($file->getRealPath()) . DS . $name;
+
+            if(file_exists($absolute_file_path) && strtolower($file->getRealPath()) !== strtolower($absolute_file_path)) {
+                FlashMessages::addErrorMessage(__('File %s already exists in that folder', $name));
+            }
+
+            elseif (!str_starts_with($absolute_file_path, $this->getBaseFolder())) {
+                FlashMessages::addErrorMessage(__('Selected folder %s is out of allowed folder scope %s', $file->getRealPath(), $this->getBaseFolder()));
+            }
+
+            elseif (!ctype_alnum(str_replace('.', '', $name))) {
+                FlashMessages::addErrorMessage(__('New file name contains invalid characters', $name));
+            }
+
+            else {
+
+
+
+                rename($file->getRealPath(), $absolute_file_path);
+                FlashMessages::addSuccessMessage(__('File %s renamed to %s (%s)', $file->getBasename(), $name, $absolute_file_path));
+                return $this->adminRedirect('files/rename?file=' . base64_encode($absolute_file_path));
+            }
+            return $this->adminRedirect();
+        }
+
+
+        return $this->adminRender('files/rename/file', ['file' => $file]);
 
     }
 
