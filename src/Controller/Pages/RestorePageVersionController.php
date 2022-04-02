@@ -44,7 +44,7 @@ class RestorePageVersionController extends Controller
         $page = $this->getPagesModel()->findOneBySecret($content_page_secret, false);
 
         if (!$page) {
-            FlashMessages::addErrorMessage(__('Page not found.'));
+            FlashMessages::addErrorMessage(__('Page not found'));
             return $this->redirect('/admin/pages');
         }
 
@@ -58,7 +58,7 @@ class RestorePageVersionController extends Controller
         }
 
         if (!isset($version_content)) {
-            FlashMessages::addErrorMessage(__('Version %s of the page not found.', $version_file_name));
+            FlashMessages::addErrorMessage(__('Version %s of the page not found', $version_file_name));
             return $this->redirect('/admin/content/edit/' . $content_page_secret);
         }
 

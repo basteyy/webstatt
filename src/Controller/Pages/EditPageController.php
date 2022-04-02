@@ -44,14 +44,14 @@ class EditPageController extends Controller
         $page = $this->getPagesModel()->findOneBySecret($content_page_secret, false);
 
         if (!$page) {
-            FlashMessages::addErrorMessage(__('Page not found.'));
+            FlashMessages::addErrorMessage(__('Page not found'));
             return $this->redirect('/admin/pages');
         }
 
 
         if ($this->isPost()) {
 
-            /* Copy the parsed body to a new array and unset fields, which are not allowed to store in the database */
+            /**Copy the parsed body to a new array and unset fields, which are not allowed to store in the database */
             $data = [
                 'url'         => '/' . slugify($request->getParsedBody()['url']),
                 'name'        => $request->getParsedBody()['name'],
@@ -73,7 +73,7 @@ class EditPageController extends Controller
             $body = $request->getParsedBody()['body'];
 
             if($data['startpage']) {
-                /* Remove startpage from other startpage */
+                /**Remove startpage from other startpage */
                 $old_startpage = $this->getPagesModel()->getStartpage();
                 if($old_startpage && $old_startpage->getId() !== $page->getId()) {
                     $this->getPagesModel()->patch($old_startpage, ['startpage' => false]);
@@ -86,30 +86,30 @@ class EditPageController extends Controller
                 return $this->redirect('/admin/pages/edit/' . $content_page_secret);
             }
 
-            /* Different hash of the body? */
+            /**Different hash of the body? */
             if($page->getStorage()->getHash() !== hash(FAST_HASH, $body)) {
                 $page->getStorage()->writeBody($body);
                 FlashMessages::addSuccessMessage(__('Body was updated'));
             }
 
-            /* Change Content Type */
+            /**Change Content Type */
             if($this->getCurrentUser()->isAdmin() && $data['pageType'] !== $page->getPageType()) {
                 $page->getStorage()->changePageType($data['pageType']);
                 FlashMessages::addSuccessMessage(__('Page Type was changed to %s', $data['pageType']->value));
             }
 
-            /* Patch the entry in the database */
+            /**Patch the entry in the database */
             $this->getPagesModel()->patch($page, $data);
 
-            /* Success message */
+            /**Success message */
             FlashMessages::addSuccessMessage(__('Changes are saved'));
 
-            /* Flush Cache */
+            /**Flush Cache */
             if(APCU_SUPPORT) {
                 apcu_clear_cache();
             }
 
-            /* Redirect */
+            /**Redirect */
             return $this->redirect('/admin/pages/edit/' . $content_page_secret);
 
 

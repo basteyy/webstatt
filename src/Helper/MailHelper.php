@@ -47,14 +47,14 @@ final class MailHelper {
         $mail->setFrom($this->configService->getMailConfig()['from'], $this->configService->getMailConfig()['name']);
         $mail->addReplyTo($this->configService->getMailConfig()['reply'], $this->configService->getMailConfig()['name']);
 
-        /* Just neerds will read that later */
+        /**Just neerds will read that later */
         $mail->addCustomHeader('X-Powered-by', 'Webstatt (https://github.com/basteyy/webstatt)');
 
         $mail->setLanguage($this->configService->getMailConfig()['lang']);
 
         if($this->configService->getMailConfig()['smtp_activated']) {
 
-            /* SMTP MAIL */
+            /**SMTP MAIL */
             $mail->isSMTP();
 
             $mail->SMTPDebug = $this->configService->getMailConfig()['smtp_server_debug'] ? SMTP::DEBUG_SERVER : SMTP::DEBUG_OFF;
@@ -75,12 +75,12 @@ final class MailHelper {
 
             if('mail' === $this->configService->getMailConfig()['mailer_method'] ) {
 
-                /* Mail */
+                /**Mail */
                 $mail->isMail();
 
             } elseif ( 'sendmail' === $this->configService->getMailConfig()['mailer_method'] ) {
 
-                /* Sendmail */
+                /**Sendmail */
                 $mail->isSendmail();
 
             } else {

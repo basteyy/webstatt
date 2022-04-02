@@ -39,7 +39,7 @@ final class AccessService
 
         } else {
 
-            /* Generate the Access Data */
+            /**Generate the Access Data */
 
             $shipped_access_file = PACKAGE_ROOT . $this->access_file_name;
             $custom_access_file = ROOT . $this->access_file_name;

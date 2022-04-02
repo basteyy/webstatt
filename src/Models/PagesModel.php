@@ -76,17 +76,6 @@ final class PagesModel extends Model
 
     /**
      * @throws IOException
-     * @throws InvalidConfigurationException
-     * @throws InvalidArgumentException|ReflectionException
-     */
-    public function getAll(): array
-    {
-        $entries = $this->getRaw()->findAll();
-        return 0 < count($entries) ? $this->createEntities($entries) : [];
-    }
-
-    /**
-     * @throws IOException
      * @throws ReflectionException
      * @throws InvalidConfigurationException
      * @throws InvalidArgumentException

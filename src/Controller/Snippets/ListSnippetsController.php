@@ -22,7 +22,7 @@ class ListSnippetsController extends Controller {
 
 
         return $this->adminRender('snippets/list', [
-            'snippets' => []
+            'snippets' => $this->getSnippetsModel()->getAll()
         ]);
     }
 

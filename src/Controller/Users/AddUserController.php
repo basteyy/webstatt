@@ -78,7 +78,7 @@ class AddUserController extends Controller
                     'secret'   => getRandomString(24)
                 ]);
 
-                /* Send a Welcome Mail ? */
+                /**Send a Welcome Mail ? */
                 if(isset($request->getParsedBody()['send_welcome_mail'])) {
 
                     $mailhelper = new MailHelper($this->getConfigService());

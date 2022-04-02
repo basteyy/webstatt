@@ -67,7 +67,7 @@ class FilesOverviewController extends Controller
             $current_folder = $basic_folder;
         }
 
-        /* Upload a new file to the current folder */
+        /**Upload a new file to the current folder */
         if($this->isPost()) {
 
             if ($request->getUploadedFiles()['file']->getError() !== UPLOAD_ERR_OK) {
@@ -82,7 +82,7 @@ class FilesOverviewController extends Controller
         }
 
 
-        /* Folder up? */
+        /**Folder up? */
         $upper_folder =  (isset($selected_folder) && $basic_folder !== $selected_folder)  ? dirname($selected_folder) : $basic_folder;
 
         $folder_helper = [];

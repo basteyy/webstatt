@@ -97,7 +97,7 @@ $User = $this->getUser();
                         </li>
 
                         <li>
-                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/pages/snippets') ?>" title="<?= __('Snippets') ?>">
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/snippets') ?>" title="<?= __('Snippets') ?>">
                                 <i class="mx-md-2 bi bi-plus-circle"></i> <?= __('Snippets') ?>
                             </a>
                         </li>
@@ -297,7 +297,14 @@ $User = $this->getUser();
         crossorigin="anonymous"></script>
 <script src="<?= $this->getAbsoluteUrl('/js/vendor/confirmbutton.js') ?>"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"/>
-
+<script>
+    window.confirmation.config({
+        titletxt: '<?= __('This action requires confirmation') ?>',
+        confirmtxt: '<?= __('Confirm') ?>',
+        canceltxt: '<?= __('Cancel') ?>',
+        confirm: '<?= __('Please confirm your action') ?>'
+    });
+</script>
 
 </body>
 </html>

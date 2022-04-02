@@ -48,7 +48,7 @@ class AddPageController extends Controller
 
         if ($this->isPost()) {
 
-            /* Inspect the new URL */
+            /**Inspect the new URL */
             $data = [
                 'url'          => '/' . slugify($request->getParsedBody()['url']),
                 'name'         => $request->getParsedBody()['name'],
@@ -71,7 +71,7 @@ class AddPageController extends Controller
                 FlashMessages::addErrorMessage(__('Invalid URL %s.', $data['url']));
             } else {
 
-                /* Add the / to the url */
+                /**Add the / to the url */
                 if (!str_starts_with($data['url'], '/')) {
                     $data['url'] = '/' . $data['url'];
                 }

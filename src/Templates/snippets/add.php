@@ -19,12 +19,26 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Add a new snippet')]);
 
     <div class="col-12">
         <label for="_key" class="form-label"><?= __('Key') ?></label>
-        <input pattern="A-z" type="text" class="form-control" id="_key" name="key" placeholder="<?= __('Key') ?>" required>
+        <input pattern="[A-z]{4,32}" type="text" class="form-control" id="_key" name="key" placeholder="<?= __('Key') ?>" required>
     </div>
 
     <div class="col-12">
         <label for="_content" class="form-label"><?= __('Content') ?></label>
         <textarea rows="10" class="form-control" id="_content" name="content" required placeholder="<?= __('Content (in HTML/PHP)')?>"></textarea>
+    </div>
+
+    <div class="col-12">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="active" name="active">
+            <label class="form-check-label" for="active"><?= __('Snippet activated') ?></label>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="caching" name="caching">
+            <label class="form-check-label" for="caching"><?= __('Caching enabled') ?></label>
+        </div>
     </div>
 
     <div class="col-12">

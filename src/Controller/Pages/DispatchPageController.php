@@ -40,8 +40,19 @@ class DispatchPageController extends Controller
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+        // Load Snippet Plugin
+        $this->getEngine()->registerFunction('getSnippet', function($key) {
+            $snippet = $this->getSnippetsModel()->findOneByKey($key);
+
+            if(!$snippet) {
+                return '<!-- Invalid Snippet "' . $key . '" -->';
+            }
+
+            return $snippet->execute();
+        });
+
         if('/' === $request->getUri()->getPath() ) {
-            /* Startpage */
+            /**Startpage */
             $startpage = $this->getPagesModel()->getStartpage();
 
 

@@ -27,6 +27,7 @@ use SleekDB\Exceptions\JsonException;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use function basteyy\VariousPhpSnippets\__;
+use function basteyy\VariousPhpSnippets\getDateTimeFormat;
 use function basteyy\VariousPhpSnippets\getRandomString;
 
 class LoginController extends Controller
@@ -68,12 +69,14 @@ class LoginController extends Controller
                     'role'     => UserRole::SUPER_ADMIN,
                     'secret' => getRandomString(12),
                     'name' => '',
-                    'alias' => ''
+                    'alias' => '',
+                    'created' => getDateTimeFormat(),
+                    'lastlogin' => getDateTimeFormat()
                 ]);
 
                 $user_id = $db->getRaw()->getLastInsertedId();
 
-                /* Send welcome mail, if mail is marked as working */
+                /**Send welcome mail, if mail is marked as working */
                 if($this->getConfigService()->getMailConfig()['activate_mail_system']) {
 
                     $mailhelper = new MailHelper($this->getConfigService());
@@ -98,6 +101,11 @@ class LoginController extends Controller
                     if (UserPasswordStrategy::comparePassword($user['password'], $password, $user['salt'])) {
                         $user_id = $user[$db->getRaw()->getPrimaryKey()];
                         $login = true;
+
+                        $db->getRaw()->updateById($user_id, [
+                            'lastlogin' => getDateTimeFormat()
+                        ]);
+
                     } else {
                         FlashMessages::addErrorMessage(__('Password was incorrect'));
                     }

@@ -69,7 +69,7 @@ class Model implements ModelInterface
         foreach($data as $name => $value) {
             if($reflection->hasProperty($name) && $reflection->getProperty($name)->hasType()) {
 
-                /* Enum? */
+                /**Enum? */
                 if($name !== $this->configService->database_primary_key && $reflection->getProperty($name)->getType()->isBuiltin()) {
 
                     $data[$name] = match ($reflection->getProperty($name)->getType()->getName()) {
@@ -121,6 +121,7 @@ class Model implements ModelInterface
     public function delete(EntityInterface $entity): void
     {
         // TODO: Implement delete() method.
+        $this->getRaw()->deleteById($entity->getId());
     }
 
     public function save(EntityInterface $entity)
@@ -151,7 +152,7 @@ class Model implements ModelInterface
 
         if (!isset($entries[0][$this->getPrimaryIdName()])) {
 
-            /* New element, when there is no primary id */
+            /**New element, when there is no primary id */
             if (!isset($entries[$this->configService->database_primary_key])) {
                 $entries['__new'] = true;
             }
@@ -162,7 +163,7 @@ class Model implements ModelInterface
         $pages = [];
         foreach ($entries as $entry) {
 
-            /* New element, when there is no primary id */
+            /**New element, when there is no primary id */
             if (!isset($entry[$this->configService->database_primary_key])) {
                 $entry['__new'] = true;
             }
@@ -198,7 +199,7 @@ class Model implements ModelInterface
         $class_name_cases[] = __NAMESPACE__ . '\\Entities\\' . $class_name;
         $class_name_cases[] = __NAMESPACE__ . '\\Entities\\' . $class_name . 'Entity';
 
-        /* Plural? */
+        /**Plural? */
         if (str_ends_with($class_name, 's')) {
             $class_name = substr($class_name, 0, -1);
             $class_name_cases[] = $class_name;
@@ -211,7 +212,7 @@ class Model implements ModelInterface
         foreach ($class_name_cases as $class) {
             if (class_exists($class)) {
 
-                /* Cache the result */
+                /**Cache the result */
                 if ($use_cache && APCU_SUPPORT && apcu_exists($called_class)) {
                     apcu_add($called_class, $class, APCU_TTL_SHORT);
                 }
@@ -238,7 +239,7 @@ class Model implements ModelInterface
     public function create(array $entity_data): EntityInterface
     {
 
-        /* save to Sleek */
+        /**save to Sleek */
         $data = $this->getRaw()->insert($entity_data);
 
         return $this->createEntities($data);
@@ -250,16 +251,7 @@ class Model implements ModelInterface
     }
 
 
-
     /**
-     * Search for one/or all, where search_field is search_value.
-     * @param string $search_field Field which is searched
-     * @param string $operator Operator
-     * @param mixed $search_value Value of search
-     * @param bool $multiple_results Return all results or just one
-     * @param bool $create_entities Create the entity directly
-     * @param bool $use_cache
-     * @return array|null|PageEntity
      * @throws ReflectionException
      */
     protected function _findByOneArgument(
@@ -299,4 +291,16 @@ class Model implements ModelInterface
         return $multiple_results ? $this->getRaw()->findBy($find_argument) : $this->getRaw()->findOneBy($find_argument);
     }
 
+
+
+    /**
+     * @throws IOException
+     * @throws InvalidConfigurationException
+     * @throws InvalidArgumentException|ReflectionException
+     */
+    public function getAll(): array
+    {
+        $entries = $this->getRaw()->findAll();
+        return 0 < count($entries) ? $this->createEntities($entries) : [];
+    }
 }

@@ -14,6 +14,8 @@ namespace basteyy\Webstatt\Models\Entities;
 
 use basteyy\Webstatt\Enums\UserRole;
 use JetBrains\PhpStorm\Pure;
+use function basteyy\VariousPhpSnippets\__;
+use function basteyy\VariousPhpSnippets\getDateTimeFormat;
 
 class UserEntity extends Entity implements EntityInterface
 {
@@ -24,6 +26,8 @@ class UserEntity extends Entity implements EntityInterface
     protected string $secret;
     protected string $name = '';
     protected string $alias = '';
+    protected \DateTime|null $created;
+    protected \DateTime|null $lastlogin;
 
     public function hasName() : bool {
         return isset($this->name) && '' !== $this->name;
@@ -35,6 +39,10 @@ class UserEntity extends Entity implements EntityInterface
 
     public function hasAlias () : bool {
         return isset($this->alias) && '' !== $this->alias;
+    }
+
+    public function getLastlogin() : string {
+        return isset($this->lastlogin) ? getDateTimeFormat($this->lastlogin) : __('never');
     }
 
     /**

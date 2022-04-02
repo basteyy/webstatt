@@ -35,6 +35,13 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Edit a page')]);
 
         <div class="row g-3">
             <div class="col-12">
+                <?php
+                if($page->getOnline()) {
+                    ?>
+                    <a class="btn btn-sm btn-primary float-end" target="_blank" href="<?= $page->getUrl() ?>"><i class="bi bi-search"></i> <?= __('View') ?></a>
+                <?php
+                }
+                ?>
                 <label for="_url" class="form-label"><?= __('Url of the page') ?></label>
                 <input type="text" class="form-control" id="_url" name="url" placeholder="<?= __('Url of the page') ?>" required value="<?= $page->getUrl() ?>"/>
                 <div class="form-check form-switch">

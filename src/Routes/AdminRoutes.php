@@ -17,7 +17,9 @@ use basteyy\Webstatt\Controller\Account\UserProfilController;
 use basteyy\Webstatt\Controller\Cache\CacheResetController;
 use basteyy\Webstatt\Controller\DashboardController;
 use basteyy\Webstatt\Controller\Files\DeleteFileController;
+use basteyy\Webstatt\Controller\Files\EditFileController;
 use basteyy\Webstatt\Controller\Files\FilesOverviewController;
+use basteyy\Webstatt\Controller\Files\RenameController;
 use basteyy\Webstatt\Controller\LoginController;
 use basteyy\Webstatt\Controller\LogoutController;
 use basteyy\Webstatt\Controller\Pages\AddPageController;
@@ -28,7 +30,9 @@ use basteyy\Webstatt\Controller\Pages\ViewPageVersionController;
 use basteyy\Webstatt\Controller\Settings\MailSettingsController;
 use basteyy\Webstatt\Controller\Settings\SettingsOverviewController;
 use basteyy\Webstatt\Controller\Snippets\AddSnippetController;
+use basteyy\Webstatt\Controller\Snippets\DeleteSnippetController;
 use basteyy\Webstatt\Controller\Snippets\ListSnippetsController;
+use basteyy\Webstatt\Controller\Snippets\EditSnippetController;
 use basteyy\Webstatt\Controller\Users\AddUserController;
 use basteyy\Webstatt\Controller\Users\EditUserController;
 use basteyy\Webstatt\Controller\Users\ListUsersController;
@@ -56,6 +60,9 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
 
     /** Reset Cache */
     $proxy->any('/cache/reset', CacheResetController::class);
+    
+    /** Show the User Profile  */
+    $proxy->get('/u/{user_secret}', \basteyy\Webstatt\Controller\ShowUserProfileController::class);
 
     /** User Account */
     $proxy->group('/account', function (RouteCollectorProxy $proxy) {
@@ -82,7 +89,7 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
         /** Delete a User */
         $proxy->any('/delete/{user_secret}', RemoveUserController::class);
 
-        /* Edit a user */
+        /**Edit a user */
         $proxy->any('/edit/{user_secret}', EditUserController::class);
     });
 
@@ -107,31 +114,34 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
 
     });
 
-    /* Snippets */
+    /**Snippets */
     $proxy->group('/snippets', function (RouteCollectorProxy $proxy) {
 
-        /* Snippets Overview */
+        /**Snippets Overview */
         $proxy->any('', ListSnippetsController::class);
 
-        /* Add a new snippet */
+        /**Add a new snippet */
         $proxy->any('/add', AddSnippetController::class);
+
+        /**Edit a snippet */
+        $proxy->any('/edit/{snippet_secret}', EditSnippetController::class);
+
+        /**Delete a snippet */
+        $proxy->any('/delete/{snippet_secret}', DeleteSnippetController::class);
 
     });
 
 
     /** Files Routes */
     $proxy->group('/files', function (RouteCollectorProxy $proxy) {
-        $proxy->get('', FilesOverviewController::class);
-        $proxy->post('', FilesOverviewController::class);
+        $proxy->any('', FilesOverviewController::class);
 
         $proxy->get('/delete', DeleteFileController::class);
 
 
-        $proxy->get('/edit', \basteyy\Webstatt\Controller\Files\EditFileController::class);
-        $proxy->post('/edit', \basteyy\Webstatt\Controller\Files\EditFileController::class);
+        $proxy->any('/edit', EditFileController::class);
 
-        $proxy->get('/rename', \basteyy\Webstatt\Controller\Files\RenameController::class);
-        $proxy->post('/rename', \basteyy\Webstatt\Controller\Files\RenameController::class);
+        $proxy->any('/rename', RenameController::class);
 
     });
 
@@ -139,7 +149,7 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
     $proxy->group('/settings', function (RouteCollectorProxy $proxy) {
         $proxy->get('', SettingsOverviewController::class);
 
-        /* Email Settings */
+        /**Email Settings */
         $proxy->any('/email', MailSettingsController::class);
 
     });

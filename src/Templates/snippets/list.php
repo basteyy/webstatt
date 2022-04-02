@@ -11,7 +11,7 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Overview of your snippets
 <h1 class="my-md-5"><?= __('Manage the snippets') ?></h1>
 
 <div class="float-md-end">
-    <a class="btn btn-primary" title="<?= __('Add a new snippet') ?>" href="<?= $this->getAbsoluteUrl('/admin/pages/snippets/add') ?>"><i class="bi bi-plus-circle"></i> <?= __('Add new') ?></a>
+    <a class="btn btn-primary" title="<?= __('Add a new snippet') ?>" href="<?= $this->getAbsoluteUrl('/admin/snippets/add') ?>"><i class="bi bi-plus-circle"></i> <?= __('Add new') ?></a>
 </div>
 
 <p>
@@ -23,7 +23,9 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Overview of your snippets
         <thead>
         <tr>
             <th scope="col">#</th>
+            <th scope="col"><?= __('Name') ?></th>
             <th scope="col"><?= __('Key') ?></th>
+            <th scope="col"><?= __('Status') ?></th>
             <th scope="col"><?= __('Options') ?></th>
         </tr>
         </thead>
@@ -34,14 +36,20 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Overview of your snippets
             ?>
             <tr>
                 <td><?= $snippet->getId() ?></td>
-                <td><?= $snippet->getKey() ?></td>
+                <td><?= $snippet->getName() ?></td>
+                <td><code><pre>&lt;?= $this->getSnippet('<?= $snippet->getKey() ?>') ?&gt;</pre></code></td>
+                <td>
+                    <span class="badge bg-<?= $snippet->isActive() ? 'success' : 'danger' ?>"><?= $snippet->isActive() ? __('Yes') : __('No') ?></span>
+                </td>
                 <td>
                     <div class="btn-group" role="group" aria-label="<?= __('Options') ?>">
-                        <a class="btn btn-primary btn-sm" href="<?= $this->getAbsoluteUrl('/admin/pages/edit/%s', $snippet->getSecret()) ?>"><i class="bi bi-gear"></i>
-                            <?= __('Edit') ?></a>
-                        <a target="_blank" class="btn btn-secondary btn-sm" href="<?= $this->getAbsoluteUrl($snippet->getUrl()) ?>"><i class="bi bi-search"></i> <?= __('View') ?></a>
-                        <a target="_blank" class="btn btn-danger btn-sm" href="<?= $this->getAbsoluteUrl($snippet->getUrl()) ?>"><i class="bi bi-search"></i> <?= __('Delete')
-                            ?></a>
+                        <a class="btn btn-primary btn-sm" href="<?= $this->getAbsoluteUrl('/admin/snippets/edit/%s', $snippet->getSecret()) ?>">
+                            <i class="bi bi-gear"></i> <?= __('Edit') ?></a>
+                        <a data-confirm="<?= __('Delete the snippet %s', $snippet->getKey()) ?>" class="btn btn-danger btn-sm" href="<?= $this->getAbsoluteUrl('/admin/snippets/delete/%s',
+                            $snippet->getSecret
+                        ()) ?>">
+                            <i class="bi bi-trash"></i> <?= __('Delete')?>
+                        </a>
                     </div>
                 </td>
             </tr>

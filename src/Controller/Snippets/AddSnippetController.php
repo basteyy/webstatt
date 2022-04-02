@@ -14,6 +14,7 @@ namespace basteyy\Webstatt\Controller\Snippets;
 
 use basteyy\Webstatt\Controller\Controller;
 use basteyy\Webstatt\Helper\FlashMessages;
+use Exception;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use ReflectionException;
@@ -21,6 +22,7 @@ use SleekDB\Exceptions\InvalidArgumentException;
 use SleekDB\Exceptions\InvalidConfigurationException;
 use SleekDB\Exceptions\IOException;
 use function basteyy\VariousPhpSnippets\__;
+use function basteyy\VariousPhpSnippets\getRandomString;
 
 class AddSnippetController extends Controller
 {
@@ -30,6 +32,7 @@ class AddSnippetController extends Controller
      * @throws ReflectionException
      * @throws InvalidConfigurationException
      * @throws InvalidArgumentException
+     * @throws Exception
      */
     public function __invoke(RequestInterface $request): ResponseInterface
     {
@@ -39,13 +42,16 @@ class AddSnippetController extends Controller
                 'name'    => $request->getParsedBody()['name'],
                 'key'     => $request->getParsedBody()['key'],
                 'content' => $request->getParsedBody()['content'],
+                'active' => (bool)$request->getParsedBody()['active'],
+                'cache' => (bool)$request->getParsedBody()['cache'],
+                'secret' => getRandomString(16),
             ];
 
             $this->getSnippetsModel()->create($data);
 
             FlashMessages::addSuccessMessage(__('Snippets was created'));
 
-            return $this->adminRedirect('/pages/snippets#' . $this->getSnippetsModel()->getRaw()->getLastInsertedId());
+            return $this->adminRedirect('/snippets#' . $this->getSnippetsModel()->getRaw()->getLastInsertedId());
 
         }
 

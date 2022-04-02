@@ -56,7 +56,7 @@ final class PageStorageHelper {
      */
     public function changePageType(PageType $new_page_type) : void {
 
-        /* Target Page Type File Extension */
+        /**Target Page Type File Extension */
         $current_extension = $this->getFileExtension();
         $new_extension = '.' . match ($new_page_type) {
             PageType::HTML_PHP => $this->file_html_php_extension,
@@ -68,20 +68,20 @@ final class PageStorageHelper {
             throw new Exception(__('Page Type is already %s', $new_extension));
         }
 
-        /* Rename all Versions */
+        /**Rename all Versions */
         foreach($this->getAllVersions() as $filemtime => $file_path) {
 
-            /* Copy to new file */
+            /**Copy to new file */
             copy($file_path, str_replace($current_extension, $new_extension, $file_path));
 
-            /* Delete old file */
+            /**Delete old file */
             unlink($file_path);
         }
 
-        /* Rename current version */
+        /**Rename current version */
         copy($current_major_version, str_replace($current_extension, $new_extension, $this->getAbsoluteFilePath()) );
 
-        /* Delete old current version */
+        /**Delete old current version */
         unlink($current_major_version);
     }
 
@@ -182,7 +182,7 @@ final class PageStorageHelper {
         }
 
         if($this->maximum_versions !== -1 && $this->maximum_versions <= count($versions)+1) {
-            /* Delete the oldest X versions */
+            /**Delete the oldest X versions */
             for($x=0; $x<= (($this->maximum_versions - (count($versions) +1)) * -1); $x++) {
                 unlink($versions[key($versions)]);
                 unseT($versions[key($versions)]);
@@ -208,7 +208,7 @@ final class PageStorageHelper {
         foreach ($dir as $file) {
             /** @var SplFileInfo $file */
 
-            /* Only accept files which the correct extension */
+            /**Only accept files which the correct extension */
             if ($file->isFile() && $file->getExtension() === $this->getFileExtension(false)) {
                 $versions[$file->getMTime()] = $file->getRealPath();
             }
@@ -237,13 +237,13 @@ final class PageStorageHelper {
 
         $new_extension = '.' . $pageType->fileExtension();
 
-        /* Copy and delete the versions */
+        /**Copy and delete the versions */
         foreach ($this->getAllVersions() as $timestamp => $path) {
             copy($path, str_replace($this->getFileExtension(true), $new_extension, $path));
             unlink($path);
         }
 
-        /* Copy and delete the current */
+        /**Copy and delete the current */
         $old = $this->getAbsoluteFilePath();
         copy($this->getAbsoluteFilePath(), str_replace($this->getFileExtension(true), $new_extension, $this->getAbsoluteFilePath()));
         unlink($old);

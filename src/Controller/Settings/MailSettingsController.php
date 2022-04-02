@@ -58,7 +58,7 @@ class MailSettingsController extends Controller
                     (file_exists(SRC . 'Resources/StaticFiles/Ini/header.ini') ? file_get_contents(SRC . 'Resources/StaticFiles/Ini/header.ini') : ''),
                     '; Generated on ' . date('d.m.y H:i:s'));
 
-                /* Free APCU Cache */
+                /**Free APCU Cache */
                 if (APCU_SUPPORT) {
                     apcu_delete(ConfigFile::MAIL->cacheName());
                 }
