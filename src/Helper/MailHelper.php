@@ -92,9 +92,6 @@ final class MailHelper {
 
         }
 
-
-        $mail->isMail();
-
         return $mail;
     }
 
