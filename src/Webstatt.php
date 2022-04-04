@@ -84,7 +84,7 @@ class Webstatt
         define('PACKAGE_ROOT', dirname(__DIR__) . DS);
 
         /** Direct path to the src folder */
-        define('SRC', PACKAGE_ROOT . DS . 'src' . DS);
+        define('SRC', PACKAGE_ROOT . 'src' . DS);
 
         /** Put trash here */
         define('TEMP', ROOT . DS . 'cache' . DS);
@@ -234,7 +234,7 @@ class Webstatt
 
             if('/' === $this->request->getUri()->getPath() || '' === $this->request->getUri()->getPath() && $startpage) {
                 $this->app->get('/', DispatchPageController::class);
-            } elseif (str_starts_with($this->request->getUri()->getPath(), '/admin') && file_exists(SRC . 'routes' . DS . 'AdminRoutes.php')) {
+            } elseif (str_starts_with($this->request->getUri()->getPath(), '/admin') && file_exists(SRC . 'Routes' . DS . 'AdminRoutes.php')) {
 
                 /**In the admin Szenario, there will be the l18n helper loaded */
                 i18n::addTranslationFolder(SRC . 'Resources' . DS . 'Languages');
@@ -245,7 +245,7 @@ class Webstatt
             } else {
 
                 /**Static Webstatt Website Routes? */
-                if (file_exists(SRC . 'routes' . DS . 'WebsiteRoutes.php')) {
+                if (file_exists(SRC . 'Routes' . DS . 'WebsiteRoutes.php')) {
                     include SRC . 'Routes' . DS . 'WebsiteRoutes.php';
                 }
 
