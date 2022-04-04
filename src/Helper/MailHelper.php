@@ -44,6 +44,8 @@ final class MailHelper {
 
         $mail = new PHPMailer($this->configService->debug);
 
+        $mail->CharSet = "UTF-8";
+
         $mail->setFrom($this->configService->getMailConfig()['from'], $this->configService->getMailConfig()['name']);
         $mail->addReplyTo($this->configService->getMailConfig()['reply'], $this->configService->getMailConfig()['name']);
 
@@ -88,6 +90,9 @@ final class MailHelper {
             }
 
         }
+
+
+        $mail->isMail();
 
         return $mail;
     }
