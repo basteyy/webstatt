@@ -25,13 +25,26 @@ The idea behind the three roles is, to create a simple system where operations w
 
 ## Setup
 
-Its quite easy to setup Webstatt as your new website. Just require the package via composer:
+It's quite easy to set up Webstatt as your new website. Just require the package via composer:
 
 ```bash
-composer require basteyy/website
+composer require basteyy/webstatt
 ```
 
-Next step is to create a new index-file for your website. For example `public/index.php`. In that file you need to include the composer autploader and than call Webstatt:
+### Notice version before 1.0.0
+
+In case you want to use a version before the first stable release, you need to adjust your `composer.json` a little. Set minimum stability to dev and require webstatt from 
+dev-master: 
+ ```json
+{
+  "minimum-stability": "dev",
+  "require": {
+    "basteyy/webstatt": "dev-master"
+  }
+}
+```
+
+Next step is to create a new index-file for your website. For example `public/index.php`. In that file you need to include the composer autoloader and then call Webstatt:
 
 ```php
 <?php declare(strict_types=1);
@@ -62,7 +75,7 @@ $website->getApp()->group('', function (RouteCollectorProxy $proxy) {
 $website->run();
 ```
 
-In case you wanna use templates, you need to create a template file. The project strucutre could be something like:
+In case you want to use templates, you need to create a template file. The project strucutre could be something like:
 
 ```text
 public/index.php

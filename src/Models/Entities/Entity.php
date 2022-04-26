@@ -12,13 +12,16 @@ declare(strict_types=1);
 
 namespace basteyy\Webstatt\Models\Entities;
 
+use DateTime;
+use DateTimeZone;
 use Exception;
 use ReflectionClass;
 use ReflectionException;
 use function basteyy\VariousPhpSnippets\__;
 use function basteyy\VariousPhpSnippets\varDebug;
 
-class Entity implements EntityInterface {
+class Entity implements EntityInterface
+{
 
     private string $primary_id_name;
     private array $accessible_properties;
@@ -26,6 +29,7 @@ class Entity implements EntityInterface {
 
     /**
      * @throws ReflectionException
+     * @throws Exception
      */
     public function __construct(array $data, string $primary_id_name)
     {
@@ -39,17 +43,17 @@ class Entity implements EntityInterface {
 
         foreach ($data as $name => $value) {
 
-            if($name === $primary_id_name) {
+            if ($name === $primary_id_name) {
                 // Thats the ID
                 $this->{$primary_id_name} = $value;
 
-            } elseif($skip_property_checking || $this->reflectionClass->hasProperty($name)) {
+            } elseif ($skip_property_checking || $this->reflectionClass->hasProperty($name)) {
                 /**Only existing property's from the data will be patched to the class */
 
                 $this->accessible_properties[] = $name;
 
                 /**Enum? */
-                if($name !== $primary_id_name && $this->reflectionClass->getProperty($name)->getType()->isBuiltin()) {
+                if ($name !== $primary_id_name && $this->reflectionClass->getProperty($name)->getType()->isBuiltin()) {
 
                     $this->{$name} = match ($this->reflectionClass->getProperty($name)->getType()->getName()) {
                         'int' => (int)$value,
@@ -61,10 +65,30 @@ class Entity implements EntityInterface {
 
                     // Webstatt Enum?
                     $enum = $this->reflectionClass->getProperty($name)->getType()->getName();
-                    if(str_starts_with($enum, 'basteyy\\Webstatt\\Enums\\')) {
-                        $this->{$name} = $enum::tryFrom($value);
+                    if (str_starts_with($enum, 'basteyy\\Webstatt\\Enums\\')) {
+                        $this->{$name} = is_string($value) ? $enum::tryFrom($value) : $value;
+                    } elseif ('DateTime' === $enum) {
+                        if (is_array($value)) {
+                            if (!isset($value['date'])) {
+                                throw new Exception('No date array element found. Data is required to build new dateTime Object');
+                            }
+
+                            $dt = new DateTime($value['date']);
+
+                            if (isset($value['timezone'])) {
+                                $dt->setTimezone(new DateTimeZone($value['timezone']));
+                            }
+
+                            $this->{$name} = $dt;
+
+                        } elseif(is_string($value)) {
+                            $this->{$name} = new DateTime($value);
+                        } else {
+                            $this->{$name} = $value;
+                        }
                     } else {
-                        $this->{$name} = new $enum($value);
+
+                        $this->{$name} = is_string($value) ? new $enum($value) : $value;
                     }
 
                 }
@@ -82,13 +106,22 @@ class Entity implements EntityInterface {
      */
     public function __call(string $name, array $arguments)
     {
-        if(substr($name, 0, 3) === 'get' ) {
+        if (substr($name, 0, 3) === 'get') {
             $var = lcfirst(substr($name, 3));
 
-            if($this->_isAccessibleProperty($var)) {
+            if ($this->_isAccessibleProperty($var)) {
                 return $this->{$var};
             }
         }
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    private function _isAccessibleProperty(string $property_name): bool
+    {
+        return in_array($property_name, $this->accessible_properties) && $this->reflectionClass->hasProperty($property_name) && !$this->reflectionClass->getProperty
+            ($property_name)->isPrivate();
     }
 
     /**
@@ -100,17 +133,9 @@ class Entity implements EntityInterface {
             throw new Exception(__('Unknown property %s in %s', $name, get_called_class()));
         }
 
-        if($this->_isAccessibleProperty($name)) {
+        if ($this->_isAccessibleProperty($name)) {
             return $this->{$name};
         }
-    }
-
-    /**
-     * @throws ReflectionException
-     */
-    private function _isAccessibleProperty(string $property_name) : bool {
-        return in_array($property_name, $this->accessible_properties) && $this->reflectionClass->hasProperty($property_name) && !$this->reflectionClass->getProperty
-            ($property_name)->isPrivate();
     }
 
 }

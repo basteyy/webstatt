@@ -245,6 +245,10 @@ class Model implements ModelInterface
         return $this->createEntities($data);
     }
 
+    /**
+     * Return the current database name
+     * @return string
+     */
     protected function getDatabaseName(): string
     {
         return $this->database_name;
@@ -282,14 +286,42 @@ class Model implements ModelInterface
         return $create_entities ? $this->createEntities($data) : $data;
     }
 
-
+    /**
+     * @throws IOException
+     * @throws ReflectionException
+     * @throws InvalidConfigurationException
+     * @throws InvalidArgumentException
+     */
     protected function _findByArgumentsArray(
-        array $find_argument,
-        bool   $multiple_results = false
-    ): array|null
+        array   $find_argument,
+        bool    $multiple_results = false,
+        bool    $create_entities = false
+    ): array|null|EntityInterface
     {
-        return $multiple_results ? $this->getRaw()->findBy($find_argument) : $this->getRaw()->findOneBy($find_argument);
+        $data = $multiple_results ? $this->getRaw()->findBy($find_argument) : $this->getRaw()->findOneBy($find_argument);
+
+        return $create_entities ? $this->createEntities($data) : $data;
     }
+
+    /**
+     * @throws IOException
+     * @throws ReflectionException
+     * @throws InvalidConfigurationException
+     * @throws InvalidArgumentException
+     */
+    protected function _findBy(
+        array $criteria,
+        array $orderBy = null,
+        int $limit = null,
+        int $offset = null,
+        bool $create_entities = true
+    ): array|null|EntityInterface
+    {
+        $data = $this->getRaw()->findBy($criteria, $orderBy, $limit, $offset);
+
+        return $create_entities ? $this->createEntities($data) : $data;
+    }
+
 
 
 

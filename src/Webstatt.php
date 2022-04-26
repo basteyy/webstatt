@@ -27,6 +27,7 @@ use basteyy\Webstatt\Services\ConfigService;
 use DI\Bridge\Slim\Bridge;
 use DI\ContainerBuilder;
 use Exception;
+use FastRoute\BadRouteException;
 use Invoker\Exception\NotCallableException;
 use JetBrains\PhpStorm\NoReturn;
 use League\Plates\Engine;
@@ -36,6 +37,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use SleekDB\Exceptions\InvalidArgumentException;
 use Slim\App;
 use Slim\Factory\ServerRequestCreatorFactory;
 use Slim\Middleware\Session;
@@ -57,8 +59,8 @@ class Webstatt
     /** @var ContainerInterface */
     private ContainerInterface $container;
 
-    /** @var array */
-    private array $config;
+    /** @var ConfigService $configService */
+    private ConfigService $configService;
 
     /** @var array Array for Navbar Items */
     private array $template_navbar_items = [];
@@ -113,18 +115,18 @@ class Webstatt
             }
 
             /**Construct the Congi Servcie */
-            $configService = new ConfigService($config);
+            $this->configService = new ConfigService($config);
 
             /**APCu installed and enabled to use it */
             if (!defined('APCU_SUPPORT')) {
-                define('APCU_SUPPORT', !$configService->caching_apcu_disabled && function_exists('apcu_enabled') && apcu_enabled());
+                define('APCU_SUPPORT', !$this->configService->caching_apcu_disabled && function_exists('apcu_enabled') && apcu_enabled());
             }
 
             /**APCu TTL */
             if (APCU_SUPPORT) {
-                define('APCU_TTL_LONG', $configService->caching_apcu_ttl_long ?? 720);
-                define('APCU_TTL_MEDIUM', $configService->caching_apcu_ttl_medium ?? 60);
-                define('APCU_TTL_SHORT', $configService->caching_apcu_ttl_short ?? 10);
+                define('APCU_TTL_LONG', $this->configService->caching_apcu_ttl_long ?? 720);
+                define('APCU_TTL_MEDIUM', $this->configService->caching_apcu_ttl_medium ?? 60);
+                define('APCU_TTL_SHORT', $this->configService->caching_apcu_ttl_short ?? 10);
             }
 
             /**Make the temp folder */
@@ -135,13 +137,13 @@ class Webstatt
             /**Some more definitions */
 
             /** @ar string W_PAGE_STORAGE_PATH Path where the content/the versions of pages are stored */
-            define('W_PAGE_STORAGE_PATH', ROOT . rtrim($configService->pages_private_folder, '/') . DS);
+            define('W_PAGE_STORAGE_PATH', ROOT . rtrim($this->configService->pages_private_folder, '/') . DS);
 
             define('W_PAGES_ROUTES_CACHE_KEY', 'pages_routing_cache');
             define('W_PAGES_STARTPAGE_CACHE_KEY', 'pages_startpage');
 
             /**Access Service Initiation */
-            $accessService = new AccessService($configService);
+            $accessService = new AccessService($this->configService);
 
             /**Yes, I create  the request here manually. See below for the why */
             /** @var Request $request */
@@ -176,7 +178,7 @@ class Webstatt
             $request = $this->request;
 
             $builder->addDefinitions([
-                ConfigService::class => $configService,
+                ConfigService::class => $this->configService,
 
                 AccessService::class => $accessService,
 
@@ -212,9 +214,9 @@ class Webstatt
             /**Session @see https://github.com/bryanjhv/slim-session */
             $this->app->add(
                 new Session([
-                    'name'        => $configService->session_name,
-                    'autorefresh' => $configService->session_auto_refresh,
-                    'lifetime'    => $configService->session_timeout,
+                    'name'        => $this->configService->session_name,
+                    'autorefresh' => $this->configService->session_auto_refresh,
+                    'lifetime'    => $this->configService->session_timeout,
                 ])
             );
 
@@ -223,62 +225,6 @@ class Webstatt
 
             /**Register the User Session Middleware */
             $this->app->add(UserSession::class);
-
-            /**Startpage */
-
-            if(!isset($pagesModel)) {
-                $pagesModel = (new PagesModel($configService));
-            }
-
-            $startpage = $pagesModel->getStartpage();
-
-            if('/' === $this->request->getUri()->getPath() || '' === $this->request->getUri()->getPath() && $startpage) {
-                $this->app->get('/', DispatchPageController::class);
-            } elseif (str_starts_with($this->request->getUri()->getPath(), '/admin') && file_exists(SRC . 'Routes' . DS . 'AdminRoutes.php')) {
-
-                /**In the admin Szenario, there will be the l18n helper loaded */
-                i18n::addTranslationFolder(SRC . 'Resources' . DS . 'Languages');
-                i18n::setTranslationLanguage('de_DE');
-
-                /**Include the Admin Routes */
-                include SRC . 'Routes' . DS . 'AdminRoutes.php';
-            } else {
-
-                /**Static Webstatt Website Routes? */
-                if (file_exists(SRC . 'Routes' . DS . 'WebsiteRoutes.php')) {
-                    include SRC . 'Routes' . DS . 'WebsiteRoutes.php';
-                }
-
-                /**Cache enabled and cache exists? */
-                if((APCU_SUPPORT && !apcu_exists(W_PAGES_ROUTES_CACHE_KEY)) || !APCU_SUPPORT) {
-
-                    if(!isset($pagesModel)) {
-                        $pagesModel = (new PagesModel($configService));
-                    }
-
-                    $pages = [];
-
-                    /** @var PageEntity $page */
-                    foreach($pagesModel->getAllOnlinePages(false) as $page) {
-                        $pages[] = $page->getUrl();
-                    }
-
-                    /**Put to cache, in case its enabled */
-                    if(APCU_SUPPORT) {
-                        /**Store to cache */
-                        apcu_add(W_PAGES_ROUTES_CACHE_KEY, $pages, APCU_TTL_LONG);
-                    }
-
-                } else {
-                    /**Routes from cache */
-                    $pages = apcu_fetch(W_PAGES_ROUTES_CACHE_KEY);
-                }
-
-                foreach ($pages as $x => $url) {
-                    $this->app->get($url, DispatchPageController::class);
-                }
-
-            }
 
         } catch (Exception|NotCallableException|Throwable $exception) {
             $this->handleException($exception);
@@ -294,7 +240,7 @@ class Webstatt
     private function handleException(Throwable $exception)
     {
         (new Run())->pushHandler(new PrettyPageHandler())->handleException($exception);
-        #if (isset($configService) && ($configService->debug || $configService->website === 'development')) {
+        #if (isset($this->configService) && ($this->configService->debug || $this->configService->website === 'development')) {
         #    (new Run())->pushHandler(new PrettyPageHandler())->handleException($exception);
         #} else {
         #    $this->displayErrorPage();
@@ -354,12 +300,104 @@ class Webstatt
     }
 
     /**
+     * @throws \SleekDB\Exceptions\IOException
+     * @throws \ReflectionException
+     * @throws \SleekDB\Exceptions\InvalidConfigurationException
+     * @throws InvalidArgumentException
+     * @throws Exception
+     */
+    private function attachWebstattRoutes() {
+        /** Startpage */
+
+        if(!isset($pagesModel)) {
+            $pagesModel = (new PagesModel($this->configService));
+        }
+
+        /** @var  $startpage */
+        $startpage = $pagesModel->getStartpage();
+
+        if('/' === $this->request->getUri()->getPath() || '' === $this->request->getUri()->getPath() && $startpage) {
+
+            $root_route_defined = false;
+
+            if(APCU_SUPPORT && apcu_exists('custom_root_route')) {
+                $root_route_defined = apcu_fetch('custom_root_route');
+            } else {
+                foreach($this->app->getRouteCollector()->getRoutes() as $route) {
+                    if($route->getPattern() === '/') {
+                        // Route found!
+                        $root_route_defined = true;
+                    }
+                }
+
+                if(APCU_SUPPORT) {
+                    apcu_add('custom_root_route', $root_route_defined, APCU_TTL_MEDIUM);
+                }
+            }
+
+            if(!$root_route_defined) {
+                $this->app->get('/', DispatchPageController::class);
+            }
+
+        } elseif (str_starts_with($this->request->getUri()->getPath(), '/admin') && file_exists(SRC . 'Routes' . DS . 'AdminRoutes.php')) {
+
+            /**In the admin Szenario, there will be the l18n helper loaded */
+            i18n::addTranslationFolder(SRC . 'Resources' . DS . 'Languages');
+            i18n::setTranslationLanguage('de_DE');
+
+            /**Include the Admin Routes */
+            include SRC . 'Routes' . DS . 'AdminRoutes.php';
+        } else {
+
+            /**Static Webstatt Website Routes? */
+            if (file_exists(SRC . 'Routes' . DS . 'WebsiteRoutes.php')) {
+                include SRC . 'Routes' . DS . 'WebsiteRoutes.php';
+            }
+
+            /**Cache enabled and cache exists? */
+            if((APCU_SUPPORT && !apcu_exists(W_PAGES_ROUTES_CACHE_KEY)) || !APCU_SUPPORT) {
+
+                if(!isset($pagesModel)) {
+                    $pagesModel = (new PagesModel($this->configService));
+                }
+
+                $pages = [];
+
+                /** @var PageEntity $page */
+                foreach($pagesModel->getAllOnlinePages(false) as $page) {
+                    if(null !== $page ) {
+                        $pages[] = $page->getUrl();
+                    }
+                }
+
+                /**Put to cache, in case its enabled */
+                if(APCU_SUPPORT) {
+                    /**Store to cache */
+                    apcu_add(W_PAGES_ROUTES_CACHE_KEY, $pages, APCU_TTL_LONG);
+                }
+
+            } else {
+                /**Routes from cache */
+                $pages = apcu_fetch(W_PAGES_ROUTES_CACHE_KEY);
+            }
+
+            foreach ($pages as $x => $url) {
+                $this->app->get($url, DispatchPageController::class);
+            }
+
+        }
+    }
+
+    /**
      * Run Webstatt
      * @return void
      */
     public function run()
     {
         try {
+
+            /** Apply the Webstatt Routes */
+            $this->attachWebstattRoutes();
 
             /** Push more admin navbar items to the template */
             if ($this->template_navbar_items && count($this->template_navbar_items) > 0) {

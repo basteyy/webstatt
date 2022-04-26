@@ -12,8 +12,8 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Add a new snippet')]);
 
 <form class="row g-5" method="post" action="<?= $this->getCurrentUrl() ?>">
 
-    <div class="col-12">
-        <label for="_name" class="form-label"><?= __('Name/Description (intern)') ?></label>
+    <div class="row mb-3">
+        <label for="_name" class="col-sm-2 col-form-label"><?= __('Name/Description (intern)') ?></label>
         <input type="text" class="form-control" id="_name" name="name" placeholder="<?= __('Name/Description (intern)') ?>" required>
     </div>
 

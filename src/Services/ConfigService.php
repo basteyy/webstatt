@@ -169,15 +169,22 @@ final class ConfigService
             return apcu_fetch($configFile->cacheName());
         }
 
-        $config = parse_ini_file(match($configFile){
+        $filename = match($configFile){
             ConfigFile::MAIL => $this->getMailConfigPath()
-        }, false, INI_SCANNER_TYPED);
+        };
 
-        if(APCU_SUPPORT) {
-            apcu_add($configFile->cacheName(), $config, APCU_TTL_LONG);
+        if(file_exists($filename)) {
+
+            $config = parse_ini_file($filename, false, INI_SCANNER_TYPED);
+
+            if(APCU_SUPPORT) {
+                apcu_add($configFile->cacheName(), $config, APCU_TTL_LONG);
+            }
+
+            return $config;
         }
 
-        return $config;
+        return [];
     }
 
 }

@@ -29,6 +29,7 @@ use basteyy\Webstatt\Controller\Pages\RestorePageVersionController;
 use basteyy\Webstatt\Controller\Pages\ViewPageVersionController;
 use basteyy\Webstatt\Controller\Settings\MailSettingsController;
 use basteyy\Webstatt\Controller\Settings\SettingsOverviewController;
+use basteyy\Webstatt\Controller\ShowUserProfileController;
 use basteyy\Webstatt\Controller\Snippets\AddSnippetController;
 use basteyy\Webstatt\Controller\Snippets\DeleteSnippetController;
 use basteyy\Webstatt\Controller\Snippets\ListSnippetsController;
@@ -37,6 +38,8 @@ use basteyy\Webstatt\Controller\Users\AddUserController;
 use basteyy\Webstatt\Controller\Users\EditUserController;
 use basteyy\Webstatt\Controller\Users\ListUsersController;
 use basteyy\Webstatt\Controller\Users\RemoveUserController;
+use basteyy\Webstatt\Controller\Users\UserInvatationController;
+use basteyy\Webstatt\Controller\Users\UserSettingsController;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 
@@ -60,9 +63,9 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
 
     /** Reset Cache */
     $proxy->any('/cache/reset', CacheResetController::class);
-    
+
     /** Show the User Profile  */
-    $proxy->get('/u/{user_secret}', \basteyy\Webstatt\Controller\ShowUserProfileController::class);
+    $proxy->get('/u/{user_secret}', ShowUserProfileController::class);
 
     /** User Account */
     $proxy->group('/account', function (RouteCollectorProxy $proxy) {
@@ -91,6 +94,13 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
 
         /**Edit a user */
         $proxy->any('/edit/{user_secret}', EditUserController::class);
+
+        /** Invitation */
+        $proxy->any('/invite', UserInvatationController::class);
+        $proxy->any('/invite/create_link', \basteyy\Webstatt\Controller\Users\AddInvatationLinkController::class);
+
+        /** Settings */
+        $proxy->any('/settings', UserSettingsController::class);
     });
 
 

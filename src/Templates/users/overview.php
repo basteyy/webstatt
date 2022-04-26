@@ -6,7 +6,7 @@ use function basteyy\VariousPhpSnippets\__;
 $this->layout('Webstatt::layouts/acp', ['title' => __('Manage the users')]);
 ?>
 
-<h1 class="my-md-5">Nutzer verwalten</h1>
+<h1 class="my-md-5"><?= __('Manage the users') ?></h1>
 <div class="table-responsive">
     <table class="table">
         <caption><?= __('List of users') ?></caption>
@@ -56,4 +56,5 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Manage the users')]);
 
 <p class="text-end">
     <a href="/admin/users/add" class="btn btn-secondary"><?= __('Add a new user') ?></a>
+    <a href="/admin/users/invite" class="btn btn-secondary"><?= __('Invitations') ?></a>
 </p>

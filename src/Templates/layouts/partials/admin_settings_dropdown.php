@@ -26,6 +26,11 @@ use function basteyy\VariousPhpSnippets\__;
         </li>
 
         <li>
+            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/users/settings') ?>" title="<?= __('Manage the user settings') ?>">
+                <i class="mx-md-2 bi bi-people"></i> <?= __('User Settings') ?>
+            </a>
+        </li>
+        <li>
             <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/users') ?>">
                 <i class="mx-md-2 bi bi-people"></i> <?= __('User-management') ?>
             </a>
