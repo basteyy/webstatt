@@ -48,7 +48,7 @@ class ChangeAccountPasswordController extends Controller
 
             } elseif ($request->getParsedBody()['password'] === $request->getParsedBody()['password_new']) {
 
-                FlashMessages::addErrorMessage(__('You need to fill in a new password (not your current password'));
+                FlashMessages::addErrorMessage(__('You need to fill in a new password (not your current password)'));
 
             } elseif ($request->getParsedBody()['password_new_confirm'] !== $request->getParsedBody()['password_new']) {
 

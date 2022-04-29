@@ -23,6 +23,7 @@ use SleekDB\Exceptions\IOException;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use function basteyy\VariousPhpSnippets\__;
+use function basteyy\VariousPhpSnippets\varDebug;
 
 class RemoveUserController extends Controller
 {
@@ -48,6 +49,10 @@ class RemoveUserController extends Controller
         $this->getUsersModel()->getRaw()->deleteById($user->getId());
 
         FlashMessages::addSuccessMessage(__('User %s (%s) was deleted successfully', $user->getAnyName(), $user->getEmail()));
+
+        if(isset($request->getQueryParams()['invitation']) && ctype_alnum($request->getQueryParams()['invitation'])) {
+            return $this->redirect('/admin/users/invite/edit/'.$request->getQueryParams()['invitation'].'#_used');
+        }
 
         return $this->redirect('/admin/users');
 

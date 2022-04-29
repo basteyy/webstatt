@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace basteyy\Webstatt\Controller;
 
+use basteyy\Webstatt\Controller\Traits\ConfigTrait;
 use basteyy\Webstatt\Controller\Traits\DatabaseTrait;
 use basteyy\Webstatt\Controller\Traits\ModelTrait;
 use basteyy\Webstatt\Controller\Traits\RequestTrait;
@@ -76,6 +77,8 @@ class Controller
     /** Model Trait */
     use ModelTrait;
 
+    use ConfigTrait;
+
     /**
      * @throws InvalidArgumentException
      */
@@ -87,17 +90,21 @@ class Controller
         $this->request = $request;
 
         $this->engine = $engine;
-        $this->configService = $configService;
         $this->accessService = $accessService;
+
+        $this->setConfigService($configService);
 
 
         /** @var UserEntity _current_user_data */
-        $this->_current_user_data =
-            UserSession::activeUserSession() ? $this->getUsersModel()->findById(UserSession::getUserSessionData(), false) : null;
-
+        $this->_current_user_data = null;
+        if(UserSession::activeUserSession()) {
+            $user = $this->getUsersModel()->findById(UserSession::getUserSessionData(), false);
+            if($user) {
+                $this->_current_user_data = $user;
+            }
+        }
 
         $role = $this->_current_user_data ? $this->_current_user_data->getRole() : UserRole::ANONYMOUS;
-
 
         if (isset($this->exact_user_role) && $this->exact_user_role !== $role) {
 

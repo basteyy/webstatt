@@ -18,39 +18,40 @@ $configService = $this->getConfig();
 <form method="post" action="<?= $this->getCurrentUrl() ?>" autocomplete="off">
 
     <?php
-    if(isset($mail_config['activate_mail_system'])
-    && !$mail_config['activate_mail_system']) { ?>
+    if (isset($mail_config['activate_mail_system'])
+        && !$mail_config['activate_mail_system']) { ?>
         <p class="alert alert-danger">
             <?= __('Using the mail module is currently <strong>deactivated</strong>.') ?>
         </p>
 
-    <?php } ?>
-
+    <?php
+    } ?>
 
 
     <div class="row m-5">
         <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" role="switch" id="_activate_mail_system" name="activate_mail_system"<?= isset($mail_config['activate_mail_system'])
-            && $mail_config['activate_mail_system'] ?' checked':''?>>
+            && $mail_config['activate_mail_system'] ? ' checked' : '' ?>>
             <label class="form-check-label" for="_activate_mail_system"><?= __('Activate email-system') ?></label>
         </div>
     </div>
 
     <?php
-    if(isset($mail_config['activate_mail_system'])
-    && !$mail_config['activate_mail_system']) { ?>
+    if (isset($mail_config['activate_mail_system'])
+        && !$mail_config['activate_mail_system']) { ?>
         <hr/>
 
-    <p class="alert alert-warning">
-        <?= __('The following settings are only used, when the above mail-activation is activated. Anyway, you can change the settings without activating emailing') ?>
-    </p>
-    <?php } ?>
+        <p class="alert alert-warning">
+            <?= __('The following settings are only used, when the above mail-activation is activated. Anyway, you can change the settings without activating emailing') ?>
+        </p>
+    <?php
+    } ?>
 
     <hr/>
 
     <div class="container-xxl">
         <div class="row">
-            <div class="col-lg-6 col-md-12">
+            <div class="col-lg-4 col-md-6">
                 <h2 class="h3"><?= __('E-Mail Settings') ?></h2>
 
                 <hr/>
@@ -88,28 +89,30 @@ $configService = $this->getConfig();
                     <div class="col-sm-8">
                         <select class="form-select" id="_mailer_method" name="mailer_method" aria-label="<?= __('Select sendmail or mail method') ?>">
                             <option selected>Open this select menu</option>
-                            <option value="mail"<?= isset($mail_config['mailer_method']) && $mail_config['mailer_method'] === 'mail' ? ' selected':'' ?>>mail</option>
-                            <option value="sendmail"<?= isset($mail_config['mailer_method']) && $mail_config['mailer_method'] === 'sendmail' ? ' selected':'' ?>>sendmail</option>
+                            <option value="mail"<?= isset($mail_config['mailer_method']) && $mail_config['mailer_method'] === 'mail' ? ' selected' : '' ?>>mail</option>
+                            <option value="sendmail"<?= isset($mail_config['mailer_method']) && $mail_config['mailer_method'] === 'sendmail' ? ' selected' : '' ?>>sendmail</option>
                         </select>
                     </div>
                 </div>
 
 
             </div>
-            <div class="col-lg-6 col-md-12">
+            <div class="col-lg-4 col-md-6">
                 <h3 class="h3"><?= __('SMTP-Settings') ?></h3>
                 <hr/>
                 <div class="row mb-3 mx-1">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="_smtp_activated" name="smtp_activated"<?= isset($mail_config['smtp_activated']) && $mail_config['smtp_activated']?' checked':''?>>
+                        <input class="form-check-input" type="checkbox" role="switch" id="_smtp_activated" name="smtp_activated"<?= isset($mail_config['smtp_activated']) &&
+                        $mail_config['smtp_activated'] ? ' checked' : '' ?>>
                         <label class="form-check-label" for="_smtp_activated"><?= __('Activate SMTP') ?></label>
                     </div>
                 </div>
 
                 <div class="row mb-3 mx-1">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="_smtp_server_debug" name="smtp_server_debug"<?= isset($mail_config['smtp_server_debug']) &&
-                        $mail_config['smtp_server_debug']?' checked':''?>>
+                        <input class="form-check-input" type="checkbox" role="switch" id="_smtp_server_debug"
+                               name="smtp_server_debug"<?= isset($mail_config['smtp_server_debug']) &&
+                        $mail_config['smtp_server_debug'] ? ' checked' : '' ?>>
                         <label class="form-check-label" for="_smtp_server_debug"><?= __('SMTP Server Debug') ?></label>
                     </div>
                 </div>
@@ -130,7 +133,8 @@ $configService = $this->getConfig();
 
                 <div class="row mb-3 mx-1">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="_smtp_auth_required" name="smtp_auth_required"<?= isset($mail_config['smtp_auth_required']) && $mail_config['smtp_auth_required']?' checked':''?>>
+                        <input class="form-check-input" type="checkbox" role="switch" id="_smtp_auth_required" value="yes"
+                               name="smtp_auth_required"<?= isset($mail_config['smtp_auth_required']) && $mail_config['smtp_auth_required'] ? ' checked' : '' ?>>
                         <label class="form-check-label" for="_smtp_auth_required"><?= __('SMTP-Auth required') ?></label>
                     </div>
                 </div>
@@ -156,16 +160,19 @@ $configService = $this->getConfig();
                     <div class="col-sm-8">
                         <select class="form-select" id="_smtp_secure" name="smtp_secure" aria-label="<?= __('Select Encryption Method') ?>">
                             <option selected>Open this select menu</option>
-                            <option value="tls"<?= isset($mail_config['smtp_secure']) && $mail_config['smtp_secure'] === 'tls' ? ' selected':'' ?>>tls</option>
-                            <option value="ssl"<?= isset($mail_config['smtp_secure']) && $mail_config['smtp_secure'] === 'ssl' ? ' selected':'' ?>>ssl</option>
+                            <option value="tls"<?= isset($mail_config['smtp_secure']) && $mail_config['smtp_secure'] === 'tls' ? ' selected' : '' ?>>tls</option>
+                            <option value="ssl"<?= isset($mail_config['smtp_secure']) && $mail_config['smtp_secure'] === 'ssl' ? ' selected' : '' ?>>ssl</option>
                         </select>
                     </div>
                 </div>
-
-
-
             </div>
 
+            <div class="col-lg-4 col-md-6">
+                <h3 class="h3"><?= __('Send testmail') ?></h3>
+                <hr/>
+                <label for="test_recipient" class="form-label"><?= __('You can send a testmail to the following recipient') ?></label>
+                <input type="email" class="form-control" id="test_recipient" name="test_recipient" autocomplete="disabled">
+            </div>
         </div>
     </div>
 

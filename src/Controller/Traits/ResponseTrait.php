@@ -67,6 +67,20 @@ trait ResponseTrait {
     }
 
     /**
+     * Shortcut for redirect to current url
+     * @param int|null $status_code
+     * @param ResponseInterface|null $response
+     * @return ResponseInterface
+     */
+    protected function reload(?int $status_code = 302, ?ResponseInterface $response = null) : ResponseInterface {
+        return $this->redirect(
+            redirect_uri: $this->getCurrentUrl(),
+            status_code: $status_code,
+            response: $response
+        );
+    }
+
+    /**
      * Render a File Not Found - Error. Method creates a new Response object!
      * @return Response
      */

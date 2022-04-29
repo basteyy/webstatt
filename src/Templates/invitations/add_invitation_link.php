@@ -18,6 +18,32 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Invite a new user')]);
 
     <div class="row g-3 mb-3">
         <div class="col-sm-2">
+            <label for="userRole" class="col-form-label"><?= __('User-role for new user') ?></label>
+        </div>
+        <div class="col-auto">
+            <select id="userRole" class="form-select form-select-sm" name="userRole">
+                <option selected><?= __('Select a user-role') ?></option>
+                <optgroup label="Rolle auswählen">
+                    <option value="<?= UserRole::SUPER_ADMIN->value ?>">
+                        <?= UserRole::SUPER_ADMIN->getTitle() ?>
+                    </option>
+
+                    <option value="<?= UserRole::ADMIN->value ?>">
+                        <?= UserRole::ADMIN->getTitle() ?>
+                    </option>
+
+                    <option value="<?= UserRole::USER->value ?>">
+                        <?= UserRole::USER->getTitle() ?>
+                    </option>
+
+                </optgroup>
+            </select>
+        </div>
+    </div>
+
+
+    <div class="row g-3 mb-3">
+        <div class="col-sm-2">
             <label for="acceptance_rules" class="col-form-label"><?= __('Validation Rules') ?></label>
         </div>
 

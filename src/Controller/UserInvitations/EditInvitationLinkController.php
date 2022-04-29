@@ -10,42 +10,49 @@
 
 declare(strict_types=1);
 
-namespace basteyy\Webstatt\Controller\Users;
+namespace basteyy\Webstatt\Controller\UserInvitations;
 
 use basteyy\Webstatt\Controller\Controller;
+use basteyy\Webstatt\Controller\Traits\InvitationsTrait;
 use basteyy\Webstatt\Enums\InvitationType;
 use basteyy\Webstatt\Enums\UserRole;
+use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Models\InvitationsModel;
 use DateTime;
+use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use ReflectionException;
 use SleekDB\Exceptions\InvalidArgumentException;
 use SleekDB\Exceptions\InvalidConfigurationException;
 use SleekDB\Exceptions\IOException;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
+use function basteyy\VariousPhpSnippets\__;
+use function basteyy\VariousPhpSnippets\getRandomString;
 use function basteyy\VariousPhpSnippets\varDebug;
 
-class AddInvatationLinkController extends Controller
+class EditInvitationLinkController extends Controller
 {
     protected UserRole $exact_user_role = UserRole::SUPER_ADMIN;
 
+    use InvitationsTrait;
+
     /**
-     * @throws IOException
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigurationException
-     * @throws \ReflectionException
-     * @throws \Exception
+     * @throws Exception
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, string $secret_key): ResponseInterface
     {
         /** @var $request Request */
         /** @var $response Response */
 
+        $invitation = $this->isValidSecretKey($secret_key, true);
+
+        if (!$invitation) {
+            return $this->handleInvalidInvitation();
+        }
+
         if($this->isPost()) {
-            // Do something
-            /** @var InvitationsModel $model */
-            $model = $this->getModel(InvitationsModel::class);
 
             // Build DateTime
             if(strlen($request->getParsedBody()['acceptance_timeout_date']) > 0 ) {
@@ -58,19 +65,22 @@ class AddInvatationLinkController extends Controller
                 $ttl = new DateTime('next year');
             }
 
-            $model->create([
-                'invitationType' => InvitationType::LINK,
-                'active' => true,
+            $this->getInvitationModel()->patch($invitation, [
+                'publicKey' => isset($request->getParsedBody()['new_public_key']) ? chunk_split(getRandomString(rand(54,72)), 8, '-') : $invitation->getPublicKey(),
+                'active' => $request->getParsedBody()['active'] ?? false,
                 'acceptanceRules' => $request->getParsedBody()['acceptance_rules'],
                 'acceptanceLimit' => $request->getParsedBody()['acceptance_limit'],
-                'acceptanceTimeoutDatetime' => $ttl
+                'acceptanceTimeoutDatetime' => $ttl,
             ]);
 
-            return $this->adminRedirect('/users/invite#' . $model->getRaw()->getLastInsertedId());
+            FlashMessages::addSuccessMessage(__('Data updated'));
+
+            return $this->adminRedirect();
 
         }
 
-        return $this->adminRender('users/add_invitation_link');
-
+        return $this->adminRender('invitations/edit', [
+            'invitationEntity' => $invitation
+        ]);
     }
 }

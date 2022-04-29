@@ -32,17 +32,13 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Manage the users')]);
                 <td><?= $user->hasName() ? $user->getName() : '' ?></td>
                 <td><?= $user->hasAlias() ? $user->getAlias() : '' ?></td>
                 <td><?= $user->hasEmail() ? $user->getEmail() : '' ?></td>
-                <td><?=
-                    $user->getRole() === UserRole::SUPER_ADMIN ?
-                        '<span class="badge rounded-pill bg-primary">Superadmin</span>' : (
-                    $user->getRole() === UserRole::ADMIN ?
-                        '<span class="badge rounded-pill bg-dark text-light">Admin</span>' :
-                        '<span class="badge rounded-pill bg-light text-dark">User</span>')
-                    ?></td>
+                <td><?= $user->getRoleBadge() ?></td>
                 <td>
-                    <a class="btn btn-danger btn-sm" href="/admin/users/delete/<?= $user->getSecret() ?>" data-confirm="<?= __('Do you really want to delete user %s %s?',
-                $user->getAnyName(), $user->getEmail()) ?>"><?= __('Delete?') ?></a>
-                    <a class="btn btn-primary btn-sm" href="/admin/users/edit/<?= $user->getSecret() ?>"><?= __('Edit') ?></a>
+                    <div class="btn-group">
+                        <a class="btn btn-danger btn-sm" href="/admin/users/delete/<?= $user->getSecret() ?>" data-confirm="<?= __('Do you really want to delete user %s %s?',
+                $user->getAnyName(), $user->getEmail()) ?>"><i class="bi bi-trash"></i> <?= __('Delete') ?></a>
+                    <a class="btn btn-primary btn-sm" href="/admin/users/edit/<?= $user->getSecret() ?>"><i class="bi bi-gear"></i> <?= __('Edit') ?></a>
+                    </div>
                 </td>
             </tr>
 

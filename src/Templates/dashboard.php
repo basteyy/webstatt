@@ -13,6 +13,17 @@ $configService = $this->getConfig();
 /** @var \basteyy\Webstatt\Models\Entities\UserEntity $User */
 $User = $this->getUser();
 
+
+
+if($this->getUser()->isAdmin()) {
+    $mail_config = $this->getConfig()->getMailConfig();
+
+    if(!$mail_config['activate_mail_system']) {
+        printf('<p class="alert alert-warning">%s</p>', __('The E-Mail System isn\'t acitacted yet. <a href="/admin/settings/email">Activate it now</a>'));
+    }
+
+}
+
 ?>
 
 
@@ -116,28 +127,6 @@ $User = $this->getUser();
         </div>
     </div>
 
-    <hr class="my-md-5" />
-
-    <div class="row">
-
-        <div class="col-md">
-
-        </div>
-
-        <div class="col-md">
-            <h3 class="h5">Webstatt Status</h3>
-            <table>
-                <tr>
-                    <td>Installed</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Github</td>
-                    <td></td>
-                </tr>
-            </table>
-        </div>
-    </div>
 </div>
 
 

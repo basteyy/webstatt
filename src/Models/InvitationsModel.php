@@ -14,7 +14,9 @@ namespace basteyy\Webstatt\Models;
 
 
 use basteyy\Webstatt\Enums\InvitationType;
+use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Models\Entities\EntityInterface;
+use basteyy\Webstatt\Models\Entities\InvitationEntity;
 use Exception;
 use ReflectionException;
 use SleekDB\Exceptions\InvalidArgumentException;
@@ -38,10 +40,38 @@ final class InvitationsModel extends Model
      */
     public function getActiveInvitationLinks(): array|null|EntityInterface
     {
-        return $this->_findBy([
-                ['invitationType', '=', InvitationType::LINK], 'AND', ['active', '=', true]
-            ]
-        );
+        return $this->_findBy([['invitationType', '=', InvitationType::LINK->value], ['active', '=', true]]);
+    }
+
+    public function findBySecretKey(string $secretKey, bool $include_joining_user_entities = false): null|InvitationEntity
+    {
+        $result = $this->getRaw()->findOneBy([
+            'secretKey', '=', $secretKey
+        ]);
+
+        if ($include_joining_user_entities && isset($result['usedByUsers'])) {
+            /** @var UsersModel $usersModel */
+            $usersModel = $this->getModel(UsersModel::class);
+            $userEntities = [];
+            foreach ($result['usedByUsers'] as $value) {
+                $user = $usersModel->findById($value['userId']);
+                if ($user) {
+                    $userEntities[] = $user;
+                } else {
+                    //$userEntities[] = $value;
+                    $result['deletedUsedByUsers'] = $value;
+                }
+            }
+
+            $result['usedByUsers'] = $userEntities;
+        }
+
+        return $this->createEntities($result);
+    }
+
+    public function findByPublicKey(string $publicKey): null|InvitationEntity
+    {
+        return $this->_findByOneArgument('publicKey', '=', $publicKey);
     }
 
     /**
@@ -50,8 +80,8 @@ final class InvitationsModel extends Model
      */
     public function create(array $entity_data): EntityInterface
     {
-        if (!isset($entity_data['secret_key'])) {
-            $entity_data['secret_key'] = getRandomString(32);
+        if (!isset($entity_data['userRole'])) {
+            $entity_data['userRole'] = UserRole::USER->value;
         }
 
         return parent::create($entity_data);

@@ -16,6 +16,7 @@ use basteyy\Webstatt\Enums\UserRole;
 use JetBrains\PhpStorm\Pure;
 use function basteyy\VariousPhpSnippets\__;
 use function basteyy\VariousPhpSnippets\getDateTimeFormat;
+use function basteyy\VariousPhpSnippets\getNiceDateTimeFormat;
 
 class UserEntity extends Entity implements EntityInterface
 {
@@ -26,9 +27,13 @@ class UserEntity extends Entity implements EntityInterface
     protected string $secret;
     protected string $name = '';
     protected string $alias = '';
+    protected string $signupIp = '';
     protected \DateTime|null $created;
     protected \DateTime|null $lastlogin;
 
+    public function getNiceCreatedDateTime() : string {
+        return isset($this->created) ? getDateTimeFormat($this->created) : __('never');
+    }
     public function hasName() : bool {
         return isset($this->name) && '' !== $this->name;
     }
@@ -43,6 +48,14 @@ class UserEntity extends Entity implements EntityInterface
 
     public function getLastlogin() : string {
         return isset($this->lastlogin) ? getDateTimeFormat($this->lastlogin) : __('never');
+    }
+
+    #[Pure] public function getRoleBadge() : string {
+        return  $this->getRole() === UserRole::SUPER_ADMIN ?
+            '<span class="badge rounded-pill bg-primary">Superadmin</span>' : (
+            $this->getRole() === UserRole::ADMIN ?
+                '<span class="badge rounded-pill bg-dark text-light">Admin</span>' :
+                '<span class="badge rounded-pill bg-light text-dark">User</span>');
     }
 
     /**

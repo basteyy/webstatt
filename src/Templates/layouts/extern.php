@@ -9,7 +9,7 @@ use function basteyy\VariousPhpSnippets\__;
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1" name="viewport">
-    <title><?= $title ?? '' ?></title>
+    <title><?= $title ?? 'Webstatt' ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" media="(prefers-color-scheme: light)">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/css/bootstrap-night.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
@@ -33,22 +33,31 @@ use function basteyy\VariousPhpSnippets\__;
             padding-bottom: 40px;
         }
 
-        .external {
-            width: 100%;
-            max-width: 330px;
-            padding: 15px;
-            margin: auto;
+        main {
+            max-width: 18rem;
         }
 
-        .form-signin .form-floating:focus-within {
+        main.xxl {
+            max-width: 72rem;
+        }
+
+        main .form-floating:focus-within {
             z-index: 2;
         }
+
+
+        @media (min-width: 992px) {
+            body>div.w-100 {
+                max-width: 72rem;
+            }
+        }
+
     </style>
 </head>
 <body>
 
 
-<div class="external text-center">
+<div class="p-4 text-center m-auto w-100">
     <?php
     $__all_messages = FlashMessages::getAllMessages();
 
@@ -65,7 +74,6 @@ use function basteyy\VariousPhpSnippets\__;
         }
     }
     ?>
-
     <?= $this->section('content') ?>
 </div>
 

@@ -35,6 +35,9 @@ final class UsersModel extends Model
         return new UserEntity($data, $this->getPrimaryIdName());
     }
 
+    public function findOneByEmail(string $email) : UserEntity|null {
+        return $this->_findByOneArgument('email', '=', $email, false, true, false);
+    }
 
     public function findBySecret(string $secret_key) : UserEntity {
         return $this->callEntity($this->getRaw()->findOneBy(['secret', '=', $secret_key]));
@@ -68,6 +71,12 @@ final class UsersModel extends Model
     {
 
         $users = $this->getRaw()->findAll();
+
+        if(is_array($users)) {
+            usort($users, function($a, $b) {
+                return $a['_id'] > $b['_id']  ? 1 : -1;
+            });
+        }
 
         $this->count_all_users = count($users);
         $_users = [];

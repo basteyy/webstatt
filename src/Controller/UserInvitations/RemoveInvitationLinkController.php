@@ -10,45 +10,51 @@
 
 declare(strict_types=1);
 
-namespace basteyy\Webstatt\Controller\Users;
+namespace basteyy\Webstatt\Controller\UserInvitations;
 
 use basteyy\Webstatt\Controller\Controller;
+use basteyy\Webstatt\Controller\Traits\InvitationsTrait;
+use basteyy\Webstatt\Enums\InvitationType;
 use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Models\InvitationsModel;
+use DateTime;
+use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use ReflectionException;
 use SleekDB\Exceptions\InvalidArgumentException;
 use SleekDB\Exceptions\InvalidConfigurationException;
 use SleekDB\Exceptions\IOException;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use function basteyy\VariousPhpSnippets\__;
+use function basteyy\VariousPhpSnippets\getRandomString;
 
-class UserInvatationController extends Controller
+class RemoveInvitationLinkController extends Controller
 {
     protected UserRole $exact_user_role = UserRole::SUPER_ADMIN;
 
+    use InvitationsTrait;
+
     /**
-     * @throws IOException
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigurationException
+     * @throws Exception
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, string $secret_key): ResponseInterface
     {
         /** @var $request Request */
         /** @var $response Response */
 
-        if($this->isPost()) {
-            // Do something
+        $invitation = $this->isValidSecretKey($secret_key);
+
+        if (!$invitation) {
+            return $this->handleInvalidInvitation();
         }
 
-        return $this->adminRender('users/invite', [
+        $this->getInvitationModel()->delete($invitation);
 
-            'pending_invitation_links' => $this->getModel(InvitationsModel::class)->getActiveInvitationLinks()
+        FlashMessages::addSuccessMessage(__('Invitation #%s was deleted successfully', $invitation->getId()));
 
-
-        ]);
-
+        return $this->adminRedirect('users/invite');
     }
 }

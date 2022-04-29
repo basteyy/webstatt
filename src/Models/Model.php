@@ -70,7 +70,7 @@ class Model implements ModelInterface
             if($reflection->hasProperty($name) && $reflection->getProperty($name)->hasType()) {
 
                 /**Enum? */
-                if($name !== $this->configService->database_primary_key && $reflection->getProperty($name)->getType()->isBuiltin()) {
+                if ($name !== $this->configService->database_primary_key && $reflection->getProperty($name)->getType()->isBuiltin()) {
 
                     $data[$name] = match ($reflection->getProperty($name)->getType()->getName()) {
                         'int' => (int)$value,
@@ -80,16 +80,40 @@ class Model implements ModelInterface
 
                 } else {
 
+
                     $enum = $reflection->getProperty($name)->getType()->getName();
 
-                    if(is_string($value)) {
-                        $data[$name] = $enum::tryFrom($value);
-                    } elseif((new \ReflectionEnum($value))->getName() === $enum) {
-                        $data[$name] = $value;
+
+                    if (str_starts_with($enum, 'basteyy\\Webstatt\\Enums\\')) {
+                        $data[$name] = is_string($value) ? $enum::tryFrom($value) : $value;
+                    } elseif ('DateTime' === $enum) {
+                        if (is_array($value)) {
+                            if (!isset($value['date'])) {
+                                throw new Exception('No date array element found. Data is required to build new dateTime Object');
+                            }
+
+                            $dt = new \DateTime($value['date']);
+
+                            if (isset($value['timezone'])) {
+                                $dt->setTimezone(new \DateTimeZone($value['timezone']));
+                            }
+
+                            $data[$name] = $dt;
+
+                        } elseif(is_string($value)) {
+                            $data[$name] = new \DateTime($value);
+                        } else {
+                            $data[$name] = $value;
+                        }
                     } else {
-                        throw new \Exception(__('Invalid enum type %s cannot assigned to enum %s', (new \ReflectionEnum($value))->getName(), $enum));
+
+                        $data[$name] = is_string($value) ? new $enum($value) : $value;
                     }
+
+
                 }
+
+
             }
         }
 
@@ -110,6 +134,8 @@ class Model implements ModelInterface
             }
 
             $this->store = new Store($this->database_name, ROOT . DS . $this->configService->database_folder, [
+                'auto_cache' => false,
+                'cache_lifetime' => 10,
                 'timeout'     => false,
                 'primary_key' => $this->configService->database_primary_key
             ]);
@@ -131,9 +157,10 @@ class Model implements ModelInterface
     /**
      * @throws InvalidArgumentException
      */
-    public function findById(int $id, bool $use_cache = true): EntityInterface
+    public function findById(int $id, bool $use_cache = true): EntityInterface|false
     {
-        return $this->createEntities($this->getRaw()->findById($id));
+        $user = $this->getRaw()->findById($id);
+        return $user ? $this->createEntities($user) : false;
     }
 
     /**
@@ -319,6 +346,10 @@ class Model implements ModelInterface
     {
         $data = $this->getRaw()->findBy($criteria, $orderBy, $limit, $offset);
 
+        if(!$data) {
+            return [];
+        }
+
         return $create_entities ? $this->createEntities($data) : $data;
     }
 
@@ -334,5 +365,20 @@ class Model implements ModelInterface
     {
         $entries = $this->getRaw()->findAll();
         return 0 < count($entries) ? $this->createEntities($entries) : [];
+    }
+
+    /**
+     * Load a model
+     * @param string $model_name
+     * @return mixed
+     */
+    private $_models = [];
+    protected function getModel(string $model_name): ModelInterface
+    {
+        if(!isset($this->models[$model_name])) {
+            $this->_models[$model_name] = new $model_name($this->configService);
+        }
+
+        return $this->_models[$model_name];
     }
 }
