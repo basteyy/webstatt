@@ -5,7 +5,7 @@ use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Models\Entities\PageEntity;
 use function basteyy\VariousPhpSnippets\__;
 
-$this->layout('Webstatt::layouts/acp', ['title' => __('Edit a page')]);
+$this->layout('Webstatt::acp', ['title' => __('Edit a page')]);
 
 /** @var PageEntity $page */
 

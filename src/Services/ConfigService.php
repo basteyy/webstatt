@@ -78,6 +78,11 @@ final class ConfigService
     readonly string $config_mail_config_file_name;
 
     /**
+     * @var mixed|null
+     */
+    protected mixed $database_pages_name;
+
+    /**
      * @throws ReflectionException
      */
     public function __construct(array $config)

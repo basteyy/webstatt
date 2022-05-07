@@ -3,7 +3,7 @@
 use basteyy\Webstatt\Enums\UserRole;
 use function basteyy\VariousPhpSnippets\__;
 
-$this->layout('Webstatt::layouts/acp', ['title' => __('Invite a new user')]);
+$this->layout('Webstatt::acp', ['title' => __('Invite a new user')]);
 ?>
 
 <span class="float-end">

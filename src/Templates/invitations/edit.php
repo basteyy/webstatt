@@ -5,7 +5,7 @@ use function basteyy\VariousPhpSnippets\__;
 
 /** @var \basteyy\Webstatt\Models\Entities\InvitationEntity $invitationEntity */
 
-$this->layout('Webstatt::layouts/acp', ['title' => __('Edit an invitation link')]);
+$this->layout('Webstatt::acp', ['title' => __('Edit an invitation link')]);
 
 ?>
 

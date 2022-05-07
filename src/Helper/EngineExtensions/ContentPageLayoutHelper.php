@@ -26,6 +26,6 @@ final class ContentPageLayoutHelper implements ExtensionInterface
 
     public function register(Engine $engine)
     {
-        $engine->registerFunction('getLayouts', fn () => $this->layouts);
+        $engine->registerFunction('getLayouts', fn () => count($this->layouts) > 0 ? $this->layouts : null);
     }
 }

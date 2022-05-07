@@ -39,6 +39,7 @@ class Model implements ModelInterface
     /** @var ConfigService */
     private ConfigService $configService;
 
+    /** @var Store $store */
     private Store $store;
 
     public function __construct(ConfigService $configService)
@@ -146,7 +147,6 @@ class Model implements ModelInterface
 
     public function delete(EntityInterface $entity): void
     {
-        // TODO: Implement delete() method.
         $this->getRaw()->deleteById($entity->getId());
     }
 
@@ -380,5 +380,16 @@ class Model implements ModelInterface
         }
 
         return $this->_models[$model_name];
+    }
+
+    /**
+     * Return the last ID
+     * @return int|null
+     * @throws IOException
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigurationException
+     */
+    public function getLastId() : int|null {
+        return $this->getRaw()->getLastInsertedId() ?? null;
     }
 }

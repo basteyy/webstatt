@@ -3,7 +3,7 @@
 use basteyy\Webstatt\Enums\PageType;
 use function basteyy\VariousPhpSnippets\__;
 
-$this->layout('Webstatt::layouts/acp', ['title' => __('Edit a content page')]);
+$this->layout('Webstatt::acp', ['title' => __('Edit a content page')]);
 
 /** @var PageType $page */
 ?>

@@ -4,7 +4,7 @@ use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Models\Entities\UserEntity;
 use function basteyy\VariousPhpSnippets\__;
 
-$this->layout('Webstatt::layouts/acp', ['title' => __('Add a new user')]);
+$this->layout('Webstatt::acp', ['title' => __('Add a new user')]);
 
 /** @var UserEntity $user */
 ?>

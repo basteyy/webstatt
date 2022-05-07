@@ -6,7 +6,7 @@ use basteyy\Webstatt\Models\Abstractions\UserAbstraction;
 use basteyy\Webstatt\Services\ConfigService;
 use function basteyy\VariousPhpSnippets\__;
 
-$this->layout('Webstatt::layouts/acp', ['title' => __('Edit file %s overview', $file->getBasename())]);
+$this->layout('Webstatt::acp', ['title' => __('Edit file %s overview', $file->getBasename())]);
 
 ?>
 

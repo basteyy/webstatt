@@ -88,12 +88,6 @@ class Webstatt
         /** Direct path to the src folder */
         define('SRC', PACKAGE_ROOT . 'src' . DS);
 
-        /** Put trash here */
-        define('TEMP', ROOT . DS . 'cache' . DS);
-
-        /** Base Public Folder in Filesystem */
-        define('PUB', ROOT . DS . 'public' . DS);
-
         try {
 
             /**Try to load default config from config.ini */
@@ -101,46 +95,29 @@ class Webstatt
                 throw new Exception(sprintf('No default-config file found at "%s"', PACKAGE_ROOT . DS . 'config.ini'));
             }
 
-            /**Load the default config */
+            /** Load the default config */
             $config = parse_ini_file(PACKAGE_ROOT . DS . 'config.ini', false);
 
-            /**Try to load the config from the config.ini in root folder */
+            /** Try to load the config from the config.ini in root folder */
             if (file_exists(ROOT . DS . 'config.ini')) {
                 $config = array_merge($config, parse_ini_file(ROOT . DS . 'config.ini', false));
             }
 
-            /**Is Debug-Mode forced? */
+            /** Is Debug-Mode forced? */
             if (isset($options['debug']) && is_bool($options['debug'])) {
                 $config['debug'] = $options['debug'];
             }
 
-            /**Construct the Congi Servcie */
+            /** Construct the Congi Servcie */
             $this->configService = new ConfigService($config);
 
-            /**APCu installed and enabled to use it */
-            if (!defined('APCU_SUPPORT')) {
-                define('APCU_SUPPORT', !$this->configService->caching_apcu_disabled && function_exists('apcu_enabled') && apcu_enabled());
-            }
+            include SRC . 'Constants.php';
 
-            /**APCu TTL */
-            if (APCU_SUPPORT) {
-                define('APCU_TTL_LONG', $this->configService->caching_apcu_ttl_long ?? 720);
-                define('APCU_TTL_MEDIUM', $this->configService->caching_apcu_ttl_medium ?? 60);
-                define('APCU_TTL_SHORT', $this->configService->caching_apcu_ttl_short ?? 10);
-            }
 
             /**Make the temp folder */
             if (!is_dir(TEMP)) {
-                mkdir(TEMP, 0755, true);
+                mkdir(TEMP, WEBSTATT_DEFAULT_FOLDER_PERMISSIONS, WEBSTATT_CREATE_FOLDER_RECURSIVE);
             }
-
-            /**Some more definitions */
-
-            /** @ar string W_PAGE_STORAGE_PATH Path where the content/the versions of pages are stored */
-            define('W_PAGE_STORAGE_PATH', ROOT . rtrim($this->configService->pages_private_folder, '/') . DS);
-
-            define('W_PAGES_ROUTES_CACHE_KEY', 'pages_routing_cache');
-            define('W_PAGES_STARTPAGE_CACHE_KEY', 'pages_startpage');
 
             /**Access Service Initiation */
             $accessService = new AccessService($this->configService);
@@ -237,7 +214,7 @@ class Webstatt
      * @param Throwable $exception
      * @return void
      */
-    private function handleException(Throwable $exception)
+    private function handleException(Throwable $exception): void
     {
         (new Run())->pushHandler(new PrettyPageHandler())->handleException($exception);
         #if (isset($this->configService) && ($this->configService->debug || $this->configService->website === 'development')) {
@@ -252,7 +229,7 @@ class Webstatt
      * @param int $status_code
      * @return void
      */
-    #[NoReturn] private function displayErrorPage(int $status_code = 501)
+    #[NoReturn] private function displayErrorPage(int $status_code = 501): void
     {
         ob_clean();
         http_response_code($status_code);
@@ -260,7 +237,12 @@ class Webstatt
         die();
     }
 
-    public function addAdminNavbarItem(AdminNavbarItem $item)
+    /**
+     * Add an item to the navbar
+     * @param AdminNavbarItem $item
+     * @return void
+     */
+    public function addAdminNavbarItem(AdminNavbarItem $item): void
     {
         $this->template_navbar_items[] = (string)$item;
     }
@@ -401,7 +383,7 @@ class Webstatt
 
             /** Push more admin navbar items to the template */
             if ($this->template_navbar_items && count($this->template_navbar_items) > 0) {
-                $this->getApp()->getContainer()->get(Engine::class)->addData(['additional_admin_nav_items' => $this->template_navbar_items], 'Webstatt::layouts/acp');
+                $this->getApp()->getContainer()->get(Engine::class)->addData(['additional_admin_nav_items' => $this->template_navbar_items], 'Webstatt::acp');
             }
 
             /** Pages Layout */

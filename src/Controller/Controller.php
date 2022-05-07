@@ -133,7 +133,7 @@ class Controller
         if(isset($this->loadModels)) {
             foreach($this->loadModels as $model) {
                 if(class_exists($model)) {
-                    $this->getModel($model);
+                    $this->{basename(str_replace('\\', '/', $model))} = $this->getModel($model);
                 }
             }
         }

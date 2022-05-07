@@ -10,24 +10,17 @@
 
 declare(strict_types=1);
 
-namespace basteyy\Webstatt\Controller;
+namespace basteyy\Webstatt\Controller\Account;
 
+use basteyy\Webstatt\Controller\Controller;
 use basteyy\Webstatt\Enums\UserRole;
-use basteyy\Webstatt\Helper\FlashMessages;
-use basteyy\Webstatt\Helper\MailHelper;
-use basteyy\Webstatt\Helper\UserPasswordStrategy;
-use basteyy\Webstatt\Helper\UserSession;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use SleekDB\Exceptions\IdNotAllowedException;
 use SleekDB\Exceptions\InvalidArgumentException;
 use SleekDB\Exceptions\InvalidConfigurationException;
 use SleekDB\Exceptions\IOException;
-use SleekDB\Exceptions\JsonException;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
-use function basteyy\VariousPhpSnippets\getRandomString;
-use function basteyy\VariousPhpSnippets\varDebug;
 
 class DashboardController extends Controller
 {
@@ -42,7 +35,7 @@ class DashboardController extends Controller
     {
         /** @var $request Request */
         /** @var $response Response */
-        return $this->render('Webstatt::dashboard', [
+        return $this->adminRender('account/dashboard', [
             'users' => $this->getUsersModel()->getAll()
         ]);
     }

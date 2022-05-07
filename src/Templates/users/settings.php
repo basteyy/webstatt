@@ -3,7 +3,7 @@
 use basteyy\Webstatt\Enums\UserRole;
 use function basteyy\VariousPhpSnippets\__;
 
-$this->layout('Webstatt::layouts/acp', ['title' => __('User Settings')]);
+$this->layout('Webstatt::acp', ['title' => __('User Settings')]);
 ?>
 
 <h1 class="my-md-5"><?= __('User Settings') ?></h1>

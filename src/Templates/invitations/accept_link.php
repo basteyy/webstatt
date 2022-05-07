@@ -2,7 +2,7 @@
 
 use function basteyy\VariousPhpSnippets\__;
 
-$this->layout('Webstatt::layouts/extern', ['title' => __('Accept invitation')]);
+$this->layout('Webstatt::extern', ['title' => __('Accept invitation')]);
 ?>
 
 <main class="w-100 m-auto xxl">

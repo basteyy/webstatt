@@ -3,7 +3,7 @@
 use function basteyy\VariousPhpSnippets\__;
 
 
-$this->layout('Webstatt::layouts/acp', ['title' => __('Rename folder')]);
+$this->layout('Webstatt::acp', ['title' => __('Rename folder')]);
 
 /** @var SplFileInfo $file */
 

@@ -3,7 +3,7 @@
 use basteyy\Webstatt\Enums\PageType;
 use function basteyy\VariousPhpSnippets\__;
 
-$this->layout('Webstatt::layouts/acp', ['title' => __('Add a new page')]);
+$this->layout('Webstatt::acp', ['title' => __('Add a new page')]);
 ?>
 
 <h1 class="my-md-5"><?= __('Create a new page') ?></h1>
@@ -11,7 +11,7 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Add a new page')]);
 <p><?= __('A page is a single website, which will delivered under the url, you type in.') ?></p>
 
 
-<form class="row g-5" method="post" action="<?= $this->getCurrentUrl() ?>" id="_createPageForm">
+<form class="row g-5" method="post" action="<?= !$this->getLayouts() ? $this->getCurrentUrl():'#' ?>" id="_createPageForm">
     <div class="col-md-4">
         <h2><?= __('Basic Page Data') ?></h2>
 
@@ -90,15 +90,17 @@ $this->layout('Webstatt::layouts/acp', ['title' => __('Add a new page')]);
                 </p>
             </div>
             <?php
-            if ($this->getLayouts() !== null && count($this->getLayouts()) > 0) {
+            if ($this->getLayouts()) {
                 echo $this->fetch('Webstatt::pages/layouts_select');
+            } else {
+                printf('<div class="alert alert-danger" role="alert">%s</div>', __('You cannot create a page without a layout. Create a new layout (Content - Layouts) or define one inside the code'));
             }
             ?></div>
     </div>
 
 
     <div class="col-12">
-        <input type="submit" class="btn btn-primary" value="<?= __('Save') ?>"/>
+        <input <?= !$this->getLayouts() ? 'disabled':'' ?> type="submit" class="btn btn-primary" value="<?= __('Save') ?>"/>
     </div>
 </form>
 

@@ -61,7 +61,7 @@ trait DatabaseTrait {
         if (!isset($this->_activeDatabases) || !isset($this->_activeDatabases[$database])) {
 
             if (!is_dir(ROOT . DS . $this->configService->database_folder)) {
-                mkdir(ROOT . DS . $this->configService->database_folder, 0755, true);
+                mkdir(ROOT . DS . $this->configService->database_folder, WEBSTATT_DEFAULT_FOLDER_PERMISSIONS, WEBSTATT_CREATE_FOLDER_RECURSIVE);
             }
 
             $this->_activeDatabases[$database] = new Store($database, ROOT . DS . $this->configService->database_folder, [

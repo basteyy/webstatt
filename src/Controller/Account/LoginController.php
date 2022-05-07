@@ -10,8 +10,10 @@
 
 declare(strict_types=1);
 
-namespace basteyy\Webstatt\Controller;
+namespace basteyy\Webstatt\Controller\Account;
 
+use basteyy\Webstatt\Controller\Controller;
+use basteyy\Webstatt\Enums\DisplayThemesEnum;
 use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Helper\MailHelper;
@@ -71,7 +73,8 @@ class LoginController extends Controller
                     'name' => '',
                     'alias' => '',
                     'created' => getDateTimeFormat(),
-                    'lastlogin' => getDateTimeFormat()
+                    'lastlogin' => getDateTimeFormat(),
+                    'displayMode' => DisplayThemesEnum::LIGHT
                 ]);
 
                 $user_id = $db->getRaw()->getLastInsertedId();
@@ -102,9 +105,13 @@ class LoginController extends Controller
                         $user_id = $user[$db->getRaw()->getPrimaryKey()];
                         $login = true;
 
-                        $db->getRaw()->updateById($user_id, [
-                            'lastlogin' => getDateTimeFormat()
-                        ]);
+                        $update_data = ['lastlogin' => getDateTimeFormat()];
+
+                        if(!isset($user['displayMode'])) {
+                            $update_data['displayMode'] = DisplayThemesEnum::LIGHT;
+                        }
+
+                        $db->getRaw()->updateById($user_id, $update_data);
 
                     } else {
                         FlashMessages::addErrorMessage(__('Password was incorrect'));

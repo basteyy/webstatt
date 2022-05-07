@@ -6,7 +6,7 @@ use function basteyy\VariousPhpSnippets\__;
 
 /** @var \basteyy\Webstatt\Models\Entities\UserEntity $user */
 
-$this->layout('Webstatt::layouts/acp', ['title' => __('Profile of %s', $user->getAnyName())]);
+$this->layout('Webstatt::acp', ['title' => __('Profile of %s', $user->getAnyName())]);
 
 
 ?>

@@ -6,7 +6,7 @@ use basteyy\Webstatt\Models\Abstractions\UserAbstraction;
 use basteyy\Webstatt\Services\ConfigService;
 use function basteyy\VariousPhpSnippets\__;
 
-$this->layout('Webstatt::layouts/acp', ['title' => __('E-Mail Settings')]);
+$this->layout('Webstatt::acp', ['title' => __('E-Mail Settings')]);
 
 /** @var ConfigService $configService */
 $configService = $this->getConfig();

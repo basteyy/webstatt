@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace basteyy\Webstatt\Models\Entities;
 
+use basteyy\Webstatt\Enums\DisplayThemesEnum;
 use basteyy\Webstatt\Enums\UserRole;
 use JetBrains\PhpStorm\Pure;
 use function basteyy\VariousPhpSnippets\__;
@@ -28,8 +29,13 @@ class UserEntity extends Entity implements EntityInterface
     protected string $name = '';
     protected string $alias = '';
     protected string $signupIp = '';
+    protected DisplayThemesEnum $displayMode = DisplayThemesEnum::LIGHT;
     protected \DateTime|null $created;
     protected \DateTime|null $lastlogin;
+
+    public function getDisplayTheme() : DisplayThemesEnum {
+        return $this->displayMode;
+    }
 
     public function getNiceCreatedDateTime() : string {
         return isset($this->created) ? getDateTimeFormat($this->created) : __('never');

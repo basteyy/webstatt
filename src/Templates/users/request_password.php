@@ -2,7 +2,7 @@
 
 use function basteyy\VariousPhpSnippets\__;
 
-$this->layout('Webstatt::layouts/extern', ['title' => __('Request your password')]);
+$this->layout('Webstatt::extern', ['title' => __('Request your password')]);
 ?>
 <main class="w-100 m-auto xxl">
 

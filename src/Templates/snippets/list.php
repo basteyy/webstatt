@@ -5,7 +5,7 @@ use function basteyy\VariousPhpSnippets\__;
 
 /** @var \basteyy\Webstatt\Models\Entities\SnippetEntity $snippet */
 
-$this->layout('Webstatt::layouts/acp', ['title' => __('Overview of your snippets')]);
+$this->layout('Webstatt::acp', ['title' => __('Overview of your snippets')]);
 ?>
 
 <h1 class="my-md-5"><?= __('Manage the snippets') ?></h1>

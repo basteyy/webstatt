@@ -10,22 +10,16 @@
 
 declare(strict_types=1);
 
-namespace basteyy\Webstatt\Controller;
+namespace basteyy\Webstatt\Controller\Account;
 
+use basteyy\Webstatt\Controller\Controller;
 use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Helper\UserSession;
-use JetBrains\PhpStorm\NoReturn;
-use League\Plates\Engine;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use SleekDB\Exceptions\IdNotAllowedException;
-use SleekDB\Exceptions\InvalidArgumentException;
-use SleekDB\Exceptions\IOException;
-use SleekDB\Exceptions\JsonException;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
-use function basteyy\VariousPhpSnippets\varDebug;
 
 class LogoutController extends Controller
 {

@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace basteyy\Webstatt\Controller\Users;
 
 use basteyy\Webstatt\Controller\Controller;
+use basteyy\Webstatt\Enums\DisplayThemesEnum;
 use basteyy\Webstatt\Enums\UserRole;
 use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Helper\MailHelper;
@@ -75,7 +76,8 @@ class AddUserController extends Controller
                     'password' => UserPasswordStrategy::getHash($password, $salt),
                     'salt'     => $salt,
                     'role'     => $role,
-                    'secret'   => getRandomString(24)
+                    'secret'   => getRandomString(24),
+                    'displayMode' => DisplayThemesEnum::LIGHT
                 ]);
 
                 /**Send a Welcome Mail ? */

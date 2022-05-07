@@ -5,7 +5,7 @@ use basteyy\Webstatt\Models\Entities\InvitationEntity;
 use function basteyy\VariousPhpSnippets\__;
 use function basteyy\VariousPhpSnippets\getNiceDateTimeFormat;
 
-$this->layout('Webstatt::layouts/acp', ['title' => __('Manage invitations')]);
+$this->layout('Webstatt::acp', ['title' => __('Manage invitations')]);
 ?>
 
 <span class="float-end">

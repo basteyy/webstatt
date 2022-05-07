@@ -4,7 +4,7 @@ use basteyy\Webstatt\Models\Abstractions\UserAbstraction;
 use basteyy\Webstatt\Services\ConfigService;
 use function basteyy\VariousPhpSnippets\__;
 
-$this->layout('Webstatt::layouts/acp', ['title' => __('Dashboard')]);
+$this->layout('Webstatt::acp', ['title' => __('Dashboard')]);
 
 
 /** @var ConfigService $configService */

@@ -1,5 +1,5 @@
 <?php
-$this->layout('Webstatt::layouts/extern', ['title' => \basteyy\VariousPhpSnippets\__('Login')]);
+$this->layout('Webstatt::extern', ['title' => \basteyy\VariousPhpSnippets\__('Login')]);
 ?>
 <main class="w-100 m-auto">
     <form method="post" action="<?= $this->getCurrentUrl() ?>">

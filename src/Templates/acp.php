@@ -8,7 +8,7 @@ use function basteyy\VariousPhpSnippets\__;
 /** @var ConfigService $configService */
 $configService = $this->getConfig();
 
-/** @var UserAbstraction $User */
+/** @var \basteyy\Webstatt\Models\Entities\UserEntity $User */
 $User = $this->getUser();
 ?>
 <!DOCTYPE html>
@@ -19,8 +19,10 @@ $User = $this->getUser();
     <title><?= $title ?? 'ACP' ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/css/bootstrap-night.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
     <link href="https://rsms.me/inter/inter.css" rel="stylesheet" crossorigin="anonymous">
+    <?php if($User->getDisplayTheme() === \basteyy\Webstatt\Enums\DisplayThemesEnum::DARK) { ?>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/css/bootstrap-night.min.css" rel="stylesheet">
+    <?php }?>
     <style>
         :root {
             --bs-body-font-family: 'Inter var', sans-serif;
@@ -28,14 +30,14 @@ $User = $this->getUser();
             --webstatt-text-rgb: 255,255,255;
             --webstatt-green: rgb(var(--webstatt-green-rgb), 1);
             --webstatt-not-green: rgb(var(--webstatt-text-rgb), 1);
+        }
 
+        <?php if($User->getDisplayTheme() === \basteyy\Webstatt\Enums\DisplayThemesEnum::DARK) { ?>
+        :root {
+            --webstatt-green: rgb(var(--webstatt-green-rgb), .3);
+            --webstatt-not-green: rgb(var(--webstatt-text-rgb), .5);
         }
-        @media(prefers-color-scheme: dark){
-            :root {
-                --webstatt-green: rgb(var(--webstatt-green-rgb), .3);
-                --webstatt-not-green: rgb(var(--webstatt-text-rgb), .5);
-            }
-        }
+        <?php }?>
 
         .above-navbar a, .above-navbar, .above-navbar a:hover {
             color: var(--webstatt-not-green);
@@ -45,8 +47,6 @@ $User = $this->getUser();
             background-color: var(--webstatt-green);
         }
     </style>
-    <meta name="color-scheme" content="light dark">
-
 </head>
 <body>
 
@@ -101,6 +101,24 @@ $User = $this->getUser();
                                 <i class="mx-md-2 bi bi-plus-circle"></i> <?= __('Snippets') ?>
                             </a>
                         </li>
+
+
+                        <?php
+                if($this->getUser()->isAdmin()) {
+                    ?>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/layouts') ?>" title="<?= __('Layouts') ?>">
+                            <i class="mx-md-2 bi bi-layout-wtf"></i> <?= __('Layouts') ?>
+                        </a>
+                    </li>
+                        <?php
+                }
+                ?>
+
 
                     </ul>
                 </li>
@@ -172,8 +190,11 @@ $User = $this->getUser();
 
             <?php
             if (isset($additional_admin_nav_items)) {
+                /** @var \basteyy\Webstatt\Helper\AdminNavbarItem $item */
                 foreach ($additional_admin_nav_items as $item) {
-                    echo $item;
+                    if($item->getStringIfAllowed($User->getRole())) {
+                        echo $item;
+                    }
                 }
             }
             ?>
@@ -181,7 +202,7 @@ $User = $this->getUser();
 
                 <?php
                 if($this->getUser()->isAdmin()) {
-                    echo $this->fetch('Webstatt::layouts/partials/admin_settings_dropdown');
+                    echo $this->fetch('Webstatt::partials/admin_settings_dropdown');
                 }
                 ?>
 

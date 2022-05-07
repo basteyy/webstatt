@@ -5,11 +5,11 @@ use basteyy\Webstatt\Helper\FlashMessages;
 use basteyy\Webstatt\Models\Abstractions\UserAbstraction;
 use basteyy\Webstatt\Services\ConfigService;
 
-$this->layout('Webstatt::layouts/acp', ['title' => 'Dein Profil']);
+$this->layout('Webstatt::acp', ['title' => 'Dein Profil']);
 
 /** @var ConfigService $configService */
 $configService = $this->getConfig();
-/** @var UserAbstraction $User */
+/** @var \basteyy\Webstatt\Models\Entities\UserEntity $User */
 $User = $this->getUser();
 ?>
 

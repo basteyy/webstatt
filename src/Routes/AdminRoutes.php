@@ -12,16 +12,16 @@
 declare(strict_types=1);
 
 use basteyy\Webstatt\Controller\Account\ChangeAccountPasswordController;
+use basteyy\Webstatt\Controller\Account\DashboardController;
+use basteyy\Webstatt\Controller\Account\LoginController;
+use basteyy\Webstatt\Controller\Account\LogoutController;
 use basteyy\Webstatt\Controller\Account\UserChangeMailController;
 use basteyy\Webstatt\Controller\Account\UserProfilController;
 use basteyy\Webstatt\Controller\Cache\CacheResetController;
-use basteyy\Webstatt\Controller\DashboardController;
 use basteyy\Webstatt\Controller\Files\DeleteFileController;
 use basteyy\Webstatt\Controller\Files\EditFileController;
 use basteyy\Webstatt\Controller\Files\FilesOverviewController;
 use basteyy\Webstatt\Controller\Files\RenameController;
-use basteyy\Webstatt\Controller\LoginController;
-use basteyy\Webstatt\Controller\LogoutController;
 use basteyy\Webstatt\Controller\Pages\AddPageController;
 use basteyy\Webstatt\Controller\Pages\EditPageController;
 use basteyy\Webstatt\Controller\Pages\PagesOverviewController;
@@ -88,6 +88,10 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
 
         /** Change password */
         $proxy->any('/password', ChangeAccountPasswordController::class);
+
+        /** Change Personal Settings */
+        $proxy->any('/settings', \basteyy\Webstatt\Controller\Account\AccountSettingsController::class);
+
     });
 
     /** Invitations */
@@ -121,8 +125,15 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
         $proxy->any('/settings', UserSettingsController::class);
     });
 
+    /** Layouts */
+    $proxy->group('/layouts', function (RouteCollectorProxy $proxy) {
+        $proxy->any('', \basteyy\Webstatt\Controller\Layouts\ListLayoutsController::class);
+        $proxy->any('/add', \basteyy\Webstatt\Controller\Layouts\AddLayoutController::class);
+    });
 
-    /** Pages Routes */
+
+
+        /** Pages Routes */
     $proxy->group('/pages', function (RouteCollectorProxy $proxy) {
 
         /** List all Pages */
