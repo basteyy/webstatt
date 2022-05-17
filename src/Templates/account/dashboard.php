@@ -18,7 +18,7 @@ $User = $this->getUser();
 if($this->getUser()->isAdmin()) {
     $mail_config = $this->getConfig()->getMailConfig();
 
-    if(!$mail_config['activate_mail_system']) {
+    if(!isset($mail_config['activate_mail_system']) || !$mail_config['activate_mail_system']) {
         printf('<p class="alert alert-warning">%s</p>', __('The E-Mail System isn\'t acitacted yet. <a href="/admin/settings/email">Activate it now</a>'));
     }
 
