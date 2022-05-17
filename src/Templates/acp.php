@@ -85,7 +85,7 @@ $User = $this->getUser();
                        aria-expanded="false">
                         <i class="mx-md-2 bi bi-newspaper"></i> <?= __('Content') ?>
                     </a>
-                    <ul class="dropdown-menu p-md-4" aria-labelledby="navbarDropdown">
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li>
                             <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/pages') ?>" title="<?= __('Pages Overview') ?>">
                                 <i class="mx-md-2 bi bi-view-list"></i> <?= __('List the content') ?>
@@ -140,7 +140,7 @@ $User = $this->getUser();
                                        aria-expanded="false">
                                         <i class="mx-md-2 bi bi-download"></i> <?= __('Files') ?>
                                     </a>
-                                    <ul class="dropdown-menu p-md-4" aria-labelledby="navbarDropdown">
+                                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                         <li>
                                             <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/files') ?>" title="<?= __('Manage uploaded files in your website') ?>">
                                                 <i class="mx-md-2 bi bi-newspaper"></i> <?= __('Manage files') ?>
@@ -171,7 +171,7 @@ $User = $this->getUser();
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="mx-md-2 bi bi-person"></i> <?= __('Your Account') ?>
                     </a>
-                    <ul class="dropdown-menu p-md-4" aria-labelledby="navbarDropdown">
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 
                         <li>
                             <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/account') ?>" title="<?= __('Manage your profil') ?>">

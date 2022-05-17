@@ -149,7 +149,7 @@ class AdminNavbarItem
     {
         $children = '';
         foreach ($this->childs as $child) {
-            $children .= (string)$child;
+            $children .= (string) $child;
         }
 
         return $children;
@@ -163,26 +163,53 @@ class AdminNavbarItem
     {
         if (count($this->childs) > 0) {
 
-            return sprintf('<li class="nav-item dropdown mx-lg-3"><a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false" href="%1$s" title="%3$s">%2$s</a><ul class="dropdown-menu p-md-4" aria-labelledby="navbarDropdown"><li><a class="dropdown-item py-md-3" href="%1$s" title="%3$s">%2$s</a></li> %4$s</ul>',
+            return sprintf($this->getDropdownTemplate(),
                 $this->url,
                 $this->value ?? $this->title ?? $this->url,
                 htmlspecialchars($this->title ?? $this->value ?? $this->url),
-                $this->getChilds()
+                $this->getChilds(),
+                sprintf(
+                    $this->getNavitemTemplate(),
+                    !$this->child ? '' : 'nav-item mx-lg-3',
+                    !$this->child ? 'dropdown-item py-md-3' : 'nav-link',
+                    $this->url,
+                    strip_tags($this->title ?? $this->value ?? $this->url),
+                    $this->value ?? $this->title ?? $this->url
+                )
             );
 
         } else {
 
             return sprintf(
-                '<li class="%4$s"><a class="%5$s" href="%1$s" title="%3$s">%2$s</a></li>',
+                $this->getNavitemTemplate(),
+                $this->child ? '' : 'nav-item mx-lg-3',
+                $this->child ? 'dropdown-item py-md-3' : 'nav-link',
                 $this->url,
-                $this->value ?? $this->title ?? $this->url,
-                htmlspecialchars($this->title ?? $this->value ?? $this->url),
-                $this->child ? 'nav-item mx-lg-3' : '',
-                $this->child ? '' : 'dropdown-item py-md-3'
+                strip_tags($this->title ?? $this->value ?? $this->url),
+                $this->value ?? $this->title ?? $this->url
             );
 
         }
 
     }
+
+    private function getNavitemTemplate() : string {
+
+        if(!isset($this->navitemTemplate)) {
+            $this->navitemTemplate = file_get_contents(PACKAGE_ROOT . '/src/Resources/StaticFiles/snippets/navbar/nav-item.php');
+        }
+
+        return $this->navitemTemplate;
+    }
+
+    private function getDropdownTemplate() : string {
+
+        if(!isset($this->dropdownTemplate)) {
+            $this->dropdownTemplate = file_get_contents(PACKAGE_ROOT . '/src/Resources/StaticFiles/snippets/navbar/nav-dropdown.php');
+        }
+
+        return $this->dropdownTemplate;
+    }
+
 
 }
