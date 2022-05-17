@@ -19,7 +19,7 @@ class AdminNavbarItem
     private string $url;
     private string $value;
     private string $title;
-    private UserRole $minimumUserRole;
+    private UserRole $minimumUserRole = UserRole::USER;
     private UserRole $exactUserRole;
 
     /**

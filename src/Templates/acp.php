@@ -1,14 +1,16 @@
 <?php
 
+use basteyy\Webstatt\Enums\DisplayThemesEnum;
+use basteyy\Webstatt\Helper\AdminNavbarItem;
 use basteyy\Webstatt\Helper\FlashMessages;
-use basteyy\Webstatt\Models\Abstractions\UserAbstraction;
+use basteyy\Webstatt\Models\Entities\UserEntity;
 use basteyy\Webstatt\Services\ConfigService;
 use function basteyy\VariousPhpSnippets\__;
 
 /** @var ConfigService $configService */
 $configService = $this->getConfig();
 
-/** @var \basteyy\Webstatt\Models\Entities\UserEntity $User */
+/** @var UserEntity $User */
 $User = $this->getUser();
 ?>
 <!DOCTYPE html>
@@ -16,27 +18,30 @@ $User = $this->getUser();
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1" name="viewport">
-    <title><?= $title ?? 'ACP' ?></title>
+    <title><?= $title ?? 'Webstatt Admin Area' ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link href="https://rsms.me/inter/inter.css" rel="stylesheet" crossorigin="anonymous">
-    <?php if($User->getDisplayTheme() === \basteyy\Webstatt\Enums\DisplayThemesEnum::DARK) { ?>
+    <?php
+    if ($User->getDisplayTheme() === DisplayThemesEnum::DARK) { ?>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/css/bootstrap-night.min.css" rel="stylesheet">
-    <?php }?>
+    <?php
+    } ?>
     <style>
         :root {
             --bs-body-font-family: 'Inter var', sans-serif;
             --webstatt-green-rgb: 139, 180, 26;
-            --webstatt-text-rgb: 255,255,255;
+            --webstatt-text-rgb: 255, 255, 255;
             --webstatt-green: rgb(var(--webstatt-green-rgb), 1);
             --webstatt-not-green: rgb(var(--webstatt-text-rgb), 1);
         }
 
-        <?php if($User->getDisplayTheme() === \basteyy\Webstatt\Enums\DisplayThemesEnum::DARK) { ?>
+        <?php if($User->getDisplayTheme() === DisplayThemesEnum::DARK) { ?>
         :root {
             --webstatt-green: rgb(var(--webstatt-green-rgb), .3);
             --webstatt-not-green: rgb(var(--webstatt-text-rgb), .5);
         }
+
         <?php }?>
 
         .above-navbar a, .above-navbar, .above-navbar a:hover {
@@ -104,20 +109,20 @@ $User = $this->getUser();
 
 
                         <?php
-                if($this->getUser()->isAdmin()) {
-                    ?>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
+                        if ($this->getUser()->isAdmin()) {
+                            ?>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
 
-                    <li>
-                        <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/layouts') ?>" title="<?= __('Layouts') ?>">
-                            <i class="mx-md-2 bi bi-layout-wtf"></i> <?= __('Layouts') ?>
-                        </a>
-                    </li>
-                        <?php
-                }
-                ?>
+                            <li>
+                                <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/layouts') ?>" title="<?= __('Layouts') ?>">
+                                    <i class="mx-md-2 bi bi-layout-wtf"></i> <?= __('Layouts') ?>
+                                </a>
+                            </li>
+                            <?php
+                        }
+                        ?>
 
 
                     </ul>
@@ -151,6 +156,17 @@ $User = $this->getUser();
                                     </ul>
                                 </li>-->
 
+
+                <?php
+                if (isset($additional_admin_nav_items)) {
+                    /** @var AdminNavbarItem $item */
+                    foreach ($additional_admin_nav_items as $item) {
+                        if ($item->getStringIfAllowed($User->getRole())) {
+                            echo $item;
+                        }
+                    }
+                }
+                ?>
                 <li class="nav-item dropdown mx-lg-3">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="mx-md-2 bi bi-person"></i> <?= __('Your Account') ?>
@@ -187,21 +203,10 @@ $User = $this->getUser();
                     </ul>
                 </li>
             </ul>
-
-            <?php
-            if (isset($additional_admin_nav_items)) {
-                /** @var \basteyy\Webstatt\Helper\AdminNavbarItem $item */
-                foreach ($additional_admin_nav_items as $item) {
-                    if($item->getStringIfAllowed($User->getRole())) {
-                        echo $item;
-                    }
-                }
-            }
-            ?>
             <ul class="navbar-nav me-0 mb-2 mb-lg-0">
 
                 <?php
-                if($this->getUser()->isAdmin()) {
+                if ($this->getUser()->isAdmin()) {
                     echo $this->fetch('Webstatt::partials/admin_settings_dropdown');
                 }
                 ?>
@@ -263,7 +268,8 @@ $User = $this->getUser();
             </div>
             <div class="nav col-md-4 justify-content-end list-unstyled d-flex">
                 <p>
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#webstattInfoModel"><i class="mx-md-2 bi bi-info"></i> Webstatt</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#webstattInfoModel"><i class="mx-md-2 bi bi-info"></i> Webstatt
+                    </button>
                 </p>
             </div>
 

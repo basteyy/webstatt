@@ -244,7 +244,19 @@ class Webstatt
      */
     public function addAdminNavbarItem(AdminNavbarItem $item): void
     {
-        $this->template_navbar_items[] = (string)$item;
+        $this->template_navbar_items[] = $item;
+    }
+
+    /**
+     * Add an array of AdminNavbarItems to the acp
+     * @param array $items
+     * @return void
+     */
+    public function addAdminNavbarItems(array $items): void
+    {
+        foreach($items as $item) {
+            $this->addAdminNavbarItem($item);
+        }
     }
 
     /**
