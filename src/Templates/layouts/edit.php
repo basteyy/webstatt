@@ -24,6 +24,14 @@ $this->layout('Webstatt::acp', ['title' => __('Edit layout %s', $layout->getName
         <input type="text" class="form-control" id="name" name="name" placeholder="<?= __('A name for internal usage') ?>" value="<?= $layout->getName() ?>">
     </div>
 
+    <?= $this->insert('Webstatt::partials/editors/html_php', [
+            'editor' => [
+                    'value' => 'dsds'
+            ]
+    ]) ?>
+
+
+
     <div>
         <button type="submit" class="btn btn-primary"><?= __('Save') ?></button>
     </div>

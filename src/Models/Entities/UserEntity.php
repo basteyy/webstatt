@@ -29,12 +29,16 @@ class UserEntity extends Entity implements EntityInterface
     protected string $name = '';
     protected string $alias = '';
     protected string $signupIp = '';
+    protected string $codemirror_theme = 'nord';
     protected DisplayThemesEnum $displayMode = DisplayThemesEnum::LIGHT;
     protected \DateTime|null $created;
     protected \DateTime|null $lastlogin;
 
     public function getDisplayTheme() : DisplayThemesEnum {
         return $this->displayMode;
+    }
+    public function getCodeMirrorTheme() : string {
+        return $this->codemirror_theme;
     }
 
     public function getNiceCreatedDateTime() : string {

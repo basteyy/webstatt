@@ -47,6 +47,11 @@ class AccountSettingsController extends Controller
                 'displayMode' => isset($request->getParsedBody()['display_mode']) ? DisplayThemesEnum::DARK : DisplayThemesEnum::LIGHT
             ];
 
+            /** Codemirror theme */
+            $update_data += [
+                'codemirror_theme' => isset($request->getParsedBody()['codemirror_theme']) ? $request->getParsedBody()['codemirror_theme'] : 'nord'
+            ];
+
 
             $this->getUsersModel()->patch($user, $update_data);
             FlashMessages::addSuccessMessage(__('Changes are saved'));
