@@ -19,6 +19,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Psr7\Request;
 use function basteyy\VariousPhpSnippets\__;
+use function basteyy\VariousPhpSnippets\getRandomAlphaString;
 
 class AddLayoutController extends \basteyy\Webstatt\Controller\Controller
 {
@@ -28,6 +29,7 @@ class AddLayoutController extends \basteyy\Webstatt\Controller\Controller
      * @throws \SleekDB\Exceptions\IOException
      * @throws \SleekDB\Exceptions\InvalidConfigurationException
      * @throws \SleekDB\Exceptions\InvalidArgumentException
+     * @throws \Exception
      */
     public function __invoke(RequestInterface $request): ResponseInterface
     {
@@ -52,7 +54,8 @@ class AddLayoutController extends \basteyy\Webstatt\Controller\Controller
 
                 $data = [
                     'name' => $request->getParsedBody()['name'],
-                    'activated' => isset($request->getParsedBody()['activated'])
+                    'activated' => isset($request->getParsedBody()['activated']),
+                    'secret' => getRandomAlphaString(16)
                 ];
 
                 $model->create($data);

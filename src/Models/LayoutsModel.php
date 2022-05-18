@@ -25,4 +25,9 @@ final class LayoutsModel extends Model
     public function findByName(string $layoutName) : LayoutEntity|null {
         return $this->_findByOneArgument('name', '=', $layoutName);
     }
+
+    public function findBySecret(string $secret_key)
+    {
+        return $this->_findByOneArgument('secret', '=', $secret_key);
+    }
 }

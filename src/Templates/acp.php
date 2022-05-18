@@ -64,7 +64,7 @@ $User = $this->getUser();
 
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-xxl">
+    <div class="container-fluid">
         <a class="navbar-brand" href="<?= $this->getAbsoluteUrl('/admin/dashboard') ?>">
             <?= __('Webstatt') ?>
         </a>
@@ -97,6 +97,16 @@ $User = $this->getUser();
                             </a>
                         </li>
 
+
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item py-md-3" href="<?= $this->getAbsoluteUrl('/admin/files') ?>" role="button"><i class="mx-md-2 bi bi-speedometer"></i> <?= __('Filebrowser') ?>
+                            </a>
+                        </li>
+
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -126,11 +136,6 @@ $User = $this->getUser();
 
 
                     </ul>
-                </li>
-
-                <li class="nav-item mx-lg-3">
-                    <a class="nav-link" href="<?= $this->getAbsoluteUrl('/admin/files') ?>" role="button"><i class="mx-md-2 bi bi-speedometer"></i> <?= __('Filebrowser') ?>
-                    </a>
                 </li>
 
 
@@ -167,6 +172,16 @@ $User = $this->getUser();
                     }
                 }
                 ?>
+            </ul>
+            <ul class="navbar-nav me-0 mb-2 mb-lg-0">
+
+                <?php
+                if ($this->getUser()->isAdmin()) {
+                    echo $this->fetch('Webstatt::partials/admin_settings_dropdown');
+                }
+                ?>
+
+
                 <li class="nav-item dropdown mx-lg-3">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="mx-md-2 bi bi-person"></i> <?= __('Your Account') ?>
@@ -202,14 +217,6 @@ $User = $this->getUser();
                         </li>
                     </ul>
                 </li>
-            </ul>
-            <ul class="navbar-nav me-0 mb-2 mb-lg-0">
-
-                <?php
-                if ($this->getUser()->isAdmin()) {
-                    echo $this->fetch('Webstatt::partials/admin_settings_dropdown');
-                }
-                ?>
 
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="<?= $this->getAbsoluteUrl('/') ?>" title="<?= __('Go to the website') ?>">

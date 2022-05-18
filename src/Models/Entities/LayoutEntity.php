@@ -19,6 +19,8 @@ class LayoutEntity extends Entity implements EntityInterface
     /** @var string $name Name of the layout */
     protected string $name;
 
+    protected string $secret;
+
     /** @var bool $activated True if the layout is ready to use */
     protected bool $activated;
 
@@ -31,7 +33,8 @@ class LayoutEntity extends Entity implements EntityInterface
      * Return the name of the layout
      * @return string
      */
-    public function getName() : string {
+    public function getName(): string
+    {
         return $this->name;
     }
 
@@ -39,7 +42,8 @@ class LayoutEntity extends Entity implements EntityInterface
      * Return the state of activation of the layout
      * @return bool
      */
-    public function isActivated() : bool {
+    public function isActivated(): bool
+    {
         return $this->activated;
     }
 
@@ -47,11 +51,20 @@ class LayoutEntity extends Entity implements EntityInterface
      * Get the Storage helper to get access to the file
      * @return LayoutStorageHelper
      */
-    public function getStorage() : LayoutStorageHelper {
-        if(!isset($this->layoutStorageHelper)) {
+    public function getStorage(): LayoutStorageHelper
+    {
+        if (!isset($this->layoutStorageHelper)) {
             $this->layoutStorageHelper = new LayoutStorageHelper($this);
         }
 
         return $this->layoutStorageHelper;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSecret(): string
+    {
+        return $this->secret;
     }
 }

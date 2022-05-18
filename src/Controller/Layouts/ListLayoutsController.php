@@ -25,9 +25,10 @@ class ListLayoutsController extends \basteyy\Webstatt\Controller\Controller
         LayoutsModel::class
     ];
 
+    protected LayoutsModel $LayoutsModel;
+
     public function __invoke(): ResponseInterface
     {
-        varDebug($this->LayoutsModel);
         if ($this->isPost()) {
 
 
@@ -35,7 +36,7 @@ class ListLayoutsController extends \basteyy\Webstatt\Controller\Controller
         }
 
         return $this->adminRender('layouts/list', [
-            'layouts' => []
+            'layouts' => $this->LayoutsModel->getAll()
         ]);
     }
 

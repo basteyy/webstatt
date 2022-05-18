@@ -129,6 +129,8 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
     $proxy->group('/layouts', function (RouteCollectorProxy $proxy) {
         $proxy->any('', \basteyy\Webstatt\Controller\Layouts\ListLayoutsController::class);
         $proxy->any('/add', \basteyy\Webstatt\Controller\Layouts\AddLayoutController::class);
+        $proxy->any('/edit/{secret_key}', \basteyy\Webstatt\Controller\Layouts\EditLayoutController::class);
+        $proxy->any('/delete/{secret_key}_{id}', \basteyy\Webstatt\Controller\Layouts\DeleteLayoutController::class);
     });
 
 
