@@ -36,14 +36,14 @@ class SelfUpdateController extends Controller
 
             FlashMessages::addSuccessMessage(__('Self Update executed'));
 
-            $output = $process->getOutput();
+            $output = 'Update Output:<br />' . PHP_EOL . $process->getOutput() . '<hr />';
         }
 
         $process = new \Symfony\Component\Process\Process(['composer', 'info'], ROOT);
         $process->enableOutput();
         $process->run();
 
-        $output .= PHP_EOL . PHP_EOL . PHP_EOL . $process->getOutput();
+        $output .= $process->getOutput();
 
 
         return $this->render('Webstatt::settings/self_update', ['process' => $output]);
