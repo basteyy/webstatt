@@ -26,24 +26,26 @@ class SelfUpdateController extends Controller
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
 
+        $output = '';
+
         if ($this->isPost()) {
             /** Sync from github */
-            $process = new \Symfony\Component\Process\Process(['composer', 'update basteyy/webstatt'], ROOT);
+            $process = new \Symfony\Component\Process\Process(['composer', 'update', 'basteyy/webstatt', '--no-interaction'], ROOT);
             $process->enableOutput();
-            $process->start();
-
-            while ($process->isRunning()) {
-                // waiting for process to finish
-            }
+            $process->run();
 
             FlashMessages::addSuccessMessage(__('Self Update executed'));
 
-        } else {
-            $process = new \Symfony\Component\Process\Process(['composer', 'info'], ROOT);
-            $process->enableOutput();
-            $process->run();
+            $output = $process->getOutput();
         }
 
-        return $this->render('Webstatt::settings/self_update', ['process' => $process->getOutput()]);
+        $process = new \Symfony\Component\Process\Process(['composer', 'info'], ROOT);
+        $process->enableOutput();
+        $process->run();
+
+        $output .= PHP_EOL . PHP_EOL . PHP_EOL . $process->getOutput();
+
+
+        return $this->render('Webstatt::settings/self_update', ['process' => $output]);
     }
 }
