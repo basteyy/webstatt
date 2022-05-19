@@ -93,14 +93,14 @@ $this->layout('Webstatt::acp', ['title' => __('Add a new page')]);
             if ($this->getLayouts()) {
                 echo $this->fetch('Webstatt::pages/layouts_select');
             } else {
-                printf('<div class="alert alert-danger" role="alert">%s</div>', __('You cannot create a page without a layout. Create a new layout (Content - Layouts) or define one inside the code'));
+                printf('<div class="alert alert-danger" role="alert">%s</div>', __('No layouts added.'));
             }
             ?></div>
     </div>
 
 
     <div class="col-12">
-        <input <?= !$this->getLayouts() ? 'disabled':'' ?> type="submit" class="btn btn-primary" value="<?= __('Save') ?>"/>
+        <input type="submit" class="btn btn-primary" value="<?= __('Save') ?>"/>
     </div>
 </form>
 

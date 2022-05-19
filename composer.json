@@ -22,21 +22,22 @@
   ],
   "require": {
     "slim/slim": "4.*",
-    "league/plates": "^3.4",
-    "slim/psr7": "^1.5",
-    "php-di/slim-bridge": "^3.2",
-    "filp/whoops": "^2.14",
+    "league/plates": "3.*",
+    "slim/psr7": "1.*",
+    "php-di/slim-bridge": "3.*",
+    "filp/whoops": "2.*",
     "basteyy/plates-url-toolset": "dev-master",
     "basteyy/plates-local-assets-copy": "dev-master",
     "basteyy/scss-php-builder": "dev-master",
     "basteyy/various-php-snippets": "dev-master",
-    "rakibtg/sleekdb": "^2.13",
-    "basteyy/minimal-hash-wrapper": "^1.0",
+    "rakibtg/sleekdb": "2.*",
+    "basteyy/minimal-hash-wrapper": "1.*",
     "bryanjhv/slim-session": "dev-master",
-    "erusev/parsedown": "^1.7.4",
+    "erusev/parsedown": "1.*",
     "ext-apcu": "*",
-    "phpmailer/phpmailer": "^v6.6.0",
-    "ext-ctype": "*"
+    "phpmailer/phpmailer": "v6.*",
+    "ext-ctype": "*",
+    "symfony/process": "6.*"
   },
   "config": {
     "sort-packages": true

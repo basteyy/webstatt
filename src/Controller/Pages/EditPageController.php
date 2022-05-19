@@ -58,7 +58,7 @@ class EditPageController extends Controller
                 'title'       => $request->getParsedBody()['title'],
                 'description' => $request->getParsedBody()['description'],
                 'keywords'    => $request->getParsedBody()['keywords'],
-                'layout'      => $request->getParsedBody()['layout'],
+                'layout'      => $request->getParsedBody()['layout'] ?? 'no_design',
                 'online'    => (bool)$request->getParsedBody()['online'],
                 'startpage' => (bool)$request->getParsedBody()['startpage'],
                 //'body'        => $request->getParsedBody()['body'],

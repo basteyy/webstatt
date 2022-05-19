@@ -28,7 +28,7 @@ class PageEntity extends Entity implements EntityInterface
     protected bool $online;
     protected bool $startpage;
     protected string $secret;
-    protected string $layout;
+    protected string $layout = 'no_design';
     protected PageType $pageType;
 
     /** @var string $cache_key_name Key for storing the page in cache */

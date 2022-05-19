@@ -56,7 +56,7 @@ class AddPageController extends Controller
                 'description'  => $request->getParsedBody()['description'],
                 'keywords'     => $request->getParsedBody()['keywords'],
                 'pageType'     => $request->getParsedBody()['PageType'],
-                'layout'       => $request->getParsedBody()['layout'],
+                'layout'       => $request->getParsedBody()['layout'] ?? 'no_design',
                 'online'    => (bool)$request->getParsedBody()['online'],
                 'startpage' => (bool)$request->getParsedBody()['startpage'],
                 'secret'       => getRandomString(18)

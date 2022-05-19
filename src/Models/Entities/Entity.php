@@ -53,7 +53,7 @@ class Entity implements EntityInterface
                 $this->accessible_properties[] = $name;
 
                 /**Enum? */
-                if ($name !== $primary_id_name && $this->reflectionClass->getProperty($name)->getType()->isBuiltin()) {
+                if ($this->reflectionClass->getProperty($name)->getType()->isBuiltin()) {
 
                     $this->{$name} = match ($this->reflectionClass->getProperty($name)->getType()->getName()) {
                         'int' => (int)$value,

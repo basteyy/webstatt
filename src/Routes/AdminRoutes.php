@@ -133,9 +133,10 @@ $this->app->group('/admin', function (RouteCollectorProxy $proxy) {
         $proxy->any('/delete/{secret_key}_{id}', \basteyy\Webstatt\Controller\Layouts\DeleteLayoutController::class);
     });
 
+    /** Webstatt Self Update */
+    $proxy->any('/self-update', \basteyy\Webstatt\Controller\Settings\SelfUpdateController::class);
 
-
-        /** Pages Routes */
+    /** Pages Routes */
     $proxy->group('/pages', function (RouteCollectorProxy $proxy) {
 
         /** List all Pages */
