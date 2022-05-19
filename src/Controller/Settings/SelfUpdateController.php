@@ -30,7 +30,11 @@ class SelfUpdateController extends Controller
             /** Sync from github */
             $process = new \Symfony\Component\Process\Process(['composer', 'update basteyy/webstatt'], ROOT);
             $process->enableOutput();
-            $process->run();
+            $process->start();
+
+            while ($process->isRunning()) {
+                // waiting for process to finish
+            }
 
             FlashMessages::addSuccessMessage(__('Self Update executed'));
 
